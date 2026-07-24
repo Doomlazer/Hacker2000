@@ -18,6 +18,7 @@ let mapInc = 2;
 let mapSel = [];
 let cities = [];
 let nodes = [];
+let audio = [];
 let mapNodeSteps = 0;
 let mapNodeStackSteps = 0;
 let mapCitiesSteps = 0;

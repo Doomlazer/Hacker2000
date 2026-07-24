@@ -249,6 +249,29 @@ class aniRect {
                         }
                     }
                 }
+            } else if (command[0].toLowerCase() == "hangup") {
+                    
+
+            } else if (command[0].toLowerCase() == "dial") {
+                // call number
+                let samples = ["freesound_community-answering-machine-107318.mp3",
+                    "freesound_community-answering-machine-beeps-clicks-phone-line-hum-april-95wav-14468.mp3",
+                    "freesound_community-answering-machine-female-out-of-town-103769.mp3",
+                    "freesound_community-answering-machine-voice-1-26679.mp3",
+                    "freesound_community-girl-voice-answering-phone-100740.mp3",
+                    "freesound_community-phone-outgoing-call-72202.mp3",
+                    "freesound_community-telephone_-_pick_up_hang_up_01_l_close_r_distant-32416.mp3",
+                    "gautawa-old-phone-ring-272648.mp3",
+                    "kave_msri-phone-calling-sfx-333916.mp3",
+                    "locrpg-911-whats-your-emergency-104104.mp3",
+                    "freesound_community-noanswer-33477.mp3",
+                    "lucadialessandro-unavailable-phone-192489.mp3"];
+                
+                audio.push(`./sfx/phone/${samples[getRandInt(samples.length)]}`);
+                this.setText(`Dailing... ${command[1]}`);
+                playDTMF(command[1]+"rh");
+                
+                
             } else if (command[0].toLowerCase() == "map") {
                 let helpText = "Map Help:\n" +
                                 "Various map related options\n" +
