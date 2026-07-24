@@ -18,40 +18,47 @@ function draw() {
     drawCursor();
 }
 
-function drawCords(cords) {
-    for (let j = 0; j < cords.length; j++) {
-        //console.log("cords[j].length: " + cords[j].length)
-        if (cords[j].length > 1) {
-            // draw that map incremenetally
-            if (mapStepsMax < cords[j].length-1) {
-                mapStepsMax = cords[j].length-1;
-            }
-            for (let k = 0; k < cords[j].length-1; k++) {
-                if (k < mapSteps) {
-                    const myLine = [((cords[j][k][0] * mapScale) + mapXOff),
-                                    ((-(cords[j][k][1]) * mapScale) + mapYOff),
-                                    ((cords[j][k+1][0] * mapScale) + mapXOff),
-                                    ((-(cords[j][k+1][1]) * mapScale) + mapYOff)];
-                    drawLineMap(myLine);
-                }
-            }
-        } else {
-            if (mapStepsMax < cords[j][0].length-1) {
-                mapStepsMax = cords[j][0].length-1;
-            }
-            for (let k = 0; k < cords[j][0].length-1; k++) {
-                if (k < mapSteps) {
-                    for (let t = 0; t < cords[j].length; t++) {
-                        const myLine = [((cords[j][t][k][0] * mapScale) + mapXOff),
-                                    ((-(cords[j][t][k][1]) * mapScale) + mapYOff),
-                                    ((cords[j][t][k+1][0] * mapScale) + mapXOff),
-                                    ((-(cords[j][t][k+1][1]) * mapScale) + mapYOff)];
-                        drawLineMap(myLine);
-                    }
-                }
-            }
+function drawCoords(coords) {
+
+    function drawLine(points) {
+        if (points.length < 2) return;
+
+        mapStepsMax = Math.max(mapStepsMax, points.length - 1);
+
+        const max = Math.min(mapSteps, points.length - 1);
+
+        for (let i = 0; i < max; i++) {
+            drawLineMap([
+                points[i][0] * mapScale + mapXOff,
+                -points[i][1] * mapScale + mapYOff,
+                points[i + 1][0] * mapScale + mapXOff,
+                -points[i + 1][1] * mapScale + mapYOff
+            ]);
         }
     }
+
+    function walk(node) {
+
+        if (!Array.isArray(node) || node.length === 0)
+            return;
+
+        // Are we looking at an array of [lon, lat] pairs?
+        if (
+            Array.isArray(node[0]) &&
+            node[0].length >= 2 &&
+            typeof node[0][0] === "number"
+        ) {
+            drawLine(node);
+            return;
+        }
+
+        // Otherwise recurse into the next level.
+        for (const child of node) {
+            walk(child);
+        }
+    }
+
+    walk(coords);
 }
 
 function drawMap() {
@@ -77,12 +84,12 @@ function drawMap() {
                 if (f.properties.name == player.selcountry) {
                     mapSel = cords;
                 }
-                drawCords(cords);
+                drawCoords(cords);
             }
         }
         // highlight the selected country
         ctxMap.strokeStyle = '#f35303';
-        drawCords(mapSel);
+        drawCoords(mapSel);
         //console.log("mapSel (" + player.selcountry + "):");
         //console.log(mapSel);
         //console.log("mapInc: " + mapInc + ", mapSteps: " + mapSteps + ", mapStepsMax: " + mapStepsMax);
