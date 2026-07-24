@@ -16,8 +16,8 @@ function doMouseMove(e) {
     if (mouseDown) {
         mapXOff = oldOffX - ((mouseDownX - mouseX));
         mapYOff = oldOffY - ((mouseDownY - mouseY));
-        mapSteps = 3;
-        mapInc = 2;
+        mapSteps = 1;
+        mapInc = 1;
         mapCitiesSteps = 0;
         mapNodeSteps = 0;
         mapNodeStackSteps = 0;

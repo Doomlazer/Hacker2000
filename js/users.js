@@ -29,5 +29,6 @@ class Player extends User{
         this.drawNodes = true;
         this.drawNodeStack = true;
         this.selCountry = locations[gUsers.length].address.country;
+        this.selectedCountry;
     }
 }

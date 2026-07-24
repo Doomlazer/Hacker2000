@@ -32,6 +32,9 @@
     <canvas id="canvasMap" width="1" height="1" style="border:2px solid #000000; display: none;">
       Your browser does not support the HTML5 canvas tag.
     </canvas>
+    <canvas id="canvasMarkers" width="1" height="1" style="border:2px solid #000000; display: none;">
+      Your browser does not support the HTML5 canvas tag.
+    </canvas>
   </div>
 
   <script>
@@ -39,6 +42,8 @@
     const ctx = c.getContext("2d");
     const cMap = document.getElementById("canvasMap");
     const ctxMap = cMap.getContext("2d");
+    const cMarkers = document.getElementById("canvasMarkers");
+    const ctxMarkers = cMap.getContext("2d");
   </script>
 </body>
 </html>

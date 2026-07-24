@@ -55,10 +55,12 @@ function drawCords(cords) {
 }
 
 function drawMap() {
+    let mouseLabel = "";
     if (updateMap || mapSteps < mapStepsMax) {
         // draw map a bit at a time
         mapSteps += mapInc;
-        mapInc = mapInc + (mapInc/8);
+        mapInc ++;
+        //mapInc = mapInc + (mapInc/8);
         if (mapSteps > mapStepsMax) {mapSteps = mapStepsMax}
         updateMap = false;
 
@@ -72,7 +74,7 @@ function drawMap() {
                 //console.log("Drawling country: " + f.properties.name);
                 const cords = f.geometry.coordinates;
                 //let cl = cords.length;
-                if (f.properties.name == player.selCity) {
+                if (f.properties.name == player.selcountry) {
                     mapSel = cords;
                 }
                 drawCords(cords);
@@ -81,22 +83,27 @@ function drawMap() {
         // highlight the selected country
         ctxMap.strokeStyle = '#f35303';
         drawCords(mapSel);
-        //console.log("mapSel (" + player.selCity + "):");
+        //console.log("mapSel (" + player.selcountry + "):");
         //console.log(mapSel);
         //console.log("mapInc: " + mapInc + ", mapSteps: " + mapSteps + ", mapStepsMax: " + mapStepsMax);
     }
 
     ctx.drawImage(cMap, 0, 0);
 
+    // clear mapMarkers ctx if map reset
+    if (mapSteps == 1) {
+        ctxMarkers.fillStyle = '#000000';
+        ctxMarkers.fillRect(0, 0, c.width, c.height);
+    }
     // Draw Cities
     if (mapSteps >= mapStepsMax && player.drawCities) {
         mapCitiesSteps += 1 + mapCitiesSteps/4;
         for (let i = 0; i < cities.length; i++) {
             if (i < mapCitiesSteps) {
                 // loc
-                ctx.strokeStyle = '#0048ff';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(((cities[i].lon) * mapScale) + mapXOff,
+                ctxMarkers.strokeStyle = '#0048ff';
+                ctxMarkers.lineWidth = 1;
+                ctxMarkers.strokeRect(((cities[i].lon) * mapScale) + mapXOff,
                                 (-(cities[i].lat) * mapScale) + mapYOff,
                                 1 * mapScale, 1 * mapScale);
                 //console.log(locations[player.uid].address.country);
@@ -105,26 +112,24 @@ function drawMap() {
                     mouseX < (cities[i].lon * mapScale) + mapXOff + (1 * mapScale) &&
                     mouseY > (-(cities[i].lat) * mapScale) + mapYOff &&
                     mouseY < (-(cities[i].lat) * mapScale) + mapYOff + (1 * mapScale)) {
-                    // move map to named loc
+                    // move map to named location
+                    // //mouseDeatil is number of clicks, we wait for two or more
                     if (mouseDetail > 1) {
-                        mapScale = 7;
+                        mapScale = 20;
                         mapXOff = (getWidth()/3*2) - ((cities[i].lon) * mapScale);
                         mapYOff = (getHeight()/2) - (-(cities[i].lat) * mapScale);
                         mapSteps = 30;
                         mapNodeSteps = 0;
                         mapInc = 2;
-                        player.selCity = cities[i].country;
+                        player.selcountry = cities[i].country;
                         cast[0].text = `Selected city ${cities[i].name}, ${cities[i].country}`;
                         cast[0].setText(cast[0].text);
                         cast[0].textDisplayChar = 0;
+                        player.selectedCity = cities[i];
                         drawMap();
                     }
-                    ctx.fillStyle = '#FF0000';
-                    ctx.font = scaleFont(0.018, "arial");
-                    ctx.fillText(cities[i].name + ", " + cities[i].country +
-                                ", population: " + (cities[i].population),
-                                ((cities[i].lon) * mapScale) + mapXOff,
-                                (-(cities[i].lat) * mapScale) + mapYOff);
+                    mouseLabel = cities[i].name + ", " + cities[i].country +
+                                ", population: " + (cities[i].population);
                 }
             }           
         }
@@ -140,9 +145,9 @@ function drawMap() {
                     mouseY > (-(nodes[i].latitude) * mapScale) + mapYOff &&
                     mouseY < (-(nodes[i].latitude) * mapScale) + mapYOff + (1 * mapScale)) {
                     // draw highlighted loc marker
-                    ctx.strokeStyle = '#35e60e';
-                    ctx.lineWidth = 3;
-                    ctx.strokeRect(((nodes[i].longitude) * mapScale) + mapXOff,
+                    ctxMarkers.strokeStyle = '#35e60e';
+                    ctxMarkers.lineWidth = 3;
+                    ctxMarkers.strokeRect(((nodes[i].longitude) * mapScale) + mapXOff,
                                     (-(nodes[i].latitude) * mapScale) + mapYOff,
                                     5,5); 
                     // move map to named loc
@@ -153,7 +158,7 @@ function drawMap() {
                         mapSteps = 30;
                         mapNodeSteps = 0;
                         mapInc = 2;
-                        player.selCity = nodes[i].country;
+                        player.selcountry = nodes[i].country;
                         cast[0].text = `Selected node: ${nodes[i].city}, ${nodes[i].country} \n
                                         ${nodes[i].router.manufacturer} ${nodes[i].router.model} 
                                         IP: ${nodes[i].ip_address} `;
@@ -163,24 +168,29 @@ function drawMap() {
                     }
 
                     // text label
-                    ctx.fillStyle = '#c37105d8';
-                    ctx.font = scaleFont(0.018, "arial");
-                    ctx.fillText(nodes[i].city + ", " + nodes[i].country +
+                    ctxMarkers.fillStyle = '#c37105d8';
+                    ctxMarkers.font = scaleFont(0.018, "arial");
+                    /*ctxMarkers.fillText(nodes[i].city + ", " + nodes[i].country +
                                 ", " + (nodes[i].router.manufacturer) +
                                 " " + (nodes[i].router.model),
                                 ((nodes[i].longitude) * mapScale) + mapXOff,
-                                (-(nodes[i].latitude) * mapScale) + mapYOff);
+                                (-(nodes[i].latitude) * mapScale) + mapYOff);*/
+                    mouseLabel = nodes[i].city + ", " + nodes[i].country +
+                                ", " + (nodes[i].router.manufacturer) +
+                                " " + (nodes[i].router.model)
                 } else {
                     // standard node marker color
-                    ctx.strokeStyle = '#d4ff00';
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(((nodes[i].longitude) * mapScale) + mapXOff,
+                    ctxMarkers.strokeStyle = '#d4ff00';
+                    ctxMarkers.lineWidth = 1;
+                    ctxMarkers.strokeRect(((nodes[i].longitude) * mapScale) + mapXOff,
                                     (-(nodes[i].latitude) * mapScale) + mapYOff,
                                     5,5);
                 } 
             }          
         }
     }
+
+    ctx.drawImage(cMarkers, 0, 0);
 
     // draw network proxy connections on map
     if (mapSteps >= mapStepsMax && player.drawNodes) {
@@ -200,6 +210,32 @@ function drawMap() {
             }
         }
     }
+
+    // draw the mouse hover label
+    ctx.fillStyle = '#ff3838';
+    ctx.font = scaleFont(0.018, "arial");
+    ctx.fillText(mouseLabel, mouseX, mouseY);
+
+    if (player.selectedCity && mapCitiesSteps > 1) {
+        let city = player.selectedCity;
+
+        // loc marker
+        ctx.strokeStyle = '#00FF00';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(((city.lon) * mapScale) + mapXOff,
+                        (-(city.lat) * mapScale) + mapYOff,
+                        1 * mapScale, 1 * mapScale);
+
+        // loc label
+        ctx.fillStyle = '#20974c';
+        ctx.font = scaleFont(0.018, "arial");
+        let lt = city.name + ", " + city.country + ", population: " + (city.population);
+        console.log("selectedCityLabel" + lt);
+        ctx.fillText(lt,
+                    ((city.lon) * mapScale) + mapXOff,
+                    (-(city.lat) * mapScale) + mapYOff);
+    }
+
     drawIcon();
 }
 
