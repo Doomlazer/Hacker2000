@@ -22,6 +22,7 @@ let audio = [];
 let mapNodeSteps = 0;
 let mapNodeStackSteps = 0;
 let mapCitiesSteps = 0;
+let movingMap = false;
 
 function init() {
     window.addEventListener('click', doClick);
@@ -32,6 +33,8 @@ function init() {
     window.addEventListener('wheel', doWheel);
     //window.addEventListener("keyup", kUp);
     window.addEventListener('resize', doResize);
+
+    document.addEventListener("gesturestart", e => e.preventDefault(), { passive: false });
     doResize();
     mapXOff = getWidth()/3 * 2;
     mapYOff = getHeight()/2;

@@ -11,6 +11,7 @@ mouseDetail = 0;
 
 function doWheel(e) {
     let adjustedWindow = false;
+    // scale the cast member if mouse hover
     for (let w = 0; w < cast.length; w ++) {
         let c = cast[w];
         if (mouseX > c.x1 &&
@@ -43,7 +44,7 @@ function doWheel(e) {
             drawMap();
         }
     }
-    
+    // or scale the map
     if (!adjustedWindow) {
         mapScale -= e.deltaY/100;
         if (mapScale < 1) {
@@ -76,40 +77,45 @@ function doMouseMove(e) {
     mouseY = e.y - 25;
     mouseDetail = e.detail;
     if (mouseDown) {
-        for (let w = 0; w < cast.length; w ++) {
-            let c = cast[w];
-            if (mouseX > c.x1 &&
-                mouseX < c.x1 + c.xW &&
-                mouseY > c.y1 &&
-                mouseY < c.y1 + c.yH) {
-                    
-                adjustedWindow = true;
-                // scale w and h by vertical scroll amount
-                //c.x1 = oldOffX - ((mouseDownX - mouseX));
-                //c.y1 = oldOffY - ((mouseDownY - mouseY));
-                //c.x1 = (mouseDownX - mouseX) - (c.xW/2);
-                //c.y1 = (mouseDownY - mouseY) - (c.yH/2);
-                c.x1 = oldOffX - ((mouseDownX - mouseX));
-                c.y1 = oldOffY - ((mouseDownY - mouseY));
-                // clear
-                ctx.fillStyle = '#000000';
-                ctx.fillRect(0, 0, c.width, c.height);
-                // clear
-                ctxMap.fillStyle = '#000000';
-                ctxMap.fillRect(0, 0, c.width, c.height);
-                // clear
-                ctxMarkers.fillStyle = '#000000';
-                ctxMarkers.fillRect(0, 0, c.width, c.height);
-                //c.updateMap = true;
-                c.setText(c.text);
-                mapSteps = 1;
-                mapInc = 1;
-                mapCitiesSteps = 0;
-                mapNodeSteps = 0;
-                mapNodeStackSteps = 0;
-                drawMap();
+        if (!movingMap) {
+            // drag windows
+            for (let w = 0; w < cast.length; w ++) {
+                let c = cast[w];
+                if (mouseX > c.x1 &&
+                    mouseX < c.x1 + c.xW &&
+                    mouseY > c.y1 &&
+                    mouseY < c.y1 + c.yH) {
+                        
+                    adjustedWindow = true;
+                    // scale w and h by vertical scroll amount
+                    //c.x1 = oldOffX - ((mouseDownX - mouseX));
+                    //c.y1 = oldOffY - ((mouseDownY - mouseY));
+                    //c.x1 = (mouseDownX - mouseX) - (c.xW/2);
+                    //c.y1 = (mouseDownY - mouseY) - (c.yH/2);
+                    c.x1 = oldOffX - ((mouseDownX - mouseX));
+                    c.y1 = oldOffY - ((mouseDownY - mouseY));
+                    // clear
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(0, 0, c.width, c.height);
+                    // clear
+                    ctxMap.fillStyle = '#000000';
+                    ctxMap.fillRect(0, 0, c.width, c.height);
+                    // clear
+                    ctxMarkers.fillStyle = '#000000';
+                    ctxMarkers.fillRect(0, 0, c.width, c.height);
+                    //c.updateMap = true;
+                    //c.setText(c.text);
+                    mapSteps = 1;
+                    mapInc = 1;
+                    mapCitiesSteps = 0;
+                    mapNodeSteps = 0;
+                    mapNodeStackSteps = 0;
+                    drawMap();
+                }
             }
         }
+
+        // drag map
         if (!adjustedWindow) {
             mapXOff = oldOffX - ((mouseDownX - mouseX));
             mapYOff = oldOffY - ((mouseDownY - mouseY));
@@ -134,6 +140,7 @@ function doClick(e) {
 }
 
 function doMouseDown(e) {
+    movingMap = false;
     mouseDown = true;
     //mapScale = 7;
     mouseDetail = e.detail;
@@ -152,6 +159,7 @@ function doMouseDown(e) {
                 //mouseDownY = mouseY + c.y1;
                 drawMap();
         } else {
+            movingMap = true;
             oldOffX = mapXOff;
             oldOffY = mapYOff;
             mouseDownX = mouseX;
@@ -163,6 +171,7 @@ function doMouseDown(e) {
 
 function doMouseUp(e) {
     mouseDown = false;
+    movingMouse = false;
     mouseDetail = e.detail;
     //mapScale = 4
     mouseDownX = 0;

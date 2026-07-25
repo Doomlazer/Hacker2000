@@ -582,12 +582,13 @@ class aniRect {
     closedState() {
         this.textDisplayChar = 0;
         //console.log(`cast.indexOf(this): ${cast.indexOf(this)}`)
-        if (this.delete) {
+        if (cast[cast.indexOf(this)] == 0) {
+            // always reopen players computer
+             this.setOpen = true;
+        } else if (this.delete) {
+            // flush it
             const s = cast.splice(1, cast.indexOf(this));
             cast = s;
-            let testRect = new aniRect(getRandInt(getWidth()), getRandInt(getHeight()),
-                                        500, 500);
-            cast.push(testRect);
         }
     }
 
