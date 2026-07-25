@@ -29,6 +29,7 @@ function init() {
     window.addEventListener('mousemove', doMouseMove);
     window.addEventListener('mousedown', doMouseDown);
     window.addEventListener('mouseup', doMouseUp);
+    window.addEventListener('wheel', doWheel);
     //window.addEventListener("keyup", kUp);
     window.addEventListener('resize', doResize);
     doResize();
