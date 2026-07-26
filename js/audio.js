@@ -1,4 +1,6 @@
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const gainNode = audioContext.createGain();
+
 function playTone(digit, dur) {
     const frequencies = {
         '1': [697, 1209],
@@ -39,11 +41,11 @@ function playTone(digit, dur) {
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-function setAudioSource(path) {
+function setAudioSource(path, bkgrnd = false) {
     // Create a new buffer source
     const source = audioContext.createBufferSource();
     audio.push(source);
-    console.log(audio)
+    console.log(audio);
 
     // Load audio data
     fetch(path)
@@ -53,8 +55,22 @@ function setAudioSource(path) {
             source.buffer = buffer; // Set the buffer to the source
             source.connect(audioContext.destination); // Connect to the destination
             source.start(0); // Play the audio
+            source.addEventListener("ended", (e) => {
+                if (player.musicOn && bkgrnd) {
+                    playMusic();
+                }
+                console.log(`Audio has finished playing. ${source}`);
+            });
+            return source;
         })
         .catch(error => console.error('Error loading audio:', error));
+}
+
+function playMusic() {
+    let path = `./sfx/music/stub.mp3`;
+    backgroundMusic = setAudioSource(path);
+    gainNode.gain.value = 0.1; // setting it to 10%
+    //gainNode.connect(backgroundMusic);
 }
  
 async function playDTMF(sequence, toneDuration = 0.06, gap = 0.02) {
@@ -82,3 +98,4 @@ async function playDTMF(sequence, toneDuration = 0.06, gap = 0.02) {
         }
     }
 }
+

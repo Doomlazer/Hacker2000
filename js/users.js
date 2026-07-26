@@ -34,5 +34,7 @@ class Player extends User{
         this.selectedCountry;
         this.proxyWindow = [];
         this.unactivated = true;
+        this.musicOn = false;
+        this.musicVol = 50;
     }
 }

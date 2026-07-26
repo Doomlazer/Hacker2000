@@ -18,6 +18,7 @@ let mapInc = 2;
 let mapSel = [];
 let cities = [];
 let nodes = [];
+let backgroundMusic;
 let audio = [];
 let mapNodeSteps = 0;
 let mapNodeStackSteps = 0;
@@ -67,6 +68,7 @@ function loadCities() {
             locations[0].homeowner = player.name;
             //player.askedForName = true;
             gUsers.push(player);
+            playMusic(); // background musics
 
             let playersComp = new aniRect(getWidth()/20, getHeight()/8, getWidth()/3, getHeight()/1.5);
             playersComp.admins.push(0); // add player as admin to own computer

@@ -9,7 +9,7 @@ class aniRect {
         this.boarderLineWidth = 5;
         this.toOpen = true;
         this.delete = false;
-        this.aniSpeed = 0.01;
+        this.aniSpeed = 30.1;
         this.ease = 0.075;
         this.x1 = x; // start
         this.y1 = y;
@@ -34,15 +34,29 @@ class aniRect {
         this.typingEffect = true;
         this.date = "07/18/2026:19:37"
         this.locNum = cast.length;
-        this.text = `Welcome to the mal-90 OS\nIt's ${this.date}`;
         this.inputStr = "";
         this.acceptInput = true;
         this.lastInput = "";
         this.promptChar = ">";
         this.authTries = 0;
+        this.proxyWindow = [];
+        this.type = "none";
+        this.wheelOff = 0;
+        this.text = `Welcome to the mal-90 OS\nIt's ${this.date}`;
+        this.proxyFontSize = 12;
+        this.proxyText = "Proxy List:\n"
+        this.proxyBackgroundColor = '#3d0240'
+        this.proxyRectColor = '#ec32f6'
+        this.proxyTextColor = '#db96de'
+        this.proxyIsRounded = false;
+        this.proxyHasBoarder = false;
+        this.pX1 = getWidth()/25 * 15,
+        this.pY1 = getHeight()/8,
+        this.pXW = getWidth()/6,
+        this.pYH = getHeight()/1.5
     }
 
-    setText(theText) {
+    setText(theText, prompt = true) {
         // Set font and text color
         ctx.fillStyle = this.textColor;
         ctx.font = this.fontSize + "px " + this.textFont;
@@ -57,7 +71,9 @@ class aniRect {
         }
         
         // add the input prompt
+        if (prompt) {
         this.displayLines.push(this.promptChar);
+        }
     }
 
     clickHandler(e) {
@@ -156,8 +172,9 @@ class aniRect {
                 // check USERNAME
                 let notFound = true;
                 for (let i = 0; i < this.accounts.length; i++) {
-                    player.tryAuthName = command;
-                    //console.log(`trying ${this.accounts[i].user} == ${player.tryAuthName}`)
+                    if (player.unactivated && i == 1) {
+                        this.accounts[i].user = player.tryAuthName;
+                    }
                     if (this.accounts[i].user == player.tryAuthName) {
                         // the entered username was valid, ask for pwd
                         notFound = false;
@@ -165,7 +182,9 @@ class aniRect {
                         player.askedForName = false;
                         player.askedForPwd = true;
                         this.authTries = 0;
-                        this.setText("Enter password");
+                        this.text = nodes[player.nodeStack[player.nodeStack.length-1]].ip_address + 
+                                    " : Enter password";
+                        this.setText(this.text);
                     }
                 }
                 if (notFound) {
@@ -183,10 +202,18 @@ class aniRect {
                 player.tryAuthPwd = command;
                 let notFound = true;
                 console.log(`${this.accounts[player.authAccountIndex].pwd} == ${player.tryAuthPwd}`)
+                if (player.unactivated) {
+                    this.accounts[player.authAccountIndex].pwd = player.tryAuthPwd;
+                    player.unactivated = false;
+                }
                 if (this.accounts[player.authAccountIndex].pwd == player.tryAuthPwd) {
                     this.setText(`Welcome, ${this.accounts[player.authAccountIndex].user}`);
                     player.askedForPwd = false;
                     notFound = false;
+                    if (cast.indexOf(this) != 0) {
+                        player.nodeStack.push(this.id);
+                    }
+                    
                 }
                 if (notFound) {
                     this.authTries ++;
@@ -201,14 +228,55 @@ class aniRect {
             
             } else if (command[0].toLowerCase() == "exit") {
                 this.setText("Goodbye...");
+                if (player.nodeStack.length > 1) {
+                    player.nodeStack.pop();
+                    player.proxyWindow[0].wheelOff --;
+                    let text = this.proxyText;
+                    for (let i = 0; i < player.nodeStack.length-1; i++) {
+                        text += nodes[player.nodeStack[i]].ip_address + 
+                        " " +  locations[player.nodeStack[i]].address.country + "\n";
+                    }
+                    player.proxyWindow[0].displayLines = [];
+                    player.proxyWindow[0].text = text;
+                    console.log(player.proxyWindow[0].text)
+                    player.proxyWindow[0].setText(text, false);
+                } else {
                 this.toOpen = false;
                 this.delete = true;
+                }
+
+            } else if (command[0].toLowerCase() == "music") {
+                if (player.musicOn) {
+                    backgroundMusic.stop();
+                }
 
             } else if (command[0].toLowerCase() == "ssh") {
                 // accepts either ip or uNam@ip
+                // spawn proxy window if one doesn't exist
+                if (player.proxyWindow.length < 1) {
+                    let pw = new aniRect(this.pX1, this.pY1, this.pXW, this.pYH);
+                    //console.log("2nf " + cast[cast.length-1]);
+                    let text = this.proxyText;
+                    for (let i = 0; i < player.nodeStack.length-1; i++) {
+                        text += nodes[player.nodeStack[i]].ip_address + 
+                        " " +  locations[player.nodeStack[i]].address.country + "\n";
+                    }
+                    pw.fontSize = this.proxyFontSize;
+                    pw.text = text;
+                    pw.setText(text, false);
+                    pw.acceptInput = false;
+                    pw.backgroundColor = this.proxyBackgroundColor;
+                    pw.rectColor = this.proxyRectColor;
+                    pw.textColor = this.proxyTextColor
+                    pw.isRounded = this.proxyIsRounded;
+                    pw.hasBoarder = this.proxyHasBoarder;
+                    pw.type = "proxy";
+                    cast.push(pw);
+                    player.proxyWindow.push(pw);
+                }
                 // searches nodes until ip found and addis it to the connection chain
                 if (command.length < 2) {
-                    this.setText("shh help text");
+                    this.setText("ssh \- OpenSSH remote login client\n\tssh [ip address]\n\tssh [user]@[ip address]");
                 } else {
                     let addr = command[1].split("@");
                     let ip;
@@ -229,6 +297,24 @@ class aniRect {
                             console.log(i.id)
                             console.log(i)
                             player.nodeStack.push(i.id);
+            
+                            let text = this.proxyText;
+                            for (let i = 0; i < player.nodeStack.length; i++) {
+                                console.log(`player.nodeStack.length: ${player.nodeStack.length}`);
+                                console.log(player.nodeStack);
+                                console.log(`player.nodeStack[${i}]: ${player.nodeStack[i]}`);
+                                let str = nodes[player.nodeStack[i]].ip_address + 
+                                " " +  locations[player.nodeStack[i]].address.country + "\n";
+                                if (ctx.measureText(str) > player.proxyWindow[0].xW) {
+                                    player.proxyWindow[0].xW = ctx.measureText(str);
+                                }
+                                text += str;
+                            }
+                            player.proxyWindow[0].text = text;
+                            player.proxyWindow[0].setText(player.proxyWindow[0].text, false);
+
+
+                            console.log(`player.nodestack ${player.nodeStack}`);
                             notFound = false;
                         }
                     }
@@ -241,16 +327,26 @@ class aniRect {
                         if (this.accounts.includes(player.tryAuthName)) {
                             // found the username, skip to password
                             player.askedForPwd = true;
-                            this.setText("Enter password");
+                            this.setText(nodes[player.nodeStack[player.nodeStack.length-1]].ip_address +
+                                        "Enter password");
                         } else {
                             // ask for a username
                             player.askedForName = true;
-                            this.setText("Enter username");
+                            this.setText(nodes[player.nodeStack[player.nodeStack.length-1]].ip_address +
+                                        "Enter username");
                         }
                     }
                 }
             } else if (command[0].toLowerCase() == "hangup") {
-                    
+                while (audio.length > 1) {
+                    //console.log(audio[audio.length - 1])
+                    audio[audio.length - 1].stop();
+                    audio.pop();
+                    console.log(audio);
+                }
+                console.log(`audio ${audio}`);
+                setAudioSource("./sfx/phone/click.mp3");
+                this.setText("Disconnected...")
 
             } else if (command[0].toLowerCase() == "dial") {
                 // call number
@@ -267,9 +363,21 @@ class aniRect {
                     "freesound_community-noanswer-33477.mp3",
                     "lucadialessandro-unavailable-phone-192489.mp3"];
                 
-                audio.push(`./sfx/phone/${samples[getRandInt(samples.length)]}`);
+                // stop previous if needed
+                while (audio.length > 1) {
+                    //console.log(audio[audio.length - 1])
+                    audio[audio.length - 1].stop();
+                    audio.pop();
+                }
+                if (audio.length > 0) {
+                    audio[0] = `./sfx/phone/${samples[getRandInt(samples.length)]}`;
+                } else {
+                    audio.push(`./sfx/phone/${samples[getRandInt(samples.length)]}`);
+                }
                 this.setText(`Dailing... ${command[1]}`);
-                playDTMF(command[1]+"rh");
+                let number = command[1].replace(/\D/g,'');
+                // play dtmf, as short ring, then the audio queue
+                playDTMF(number+"rh");
                 
                 
             } else if (command[0].toLowerCase() == "map") {
@@ -368,9 +476,9 @@ class aniRect {
             } else if (command[0].toLowerCase() == "zoom") {
 
                 if (command[1] < 0 || command[1] > 0) {
-                    mapScale += parseInt(command[1]);
+                    mapScale = parseInt(command[1]);
                 } else {
-                    mapScale ++;
+                    this.setText("USAGE: zoom [level]");
                 }
                 mapInc = 2;
                 mapSteps = 0;
@@ -510,7 +618,8 @@ class aniRect {
 
     blitRect() {
         ctx.strokeStyle = this.rectColor;
-        ctx.rectLineWidth = this.rectLineWidth;
+        //ctx.rectLineWidth = this.rectLineWidth;
+        ctx.lineWidth = this.rectLineWidth;
 
         if (this.xP > 0 || this.yP > 0) {
             // background
@@ -568,27 +677,57 @@ class aniRect {
         ctx.font = this.fontSize + "px " + this.textFont;
 
         // remove overflow lines
+        if (this.type != "proxy") {
         while (this.displayLines.length > this.textMaxLines) {
             this.displayLines.shift();
+            }
         }
         
         // draw the text
-        for (let i = 0; i <  this.displayLines.length; i++) {
+        //let toPrint = this.displayLines.slice(this.displayLines.length - this.wheelOff, this.textMaxLines);
+        //console.log(toPrint);
+        if (this.wheelOff > this.displayLines.length - this.textMaxLines) {
+            this.wheelOff = this.displayLines.length - this.textMaxLines;
+        }
+        if (this.wheelOff < 0) {
+            this.wheelOff = 0;
+        }
+        let max;
+        if (this.textMaxLines < this.displayLines.length) {
+            max = this.textMaxLines
+        } else {
+            max = this.displayLines.length;
+        }
+        for (let i = this.wheelOff; i <  this.displayLines.length; i++) {
+            if (i - this.wheelOff < this.textMaxLines) {
             ctx.fillText(this.displayLines[i], this.x1 + this.fontSize/2, 
-                        this.y1 + (this.fontSize) + (this.fontSize * 1.25 * i));
+                        this.y1 + (this.fontSize) + (this.fontSize * 1.25 * (i-this.wheelOff)));
+            }
         }
     }
 
     closedState() {
         this.textDisplayChar = 0;
-        //console.log(`cast.indexOf(this): ${cast.indexOf(this)}`)
-        if (cast[cast.indexOf(this)] == 0) {
+        console.log("CloedState");
+        console.log(`cast[cast.indexOf(this)]: ${cast[cast.indexOf(this)]}`)
+        if (cast.indexOf(this) == 0) {
             // always reopen players computer
-             this.setOpen = true;
+             this.toOpen = true;
+             this.delete = false;
+             this.xW = getWidth()/2;
+             this.yH = getHeight()/2;
+             this.xP = 1;
+             this.yP = 1;
         } else if (this.delete) {
             // flush it
-            const s = cast.splice(1, cast.indexOf(this));
+            const s = cast.splice(cast.indexOf(this)[0], 1);
             cast = s;
+
+            console.log(`player.proxyWindow: ${player.proxyWindow}`);
+
+            if (this == player.proxyWindow[0]) {
+                player.proxyWindow.pop();
+            }
         }
     }
 
