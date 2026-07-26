@@ -206,13 +206,41 @@ function drawMap() {
             for (let i = 0; i < player.nodeStack.length - 1; i++) {
                 //console.log(g/(player.nodeStack.length-i))
                 ctx.strokeStyle = `rgb(${(g/player.nodeStack.length)*(i+1)+100}, 20, 20)`;
-                let l1 = nodes[i];
-                let l2 = nodes[i+1];
+                let l1 = nodes[player.nodeStack[i]];
+                let l2 = nodes[player.nodeStack[i+1]];
                 mapNodeStackSteps += 0.02;
                 if (i < mapNodeStackSteps) {
                     ctx.lineWidth = 1 * mapScale;
                     drawLine([(l1.longitude * mapScale) + mapXOff, -(l1.latitude * mapScale) + mapYOff, 
                               (l2.longitude * mapScale) + mapXOff, -(l2.latitude * mapScale) + mapYOff]);
+                }
+            }
+        }
+    }
+    //label network proxy connection cities
+    if (mapSteps >= mapStepsMax && player.drawNodes) {
+        let g = 155;
+        ctx.lineWidth = 2;
+        if (player.nodeStack.length > 1) {
+            for (let i = 0; i < player.nodeStack.length - 1; i++) {
+                if (i < mapNodeStackSteps) {
+                    ctx.strokeStyle = `rgb(200, 200, 200)`;
+                    let node = nodes[player.nodeStack[i+1]];
+                    // ring
+                    ctx.beginPath();
+                    ctx.arc((node.longitude * mapScale) + mapXOff,
+                            -(node.latitude * mapScale) + mapYOff,
+                            1 * mapScale,
+                            0,
+                            2 * Math.PI); // x, y, radius, startAngle, endAngle
+                    ctx.stroke();
+
+                    // country, city label
+                    let label = node.country + ", " + node.city;
+                    ctx.fillStyle = '#f4eded';
+                    ctx.font = scaleFont(0.010, "arial");
+                    ctx.fillText(label, (node.longitude * mapScale) + mapXOff,
+                                        -(node.latitude * mapScale) + mapYOff);
                 }
             }
         }

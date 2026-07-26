@@ -196,7 +196,7 @@ function doMouseUp(e) {
 
 function doKeyDown(e) {
     for (let i = 0; i < cast.length; i++) {
-        console.log(`cast[${i}].acceptInput: ${cast[i].acceptInput}`)
+        //console.log(`cast[${i}].acceptInput: ${cast[i].acceptInput}`)
         if (cast[i].acceptInput) {
             cast[i].keyHandler(e);
         }

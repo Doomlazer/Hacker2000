@@ -33,7 +33,7 @@ class Player extends User{
         this.selCountry = locations[gUsers.length].address.country;
         this.selectedCountry;
         this.proxyWindow = [];
-        this.unactivated = true;
+        this.unactivated = false;
         this.musicOn = false;
         this.musicVol = 50;
     }

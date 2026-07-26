@@ -26,8 +26,6 @@ class aniRect {
         this.textLines = []
         this.textMaxLines = 0;
         this.admins = [];
-        this.accounts = [{"user": "root", "pwd":"password1234", "admin": true, "userId":0}, 
-                            {"user": "rcrumb", "pwd":"comix", "admin": false, "userId":100}];
         this.approvedComands = ["reg"];
         this.displayLines = [];
         this.textDisplayChar = 0;
@@ -158,6 +156,32 @@ class aniRect {
         }
     }
 
+    setProxyText() {
+        let text = this.proxyText;
+        for (let i = 0; i < player.nodeStack.length; i++) {
+            //console.log(`player.nodeStack.length: ${player.nodeStack.length}`);
+            //console.log(player.nodeStack);
+            //console.log(`player.nodeStack[${i}]: ${player.nodeStack[i]}`);
+            let str = nodes[player.nodeStack[i]].ip_address + 
+            " " +  nodes[player.nodeStack[i]].country + "\n";
+            // expand width working?
+            if (ctx.measureText(str) > player.proxyWindow[0].xW) {
+                player.proxyWindow[0].xW = ctx.measureText(str);
+            }
+            text += str;
+        }
+
+        player.proxyWindow[0].displayLines = [];
+        player.proxyWindow[0].text = text;
+        //console.log(player.proxyWindow[0].text)
+        player.proxyWindow[0].setText(text, false);
+
+        //player.proxyWindow[0].text = text;
+        //player.proxyWindow[0].setText(player.proxyWindow[0].text, false);
+
+        //console.log(`player.nodestack ${player.nodeStack}`);
+    }
+
     commandHandler() {
         const command = this.inputStr.split(" ");
         this.inputStr = "";
@@ -167,23 +191,26 @@ class aniRect {
         if (this.approvedComands.includes(command[0].toLowerCase())
             || this.admins.includes(player.uid)
             || command[0].toLowerCase() == "exit") {
-             
+            
+            //console.log("ficckck node.account[1]: " + node.account[1]);
             if (player.askedForName) {
                 // check USERNAME
                 let notFound = true;
-                for (let i = 0; i < this.accounts.length; i++) {
+                let node = nodes[player.nodeStack[player.nodeStack.length-1]];
+                for (let i = 0; i < node.accounts.length; i++) {
+                    console.log(`pssword: ${node.accounts[0].pwd} acct: ${node.accounts[0]}`);
                     if (player.unactivated && i == 1) {
-                        this.accounts[i].user = player.tryAuthName;
+                        node.accounts[i].user = player.tryAuthName;
                     }
-                    if (this.accounts[i].user == player.tryAuthName) {
+                    if (node.accounts[i].user == player.tryAuthName) {
                         // the entered username was valid, ask for pwd
                         notFound = false;
                         player.authAccountIndex = i;
                         player.askedForName = false;
                         player.askedForPwd = true;
                         this.authTries = 0;
-                        this.text = nodes[player.nodeStack[player.nodeStack.length-1]].ip_address + 
-                                    " : Enter password";
+                        this.text = node.ip_address + 
+                                    ": Enter password";
                         this.setText(this.text);
                     }
                 }
@@ -192,7 +219,9 @@ class aniRect {
                     if (this.authTries >= 3) {
                         this.setText("Invalid user. Too many attempts\nDisconnected...");
                         player.askedForName = false;
+                        this.authTries = 0;
                         player.nodeStack.pop();
+                        this.setProxyText();
                     } else {
                         this.setText("Invalid user. Enter username");
                     }
@@ -201,14 +230,14 @@ class aniRect {
                 // check PASSWORD
                 player.tryAuthPwd = command;
                 let notFound = true;
-                console.log(`${this.accounts[player.authAccountIndex].pwd} == ${player.tryAuthPwd}`)
                 if (player.unactivated) {
-                    this.accounts[player.authAccountIndex].pwd = player.tryAuthPwd;
+                    node.accounts[player.authAccountIndex].pwd = player.tryAuthPwd;
                     player.unactivated = false;
                 }
-                if (this.accounts[player.authAccountIndex].pwd == player.tryAuthPwd) {
-                    this.setText(`Welcome, ${this.accounts[player.authAccountIndex].user}`);
+                if (node.accounts[player.authAccountIndex].pwd == player.tryAuthPwd) {
+                    this.setText(`Welcome, ${node.accounts[player.authAccountIndex].user}`);
                     player.askedForPwd = false;
+                    this.authTries = 0;
                     notFound = false;
                     if (cast.indexOf(this) != 0) {
                         player.nodeStack.push(this.id);
@@ -220,6 +249,8 @@ class aniRect {
                     if (this.authTries >= 3) {
                         this.setText("Invalid password. Too many attempts\nDisconnected...");
                         player.nodeStack.pop();
+                        this.authTries = 0;
+                        this.setProxyText();
                         this.askedForPwd = false;
                     } else {
                         this.setText("Incorrect. Enter password");
@@ -231,39 +262,42 @@ class aniRect {
                 if (player.nodeStack.length > 1) {
                     player.nodeStack.pop();
                     player.proxyWindow[0].wheelOff --;
-                    let text = this.proxyText;
-                    for (let i = 0; i < player.nodeStack.length-1; i++) {
-                        text += nodes[player.nodeStack[i]].ip_address + 
-                        " " +  locations[player.nodeStack[i]].address.country + "\n";
-                    }
-                    player.proxyWindow[0].displayLines = [];
-                    player.proxyWindow[0].text = text;
-                    console.log(player.proxyWindow[0].text)
-                    player.proxyWindow[0].setText(text, false);
+                    this.setProxyText()
                 } else {
                 this.toOpen = false;
                 this.delete = true;
                 }
 
+            } else if (command[0].toLowerCase() == "ulist") {
+                let str = "Users: ";
+                for (let i = 0; i < this.accounts.length; i ++) {
+                    str += this.accounts[i].user;
+                    if (i < this.accounts.length-1) {
+                        str += ", ";
+                    }
+                }
+                this.setText(str);
             } else if (command[0].toLowerCase() == "music") {
                 if (player.musicOn) {
-                    backgroundMusic.stop();
+                    player.musicOn = false;
+                    this.setText("Stopping...");
+                    while (backgroundMusic.length > 0) {
+                        backgroundMusic[backgroundMusic.length - 1].stop();
+                        backgroundMusic.pop();
+                    }
+                } else {
+                    player.musicOn = true;
+                    this.setText("Playing...");
+                    playMusic();
                 }
 
             } else if (command[0].toLowerCase() == "ssh") {
                 // accepts either ip or uNam@ip
                 // spawn proxy window if one doesn't exist
                 if (player.proxyWindow.length < 1) {
-                    let pw = new aniRect(this.pX1, this.pY1, this.pXW, this.pYH);
+                    let pw = new aniRect(this.x1+this.xW+this.boarderWidth+10, this.pY1, this.pXW, this.pYH);
                     //console.log("2nf " + cast[cast.length-1]);
-                    let text = this.proxyText;
-                    for (let i = 0; i < player.nodeStack.length-1; i++) {
-                        text += nodes[player.nodeStack[i]].ip_address + 
-                        " " +  locations[player.nodeStack[i]].address.country + "\n";
-                    }
                     pw.fontSize = this.proxyFontSize;
-                    pw.text = text;
-                    pw.setText(text, false);
                     pw.acceptInput = false;
                     pw.backgroundColor = this.proxyBackgroundColor;
                     pw.rectColor = this.proxyRectColor;
@@ -273,7 +307,10 @@ class aniRect {
                     pw.type = "proxy";
                     cast.push(pw);
                     player.proxyWindow.push(pw);
+                    this.setProxyText();
                 }
+
+                this.setText("Connecting...", false);
                 // searches nodes until ip found and addis it to the connection chain
                 if (command.length < 2) {
                     this.setText("ssh \- OpenSSH remote login client\n\tssh [ip address]\n\tssh [user]@[ip address]");
@@ -294,27 +331,11 @@ class aniRect {
                     let notFound = true;
                     for (let i of nodes) {
                         if (ip == i.ip_address) {
-                            console.log(i.id)
-                            console.log(i)
+                            //console.log(i.id)
+                            //console.log(i)
                             player.nodeStack.push(i.id);
-            
-                            let text = this.proxyText;
-                            for (let i = 0; i < player.nodeStack.length; i++) {
-                                console.log(`player.nodeStack.length: ${player.nodeStack.length}`);
-                                console.log(player.nodeStack);
-                                console.log(`player.nodeStack[${i}]: ${player.nodeStack[i]}`);
-                                let str = nodes[player.nodeStack[i]].ip_address + 
-                                " " +  locations[player.nodeStack[i]].address.country + "\n";
-                                if (ctx.measureText(str) > player.proxyWindow[0].xW) {
-                                    player.proxyWindow[0].xW = ctx.measureText(str);
-                                }
-                                text += str;
-                            }
-                            player.proxyWindow[0].text = text;
-                            player.proxyWindow[0].setText(player.proxyWindow[0].text, false);
-
-
-                            console.log(`player.nodestack ${player.nodeStack}`);
+                            this.setProxyText();
+                            //console.log(`player.nodestack ${player.nodeStack}`);
                             notFound = false;
                         }
                     }
@@ -323,28 +344,27 @@ class aniRect {
                         this.setText("Unable to open a connection or host does not exist.");
                     } else {
                         // get remote accounts
-                        let node = player.nodeStack[player.nodeStack.length-1];
-                        if (this.accounts.includes(player.tryAuthName)) {
+                        let node = nodes[player.nodeStack[player.nodeStack.length-1]];
+                        console.log(`node account: ${node.accounts[1].user}, password ${node.accounts[1].pwd}`);
+                        if (node.accounts.includes(player.tryAuthName)) {
                             // found the username, skip to password
                             player.askedForPwd = true;
-                            this.setText(nodes[player.nodeStack[player.nodeStack.length-1]].ip_address +
-                                        "Enter password");
+                            this.setText(node.ip_address + ": Enter password");
                         } else {
                             // ask for a username
                             player.askedForName = true;
-                            this.setText(nodes[player.nodeStack[player.nodeStack.length-1]].ip_address +
-                                        "Enter username");
+                            this.setText(node.ip_address + ": Enter username");
                         }
                     }
                 }
             } else if (command[0].toLowerCase() == "hangup") {
                 while (audio.length > 1) {
                     //console.log(audio[audio.length - 1])
-                    audio[audio.length - 1].stop();
-                    audio.pop();
-                    console.log(audio);
+                    phoneAudio[phoneAudio.length - 1].stop();
+                    phoneAudio.pop();
+                    //console.log(phoneAudio);
                 }
-                console.log(`audio ${audio}`);
+                //console.log(`phoneAudio ${phoneAudio}`);
                 setAudioSource("./sfx/phone/click.mp3");
                 this.setText("Disconnected...")
 
@@ -364,15 +384,15 @@ class aniRect {
                     "lucadialessandro-unavailable-phone-192489.mp3"];
                 
                 // stop previous if needed
-                while (audio.length > 1) {
+                while (phoneAudio.length > 1) {
                     //console.log(audio[audio.length - 1])
-                    audio[audio.length - 1].stop();
-                    audio.pop();
+                    phoneAudio[phoneAudio.length - 1].stop();
+                    phoneAudio.pop();
                 }
-                if (audio.length > 0) {
-                    audio[0] = `./sfx/phone/${samples[getRandInt(samples.length)]}`;
+                if (phoneAudio.length > 0) {
+                    phoneAudio[0] = `./sfx/phone/${samples[getRandInt(samples.length)]}`;
                 } else {
-                    audio.push(`./sfx/phone/${samples[getRandInt(samples.length)]}`);
+                    phoneAudio.push(`./sfx/phone/${samples[getRandInt(samples.length)]}`);
                 }
                 this.setText(`Dailing... ${command[1]}`);
                 let number = command[1].replace(/\D/g,'');
@@ -426,6 +446,7 @@ class aniRect {
                 } else {
                     this.setText(helpText);
                 }
+                updateMap = true;
             } else if (command[0].toLowerCase() == "clear") {
 
                 // reset display text
@@ -522,7 +543,7 @@ class aniRect {
                 this.textDisplayChar = 0;
                 this.setText(this.text);
             } else if (command[0].toLowerCase() == "setparam") {
-                //console.log(`this[command[1]]: ${this[command[1]]}`);
+                // allow players to list and change all window prperties
                 // player enters: setparm textColor #FF0000
                 if (command[1].toLowerCase() == "list") {
                     this.text = "";

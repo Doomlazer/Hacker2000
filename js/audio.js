@@ -41,11 +41,11 @@ function playTone(digit, dur) {
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-function setAudioSource(path, bkgrnd = false) {
+function setAudioSource(path, array = phoneAudio) {
     // Create a new buffer source
     const source = audioContext.createBufferSource();
-    audio.push(source);
-    console.log(audio);
+    array.push(source);
+    console.log(array);
 
     // Load audio data
     fetch(path)
@@ -56,19 +56,18 @@ function setAudioSource(path, bkgrnd = false) {
             source.connect(audioContext.destination); // Connect to the destination
             source.start(0); // Play the audio
             source.addEventListener("ended", (e) => {
-                if (player.musicOn && bkgrnd) {
+                if (player.musicOn && array == backgroundMusic) {
                     playMusic();
                 }
-                console.log(`Audio has finished playing. ${source}`);
+                console.log(`Audio has finished playing. array is ${array}`);
             });
-            return source;
         })
         .catch(error => console.error('Error loading audio:', error));
 }
 
 function playMusic() {
     let path = `./sfx/music/stub.mp3`;
-    backgroundMusic = setAudioSource(path);
+    setAudioSource(path, backgroundMusic);
     gainNode.gain.value = 0.1; // setting it to 10%
     //gainNode.connect(backgroundMusic);
 }
@@ -78,19 +77,19 @@ async function playDTMF(sequence, toneDuration = 0.06, gap = 0.02) {
 
     for (const digit of sequence) {
         if (digit == "h") {
-            while (audio.length > 1) {
+            while (phoneAudio.length > 1) {
                 //console.log(audio[audio.length - 1])
-                audio[audio.length - 1].stop();
-                audio.pop();
+                phoneAudio[phoneAudio.length - 1].stop();
+                phoneAudio.pop();
             }
-            setAudioSource(audio[0]);
+            setAudioSource(phoneAudio[0], phoneAudio);
         } else if (digit == "r") {
-            while (audio.length > 1) {
+            while (phoneAudio.length > 1) {
                 //console.log(audio[audio.length - 1])
-                audio[audio.length - 1].stop();
-                audio.pop();
+                phoneAudio[phoneAudio.length - 1].stop();
+                phoneAudio.pop();
             }
-            setAudioSource(`./sfx/phone/ring.mp3`);
+            setAudioSource(`./sfx/phone/ring.mp3`, phoneAudio);
             await sleep(getRandInt(3000) + 1500);
         } else {
             playTone(digit, toneDuration);
