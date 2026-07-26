@@ -20,11 +20,21 @@ function doWheel(e) {
             mouseY < c.y1 + c.yH) {
 
             adjustedWindow = true;
-            // scale w and h by vertical scroll amount
-            c.xW -= e.deltaY;
-            c.yH -= e.deltaY;
-            c.xP -= e.deltaY;
-            c.yP -= e.deltaY;
+
+            if (c.type == "proxy") {
+                c.wheelOff += e.deltaY;
+                //console.log(`wheelOff ; ${c.wheelOff} ${c.type}`)
+            } else {
+                // scale w and h by vertical scroll amount
+                c.xW -= e.deltaY;
+                c.yH -= e.deltaY;
+                c.xP -= e.deltaY;
+                c.yP -= e.deltaY;
+            }
+
+            // set max
+            c.textMaxLines = Math.floor(c.yH / (c.fontSize * 1.25));
+    
             // clear
             ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, c.width, c.height);
@@ -35,13 +45,15 @@ function doWheel(e) {
             ctxMarkers.fillStyle = '#000000';
             ctxMarkers.fillRect(0, 0, c.width, c.height);
             //c.updateMap = true;
-            c.setText(c.text);
-            mapSteps = 1;
-            mapInc = 1;
-            mapCitiesSteps = 0;
-            mapNodeSteps = 0;
-            mapNodeStackSteps = 0;
-            drawMap();
+            ``
+            //c.displayLines = [];
+            //c.setText(c.text, false);
+
+            //mapSteps = 1;
+            //mapInc = 1;
+            //mapCitiesSteps = 0;
+            //mapNodeSteps = 0;
+            //mapNodeStackSteps = 0;
         }
     }
     // or scale the map
@@ -84,16 +96,18 @@ function doMouseMove(e) {
                 if (mouseX > c.x1 &&
                     mouseX < c.x1 + c.xW &&
                     mouseY > c.y1 &&
-                    mouseY < c.y1 + c.yH) {
-                        
+                    mouseY < c.y1 + c.yH &&
+                    c.mouseDrag) { // moving this window
+
                     adjustedWindow = true;
-                    // scale w and h by vertical scroll amount
-                    //c.x1 = oldOffX - ((mouseDownX - mouseX));
-                    //c.y1 = oldOffY - ((mouseDownY - mouseY));
-                    //c.x1 = (mouseDownX - mouseX) - (c.xW/2);
-                    //c.y1 = (mouseDownY - mouseY) - (c.yH/2);
                     c.x1 = oldOffX - ((mouseDownX - mouseX));
                     c.y1 = oldOffY - ((mouseDownY - mouseY));
+                    if (c.type == "proxy") {
+                        //console.log("proxy")
+                        cast[0].pX1 = c.x1;
+                        cast[0].pY1 = c.y1;
+                    }
+
                     // clear
                     ctx.fillStyle = '#000000';
                     ctx.fillRect(0, 0, c.width, c.height);
@@ -103,14 +117,12 @@ function doMouseMove(e) {
                     // clear
                     ctxMarkers.fillStyle = '#000000';
                     ctxMarkers.fillRect(0, 0, c.width, c.height);
-                    //c.updateMap = true;
-                    //c.setText(c.text);
-                    mapSteps = 1;
-                    mapInc = 1;
-                    mapCitiesSteps = 0;
-                    mapNodeSteps = 0;
-                    mapNodeStackSteps = 0;
-                    drawMap();
+                    //mapSteps = 1;
+                    //mapInc = 1;
+                    //mapCitiesSteps = 0;
+                    //mapNodeSteps = 0;
+                    //mapNodeStackSteps = 0;
+                    //drawMap();
                 }
             }
         }
@@ -142,10 +154,10 @@ function doClick(e) {
 function doMouseDown(e) {
     movingMap = false;
     mouseDown = true;
-    //mapScale = 7;
     mouseDetail = e.detail;
 
-    for (let w = 0; w < cast.length; w ++) {
+    let notFound = true;
+    for (let w = 0; w < cast.length; w++) {
         let c = cast[w];
         if (mouseX > c.x1 &&
             mouseX < c.x1 + c.xW &&
@@ -153,29 +165,32 @@ function doMouseDown(e) {
             mouseY < c.y1 + c.yH) {
                 oldOffX = -(c.xW/2);
                 oldOffY = -(c.yH/2);
-                //mouseDownX = mouseX;
-                //mouseDownY = mouseY;
-                //mouseDownX = mouseX - c.x1;
-                //mouseDownY = mouseY + c.y1;
+                notFound = false;
+                c.mouseDrag = true;
                 drawMap();
-        } else {
-            movingMap = true;
-            oldOffX = mapXOff;
-            oldOffY = mapYOff;
-            mouseDownX = mouseX;
-            mouseDownY = mouseY;
-            drawMap();
         }
+    }
+    if (notFound) {
+        movingMap = true;
+        oldOffX = mapXOff;
+        oldOffY = mapYOff;
+        mouseDownX = mouseX;
+        mouseDownY = mouseY;
+        drawMap();
     }
 }
 
 function doMouseUp(e) {
     mouseDown = false;
     movingMouse = false;
+    movingMap = false;
     mouseDetail = e.detail;
     //mapScale = 4
     mouseDownX = 0;
     mouseDownY = 0;
+    for (let w = 0; w < cast.length; w++) {
+        cast[w].mouseDrag = false;
+    }
     drawMap();
 }
 

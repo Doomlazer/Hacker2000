@@ -1,10 +1,10 @@
 // canvas defined in index.html
 // c = document.getElementById("canvas");
 // ctx = c.getContext("2d");
-let debug = true;
-let cast = []
+let debug = false;
+let cast = [];
 let gUsers = [];
-let player
+let player;
 let locations = [];
 let map = [];
 let mapScale = 3;
@@ -65,6 +65,7 @@ function loadCities() {
             //player = new user(prompt("enter player name:"));
             player = new Player("Robort Copeland");
             locations[0].homeowner = player.name;
+            //player.askedForName = true;
             gUsers.push(player);
 
             let playersComp = new aniRect(getWidth()/20, getHeight()/8, getWidth()/3, getHeight()/1.5);

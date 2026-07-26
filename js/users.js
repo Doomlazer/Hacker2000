@@ -14,6 +14,7 @@ class User {
         this.authAccountIndex = 0;
         this.askedForName = false;
         this.askedForPwd = false;
+        this.windowHover = false;
     }
 }
 
@@ -28,7 +29,10 @@ class Player extends User{
         this.drawCities = true;
         this.drawNodes = true;
         this.drawNodeStack = true;
+        this.connectTo = 0;
         this.selCountry = locations[gUsers.length].address.country;
         this.selectedCountry;
+        this.proxyWindow = [];
+        this.unactivated = true;
     }
 }
