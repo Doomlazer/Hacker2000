@@ -41,6 +41,7 @@ class aniRect {
         this.type = "none";
         this.wheelOff = 0;
         this.text = `Welcome to the mal-90 OS\nIt's ${this.date}`;
+        // proxy defaults
         this.proxyFontSize = 12;
         this.proxyText = "Proxy List:\n"
         this.proxyBackgroundColor = '#3d0240'
@@ -48,10 +49,22 @@ class aniRect {
         this.proxyTextColor = '#db96de'
         this.proxyIsRounded = false;
         this.proxyHasBoarder = false;
-        this.pX1 = getWidth()/25 * 15,
-        this.pY1 = getHeight()/8,
-        this.pXW = getWidth()/6,
-        this.pYH = getHeight()/1.5
+        this.pX1 = getWidth()/25 * 10.2;
+        this.pY1 = getHeight()/8;
+        this.pXW = getWidth()/6;
+        this.pYH = getHeight()/1.5;
+        // reader defaults
+        this.readerFontSize = 16;
+        this.readerText = "Proxy List:\n"
+        this.readerBackgroundColor = '#2e2d2d'
+        this.readerRectColor = '#152272'
+        this.readerTextColor = '#03a631'
+        this.readerIsRounded = false;
+        this.readerHasBoarder = true;
+        this.rX1 = getWidth()/25 * 10.5;
+        this.rY1 = getHeight()/8;
+        this.rXW = getWidth()/2.5;
+        this.rYH = getHeight()/1.5;
     }
 
     setText(theText, prompt = true) {
@@ -76,7 +89,7 @@ class aniRect {
 
     clickHandler(e) {
         //console.log(`clicked on ${this} e.details: ${e.detail}`);
-        if (e.detail > 1) {
+        if (e.detail > 1 && mouseUnclaimed) {
             mouseUnclaimed = false;
             this.toOpen = false;
             this.delete = true;
@@ -294,11 +307,29 @@ class aniRect {
                     playMusic();
                 }
 
+            } else if (command[0].toLowerCase() == "read") {
+                // read files in scrolling window
+                if (player.readerWindow.length < 1) {
+                    let rw = new aniRect(this.rX1, this.rY1, this.rXW, this.rYH);
+                    //console.log("2nf " + cast[cast.length-1]);
+                    rw.fontSize = this.readerFontSize;
+                    rw.acceptInput = false;
+                    rw.backgroundColor = this.readerBackgroundColor;
+                    rw.rectColor = this.readerRectColor;
+                    rw.textColor = this.readerTextColor
+                    rw.isRounded = this.readerIsRounded;
+                    rw.hasBoarder = this.readerHasBoarder;
+                    rw.type = "reader";
+                    cast.push(rw);
+                    player.readerWindow.push(rw);
+                    rw.setText(file, false);
+                    this.setText("Opening...");
+                }
             } else if (command[0].toLowerCase() == "ssh") {
                 // accepts either ip or uNam@ip
                 // spawn proxy window if one doesn't exist
                 if (player.proxyWindow.length < 1) {
-                    let pw = new aniRect(this.x1+this.xW+this.boarderWidth+10, this.pY1, this.pXW, this.pYH);
+                    let pw = new aniRect(this.pX1, this.pY1, this.pXW, this.pYH);
                     //console.log("2nf " + cast[cast.length-1]);
                     pw.fontSize = this.proxyFontSize;
                     pw.acceptInput = false;
@@ -721,16 +752,14 @@ class aniRect {
         ctx.fillStyle = this.textColor;
         ctx.font = this.fontSize + "px " + this.textFont;
 
-        // remove overflow lines
-        if (this.type != "proxy") {
-        while (this.displayLines.length > this.textMaxLines) {
-            this.displayLines.shift();
+        // remove overflow lines, but don't crop schooling windows
+        if (this.type != "proxy" && this.type != "reader") {
+            while (this.displayLines.length > this.textMaxLines) {
+                this.displayLines.shift();
             }
         }
         
         // draw the text
-        //let toPrint = this.displayLines.slice(this.displayLines.length - this.wheelOff, this.textMaxLines);
-        //console.log(toPrint);
         if (this.wheelOff > this.displayLines.length - this.textMaxLines) {
             this.wheelOff = this.displayLines.length - this.textMaxLines;
         }
@@ -768,10 +797,16 @@ class aniRect {
             const s = cast.splice(cast.indexOf(this)[0], 1);
             cast = s;
 
-            console.log(`player.proxyWindow: ${player.proxyWindow}`);
-
-            if (this == player.proxyWindow[0]) {
-                player.proxyWindow.pop();
+            if (this.type == "proxy") {
+                console.log(`player.proxyWindow: ${player.proxyWindow}`);
+                if (this == player.proxyWindow[0]) {
+                    player.proxyWindow.pop();
+                }
+            } else if (this.type = "reader") {
+                console.log(`player.readerWindow: ${player.readerWindow}`);
+                if (this == player.readerWindow[0]) {
+                    player.readerWindow.pop();
+                }
             }
         }
     }

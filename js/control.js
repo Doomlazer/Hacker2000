@@ -21,7 +21,7 @@ function doWheel(e) {
 
             adjustedWindow = true;
 
-            if (c.type == "proxy") {
+            if (c.type == "proxy" || c.type == "reader") {
                 c.wheelOff += e.deltaY;
                 //console.log(`wheelOff ; ${c.wheelOff} ${c.type}`)
             } else {
@@ -108,6 +108,11 @@ function doMouseMove(e) {
                         cast[0].pX1 = c.x1;
                         cast[0].pY1 = c.y1;
                     }
+                    if (c.type == "reader") {
+                        //console.log("proxy")
+                        cast[0].rX1 = c.x1;
+                        cast[0].rY1 = c.y1;
+                    }
 
                     // clear
                     ctx.fillStyle = '#000000';
@@ -132,8 +137,8 @@ function doMouseMove(e) {
         if (!adjustedWindow) {
             mapXOff = oldOffX - ((mouseDownX - mouseX));
             mapYOff = oldOffY - ((mouseDownY - mouseY));
-            mapSteps = 1;
-            mapInc = 1;
+            mapSteps = 0;
+            mapInc = 0;
             mapCitiesSteps = 0;
             mapNodeSteps = 0;
             mapNodeStackSteps = 0;

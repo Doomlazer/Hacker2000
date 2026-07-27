@@ -23,7 +23,6 @@ class Player extends User{
         super();
         this.name = name;
         this.uName = this.name.split(" ")[0].substring(0,1).toLowerCase() + this.name.split(" ")[1].toLowerCase();
-        this.selNodeNum = 0; // selected node on map
         this.selCountry = locations[gUsers.length].address.country; // selected country on map
         this.focus;
         this.drawCities = true;
@@ -33,6 +32,7 @@ class Player extends User{
         this.selCountry = locations[gUsers.length].address.country;
         this.selectedCountry;
         this.proxyWindow = [];
+        this.readerWindow = [];
         this.unactivated = false;
         this.musicOn = false;
         this.musicVol = 50;

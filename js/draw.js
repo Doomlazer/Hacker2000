@@ -157,7 +157,7 @@ function drawMap() {
                     ctxMarkers.lineWidth = 3;
                     ctxMarkers.strokeRect(((nodes[i].longitude) * mapScale) + mapXOff,
                                     (-(nodes[i].latitude) * mapScale) + mapYOff,
-                                    5,5); 
+                                    1 * mapScale, 1 * mapScale); 
                     // move map to named loc
                     if (mouseDetail > 1) {
                         mapScale = 50;
@@ -172,6 +172,7 @@ function drawMap() {
                                         IP: ${nodes[i].ip_address} `;
                         cast[0].setText(cast[0].text);
                         cast[0].textDisplayChar = 0;
+                        player.selectedNode = nodes[i];
                         drawMap();
                     }
 
@@ -192,7 +193,7 @@ function drawMap() {
                     ctxMarkers.lineWidth = 1;
                     ctxMarkers.strokeRect(((nodes[i].longitude) * mapScale) + mapXOff,
                                     (-(nodes[i].latitude) * mapScale) + mapYOff,
-                                    5,5);
+                                    1 * mapScale, 1 * mapScale);
                 } 
             }          
         }
@@ -276,7 +277,7 @@ function drawMap() {
         // loc marker
         ctx.strokeStyle = '#00FF00';
         ctx.lineWidth = 4;
-        ctx.strokeRect(((city.lon) * mapScale) + mapXOff,
+        ctx.strokeRect((city.lon * mapScale) + mapXOff,
                         (-(city.lat) * mapScale) + mapYOff,
                         1 * mapScale, 1 * mapScale);
 
@@ -285,8 +286,27 @@ function drawMap() {
         ctx.font = scaleFont(0.018, "arial");
         let lt = city.name + ", " + city.country + ", population: " + (city.population);
         ctx.fillText(lt,
-                    ((city.lon) * mapScale) + mapXOff,
+                    (city.lon * mapScale) + mapXOff,
                     (-(city.lat) * mapScale) + mapYOff);
+    }
+
+    if (player.selectedNode && mapNodeSteps > 1) {
+        let node = nodes[player.selNodeNum];
+
+        // loc marker
+        ctx.strokeStyle = '#f1700d';
+        ctx.lineWidth = 4;
+        ctx.strokeRect((node.longitude * mapScale) + mapXOff,
+                        (-(node.latitude) * mapScale) + mapYOff,
+                        1 * mapScale, 1 * mapScale);
+
+        // loc label
+        ctx.fillStyle = '#20974c';
+        ctx.font = scaleFont(0.018, "arial");
+        let lt = node.country + ", ip: " + node.ip_address;
+        ctx.fillText(lt,
+                    (node.longitude * mapScale) + mapXOff,
+                    (-(node.latitude) * mapScale) + mapYOff);
     }
 
     //drawIcon();
