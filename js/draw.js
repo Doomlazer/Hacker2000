@@ -122,17 +122,18 @@ function drawMap() {
                     // move map to named location
                     // //mouseDeatil is number of clicks, we wait for two or more
                     if (mouseDetail > 1) {
-                        mapScale = 20;
+                        mapScale = 30;
                         mapXOff = (getWidth()/3*2) - ((cities[i].lon) * mapScale);
                         mapYOff = (getHeight()/2) - (-(cities[i].lat) * mapScale);
-                        mapSteps = 30;
-                        mapNodeSteps = 0;
+                        mapSteps = 1;
+                        mapNodeSteps = 1;
                         mapInc = 2;
                         player.selcountry = cities[i].country;
-                        cast[0].text = `Selected city ${cities[i].name}, ${cities[i].country}`;
+                        cast[0].text = `Selected ${cities[i].name}, ${cities[i].country}`;
                         cast[0].setText(cast[0].text);
                         cast[0].textDisplayChar = 0;
                         player.selectedCity = cities[i];
+                        updateMap = true;
                         drawMap();
                     }
                     mouseLabel = cities[i].name + ", " + cities[i].country +
@@ -162,7 +163,7 @@ function drawMap() {
                         mapScale = 50;
                         mapXOff = (getWidth()/3*2) - ((nodes[i].longitude) * mapScale);
                         mapYOff = (getHeight()/2) - (-(nodes[i].latitude) * mapScale);
-                        mapSteps = 30;
+                        mapSteps = 0;
                         mapNodeSteps = 0;
                         mapInc = 2;
                         player.selcountry = nodes[i].country;
@@ -224,8 +225,14 @@ function drawMap() {
         if (player.nodeStack.length > 1) {
             for (let i = 0; i < player.nodeStack.length - 1; i++) {
                 if (i < mapNodeStackSteps) {
-                    ctx.strokeStyle = `rgb(200, 200, 200)`;
                     let node = nodes[player.nodeStack[i+1]];
+                    if (node.compromisedAccounts.length > 0) {
+                        // node aquired
+                        ctx.strokeStyle = `rgb(19, 195, 39)`;
+                    } else {
+                        // un hacked
+                        ctx.strokeStyle = `rgb(138, 6, 6)`;
+                    }
                     // ring
                     ctx.beginPath();
                     ctx.arc((node.longitude * mapScale) + mapXOff,

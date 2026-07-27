@@ -62,6 +62,7 @@ function doWheel(e) {
         if (mapScale < 1) {
             mapScale = 1;
         }
+        /*
         if (mapXOff < 0) {
             mapXOff = 0;
         }
@@ -73,7 +74,7 @@ function doWheel(e) {
         }
         if (mapYOff > c.height) {
             mapYOff = c.heigth;
-        }
+        }*/
         mapSteps = 1;
         mapInc = 1;
         mapCitiesSteps = 0;

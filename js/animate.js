@@ -192,13 +192,13 @@ class aniRect {
             || this.admins.includes(player.uid)
             || command[0].toLowerCase() == "exit") {
             
-            //console.log("ficckck node.account[1]: " + node.account[1]);
             if (player.askedForName) {
                 // check USERNAME
+                player.tryAuthName = command;
                 let notFound = true;
                 let node = nodes[player.nodeStack[player.nodeStack.length-1]];
                 for (let i = 0; i < node.accounts.length; i++) {
-                    console.log(`pssword: ${node.accounts[0].pwd} acct: ${node.accounts[0]}`);
+                    //console.log(`node.accounts[i].user: ${node.accounts[i].user} player.tryAuthName: ${player.tryAuthName}`);
                     if (player.unactivated && i == 1) {
                         node.accounts[i].user = player.tryAuthName;
                     }
@@ -228,21 +228,23 @@ class aniRect {
                 }
             } else if (player.askedForPwd) {
                 // check PASSWORD
+                let node = nodes[player.nodeStack[player.nodeStack.length-1]];
                 player.tryAuthPwd = command;
                 let notFound = true;
                 if (player.unactivated) {
                     node.accounts[player.authAccountIndex].pwd = player.tryAuthPwd;
                     player.unactivated = false;
                 }
+                //console.log("node.accounts[player.authAccountIndex].pwd: " + node.accounts[player.authAccountIndex].pwd + ", player.tryAuthPwd: " + player.tryAuthPwd);
                 if (node.accounts[player.authAccountIndex].pwd == player.tryAuthPwd) {
                     this.setText(`Welcome, ${node.accounts[player.authAccountIndex].user}`);
+                    if (!node.compromisedAccounts.includes(player.authAccountIndex)) {
+                        node.compromisedAccounts.push(player.authAccountIndex);
+                    }
                     player.askedForPwd = false;
                     this.authTries = 0;
                     notFound = false;
-                    if (cast.indexOf(this) != 0) {
-                        player.nodeStack.push(this.id);
-                    }
-                    
+                    node.compromisedAccounts.push(player.authAccountIndex);
                 }
                 if (notFound) {
                     this.authTries ++;
@@ -269,10 +271,11 @@ class aniRect {
                 }
 
             } else if (command[0].toLowerCase() == "ulist") {
+                let node = nodes[player.nodeStack[player.nodeStack.length-1]];
                 let str = "Users: ";
-                for (let i = 0; i < this.accounts.length; i ++) {
-                    str += this.accounts[i].user;
-                    if (i < this.accounts.length-1) {
+                for (let i = 0; i < node.accounts.length; i ++) {
+                    str += node.accounts[i].user;
+                    if (i < node.accounts.length-1) {
                         str += ", ";
                     }
                 }
@@ -326,7 +329,7 @@ class aniRect {
                         player.tryAuthName = addr[0];
                         ip = addr[1];
                     }
-                    console.log(`entered: ${player.tryAuthName}@${ip}`)
+                    console.log(`sshing to: ${player.tryAuthName}@${ip}`)
                     // find the ip address
                     let notFound = true;
                     for (let i of nodes) {
@@ -345,15 +348,27 @@ class aniRect {
                     } else {
                         // get remote accounts
                         let node = nodes[player.nodeStack[player.nodeStack.length-1]];
-                        console.log(`node account: ${node.accounts[1].user}, password ${node.accounts[1].pwd}`);
-                        if (node.accounts.includes(player.tryAuthName)) {
-                            // found the username, skip to password
-                            player.askedForPwd = true;
-                            this.setText(node.ip_address + ": Enter password");
+                        // Auto Auth if no user provided and previously compromised
+                        if (addr.length < 2 && node.compromisedAccounts.length > 0) {
+                            player.authAccountIndex = node.compromisedAccounts[0];
+                            this.setText("Auto authenticating " + node.accounts[player.authAccountIndex].user + "...", false);
+                            this.setText(`Welcome, ${node.accounts[player.authAccountIndex].user}`);
+                            //player.nodeStack.push(this.id);
                         } else {
-                            // ask for a username
-                            player.askedForName = true;
-                            this.setText(node.ip_address + ": Enter username");
+                            // free account info - testing only
+                            //
+                            console.log("User: " + node.accounts[1].user + ", pwd: " + node.accounts[1].pwd)
+                            // END free account info - testing only
+                            //
+                            if (node.accounts.includes(player.tryAuthName)) {
+                                // found the username, skip to password
+                                player.askedForPwd = true;
+                                this.setText(node.ip_address + ": Enter password");
+                            } else {
+                                // ask for a username
+                                player.askedForName = true;
+                                this.setText(node.ip_address + ": Enter username");
+                            }
                         }
                     }
                 }
@@ -431,8 +446,17 @@ class aniRect {
                         mapCitiesSteps = 0
                         this.setText("Show Cities");
                     }
+                } else if (command[1].toLowerCase() == "center") {
+                    mapXOff = getWidth()/2;
+                    mapYOff = getHeight()/2;
+                    mapSteps = 0;
+                    mapCitiesSteps = 0;
+                    mapNodeSteps = 0;
+                    mapNodeStackSteps = 0;
+                    mapInc = 2;
+                    this.setText("Map centered");
+                    updateMap = true;
                 } else if (command[1].toLowerCase() == "reset") {
-                    // toggle reset
                     mapXOff = getWidth()/2;
                     mapYOff = getHeight()/2;
                     mapScale = 4;
