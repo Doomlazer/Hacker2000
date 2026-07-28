@@ -11,7 +11,7 @@ class User {
         this.workAddress;
         this.tryAuthName;
         this.tryAuthPwd;
-        this.authAccountIndex = 0;
+        this.authAccountIndex = 0; // current user starts a zero/admin
         this.askedForName = false;
         this.askedForPwd = false;
         this.windowHover = false;

@@ -19,7 +19,7 @@ class aniRect {
         this.yH = height;
         this.rectColor = '#028220';
         this.textColor = '#ffffff';
-        this.fontSize = 20;
+        this.fontSize = 18;
         this.textFont = "Courier New"; // "Hyperspace";
         this.opaqueBackground = true;
         this.backgroundColor = '#404141';
@@ -254,6 +254,8 @@ class aniRect {
                     if (!node.compromisedAccounts.includes(player.authAccountIndex)) {
                         node.compromisedAccounts.push(player.authAccountIndex);
                     }
+                    node.lastAuthAccount = player.authAccountIndex; // remember who is signed in.
+                    fs.changeDirectory("\\"); //clear file path
                     player.askedForPwd = false;
                     this.authTries = 0;
                     notFound = false;
@@ -275,9 +277,18 @@ class aniRect {
             } else if (command[0].toLowerCase() == "exit") {
                 this.setText("Goodbye...");
                 if (player.nodeStack.length > 1) {
+                    // foget logged in user on system
+                    let node = nodes[player.nodeStack[player.nodeStack.length-1]];
+                    node.lastAuthAccount = -1;
+                    fs.changeDirectory("\\");
+
+                    // remove from stack
                     player.nodeStack.pop();
-                    player.proxyWindow[0].wheelOff --;
+                    player.proxyWindow[0].wheelOff --; // needed?
                     this.setProxyText()
+                    // set preious authenticated user
+                    node = nodes[player.nodeStack[player.nodeStack.length-1]];
+                    node.authAccountIndex = node.lastAuthAccount;
                 } else {
                 this.toOpen = false;
                 this.delete = true;
@@ -325,6 +336,25 @@ class aniRect {
                     rw.setText(file, false);
                     this.setText("Opening...");
                 }
+            } else if (command[0].toLowerCase() == "cd") {
+                console.log(player.authAccountIndex);
+                this.setText(fs.changeDirectory(command[1], player.authAccountIndex));
+            } else if (command[0].toLowerCase() == "ls") {
+                let bool = false;
+                let path = fs.currectPath;
+                if (command.length > 1) {
+                    if (command[1] == "-a") {
+                        bool = true
+                        if (command.length > 2) {
+                            path = fs.resolvePath(command[2]);
+                        }
+                    } else {
+                        path = fs.resolvePath(command[1]);
+                    }
+                }
+                this.setText(fs.list(path, player.authAccountIndex, bool));
+            } else if (command[0].toLowerCase() == "pwd") {
+                this.setText(fs.getCurrentDirectory());
             } else if (command[0].toLowerCase() == "ssh") {
                 // accepts either ip or uNam@ip
                 // spawn proxy window if one doesn't exist
@@ -384,6 +414,8 @@ class aniRect {
                             player.authAccountIndex = node.compromisedAccounts[0];
                             this.setText("Auto authenticating " + node.accounts[player.authAccountIndex].user + "...", false);
                             this.setText(`Welcome, ${node.accounts[player.authAccountIndex].user}`);
+                            node.lastAuthAccount = node.compromisedAccounts[0];
+                            fs.changeDirectory("\\");
                             //player.nodeStack.push(this.id);
                         } else {
                             // free account info - testing only

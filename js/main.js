@@ -86,7 +86,7 @@ function createAccounts(n) {
         let last = locations[n].homeowner.split(" ")[1].toLowerCase()
         let uname = f + last;
         let pwd = passwords[getRandInt(passwords.length)] + getRandInt(999); 
-        let b = {"user": uname, "pwd": pwd, "admin": true, "userId": n};
+        let b = {"user": uname, "pwd": pwd, "admin": true, "userId": 1};
         //console.log("b " + b);
         
         a.push(b);
@@ -97,6 +97,7 @@ function createAccounts(n) {
         nodes[n].id = n;
         nodes[n].compromisedAccounts = [];
         nodes[n].accounts = a;
+        nodes[n].lastAuthAccount = -1;
     }
 }
 
