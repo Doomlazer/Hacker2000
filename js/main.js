@@ -98,6 +98,8 @@ function createAccounts(n) {
         nodes[n].compromisedAccounts = [];
         nodes[n].accounts = a;
         nodes[n].lastAuthAccount = -1;
+
+        nodes[n].telephone = generatePhoneNumber(nodes[n].country);
     }
 }
 
