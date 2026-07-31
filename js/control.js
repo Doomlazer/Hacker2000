@@ -74,8 +74,8 @@ function doWheel(e) {
 
 function doMouseMove(e) {
     let adjustedWindow = false;
-    mouseX = e.x - 10;
-    mouseY = e.y - 25;
+    mouseX = e.x - 2//- 10;
+    mouseY = e.y - 17//- 25;
     mouseDetail = e.detail;
     if (mouseDown) {
         if (!movingMap) {
@@ -199,7 +199,7 @@ function doKeyDown(e) {
             cast[i].keyHandler(e);
         }
     }
-    if (e.key == " ") {
+    if (e.key === " ") {
 
     }
 }

@@ -142,7 +142,9 @@ class aniRect {
             }
 
         } else {
-            if (e.key != "Shift" &&
+            if (e.key != "Control" &&
+                e.key != "Meta" &&
+                e.key != "Shift" &&
                 e.key != "ArrowLeft" &&
                 e.key != "ArrowRight") {
                 // add character to input    

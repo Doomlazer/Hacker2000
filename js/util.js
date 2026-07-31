@@ -3,6 +3,13 @@ function doResize() {
     c.height = getHeight() - 40;
     cMap.width = getWidth() - 20;
     cMap.height = getHeight() - 40;
+    mapXOff = getWidth()/3 * 2;
+    mapYOff = getHeight()/2;
+    mapSteps = 0;
+    mapInc = 0;
+    mapCitiesSteps = 0;
+    mapNodeSteps = 0;
+    mapNodeStackSteps = 0;
 }
 
 function getWidth() {

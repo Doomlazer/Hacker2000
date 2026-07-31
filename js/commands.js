@@ -77,6 +77,22 @@ function commandHandler(win) {
                 }
             }
         
+        } else if (command[0].toLowerCase() == 'fullscreen') {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+                cast[0].setText("Entering Fullscreen...");
+            } else {
+                document.exitFullscreen();
+                cast[0].setText("Exiting Fullscreen...");
+            }
+            doResize();
+            mapXOff = getWidth()/3 * 2;
+            mapYOff = getHeight()/2;
+            mapSteps = 0;
+            mapInc = 0;
+            mapCitiesSteps = 0;
+            mapNodeSteps = 0;
+            mapNodeStackSteps = 0;
         } else if (command[0].toLowerCase() == "exit") {
             win.setText("Goodbye...");
             if (player.nodeStack.length > 1) {
