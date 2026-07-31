@@ -2,17 +2,13 @@ function draw() {
     // clear
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, c.width, c.height);
-    
-    /*/ circle
-    ctx.strokeStyle = '#FF0000';
-    ctx.beginPath();
-    ctx.arc(250, 250, 50, 0, 360);
-    ctx.stroke();*/
 
     drawMap();
-    for (let i = 0; i < cast.length; i++) {
-        cast[i].draw();
-        //console.log(cast[i]);
+
+    // draw windows based on priority, highest is top most window
+    let s = cast.toSorted((a, b) => a.pri - b.pri);
+    for (let i = 0; i < s.length; i++) {
+       winDraw(s[i]);
     }
 
     drawCursor();
@@ -28,12 +24,23 @@ function drawCoords(coords) {
         const max = Math.min(mapSteps, points.length - 1);
 
         for (let i = 0; i < max; i++) {
-            drawLineMap([
-                points[i][0] * mapScale + mapXOff,
-                -points[i][1] * mapScale + mapYOff,
-                points[i + 1][0] * mapScale + mapXOff,
-                -points[i + 1][1] * mapScale + mapYOff
-            ]);
+            if (mapSteps < 2) {
+                // some countrys have a short first line, other are very long. 
+                // Keep them all the same while moving the map
+                drawLineMap([
+                    points[i][0] * mapScale + mapXOff,
+                    -points[i][1] * mapScale + mapYOff,
+                    points[i][0] * mapScale + mapXOff+2,
+                    -points[i][1] * mapScale + mapYOff+2
+                ]);
+            } else {
+                drawLineMap([
+                    points[i][0] * mapScale + mapXOff,
+                    -points[i][1] * mapScale + mapYOff,
+                    points[i + 1][0] * mapScale + mapXOff,
+                    -points[i + 1][1] * mapScale + mapYOff
+                ]);
+            }
         }
     }
 
@@ -88,17 +95,25 @@ function drawMap() {
             }
         }
         // highlight the selected country
-        ctxMap.strokeStyle = '#f35303';
+        ctxMap.strokeStyle = '#c04202';
         drawCoords(mapSel);
         //console.log("mapSel (" + player.selcountry + "):");
         //console.log(mapSel);
         //console.log("mapInc: " + mapInc + ", mapSteps: " + mapSteps + ", mapStepsMax: " + mapStepsMax);
+
+        // outer map rect
+        ctxMap.strokeStyle = '#3bd607';
+        ctxMap.strokeRect(-180 * mapScale + mapXOff,
+                        (-90 * mapScale) + mapYOff,
+                        360 * mapScale,
+                        (180 * mapScale));
+        ctxMap.lineWidth = 1;
     }
 
     ctx.drawImage(cMap, 0, 0);
 
     // clear mapMarkers ctx if map reset
-    if (mapSteps == 1) {
+    if (mapSteps <= 1) {
         ctxMarkers.fillStyle = '#000000';
         ctxMarkers.fillRect(0, 0, c.width, c.height);
     }
@@ -363,3 +378,102 @@ function drawIcon() {
         drawLineMap(icon[i]);
     }
 }
+
+function winDraw(win) { // draw a window
+        // update the animation, blit the rect and boarders if fully open draw text.
+        if (win.toOpen) {
+            // is opening
+            if (win.xP < win.xW) {
+                win.xP += win.aniSpeed;
+                if (win.xP > win.xW) {
+                    win.xP = win.xW;
+                }
+            }
+            if (win.yP < win.yH) {
+                win.yP += win.aniSpeed;
+                if (win.yP > win.yH) {
+                    win.yP = win.yH;
+                }
+            }
+
+            blitWinRect(win);
+
+            if (win.xP == win.xW && win.yP == win.yH) {
+                win.openedState();
+            } else {
+                win.aniSpeed += win.ease;
+            }
+
+        } else {
+            // is closing
+            if (win.xP > 0) {
+                win.xP -= win.aniSpeed;
+                if (win.xP < 0) {
+                    win.xP = 0;
+                }
+            }
+            if (win.yP > 0) {
+                win.yP -= win.aniSpeed;
+                if (win.yP < 0) {
+                    win.yP = 0;
+                }
+            }
+            
+            blitWinRect(win);
+
+            if (win.xP == 0 && win.yP == 0) {
+                win.closedState();
+            } else {
+                win.aniSpeed -= win.ease;
+            }
+        }
+    }
+
+    function blitWinRect(win) {
+        ctx.strokeStyle = win.rectColor;
+        //ctx.rectLineWidth = win.rectLineWidth;
+        ctx.lineWidth = win.rectLineWidth;
+
+        if (win.xP > 0 || win.yP > 0) {
+            // background
+            if (win.opaqueBackground) {
+                ctx.fillStyle = win.backgroundColor;
+                if (win.isRounded) {
+                    ctx.beginPath();
+                    ctx.roundRect(win.x1, win.y1, win.xP, win.yP, win.cornerRad);
+                    ctx.fill();
+                } else {
+                    ctx.fillRect(win.x1, win.y1, win.xP, win.yP);
+                }
+    
+            }
+
+            // main rect
+            if (win.isRounded) {
+                ctx.beginPath();
+                ctx.roundRect(win.x1, win.y1, win.xP, win.yP, win.cornerRad);
+                ctx.stroke();
+            } else {
+                ctx.strokeRect(win.x1, win.y1, win.xP, win.yP);
+            }
+
+            // boarder
+            if (win.hasBoarder) {
+                ctx.lineWidth = win.boarderLineWidth;
+                if (win.isRounded) {
+                    ctx.beginPath();
+                    ctx.roundRect(win.x1 - (win.boarderWidth * (win.xP/win.xW)),
+                                    win.y1 - (win.boarderHeight * (win.yP / win.yH)),
+                                    win.xP + ((win.boarderWidth * (win.xP/win.xW)) * 2),
+                                    win.yP + ((win.boarderHeight * (win.yP / win.yH)) * 2),
+                                    win.cornerRad);
+                    ctx.stroke();
+                } else {
+                    ctx.strokeRect(win.x1 - (win.boarderWidth * (win.xP/win.xW)),
+                                    win.y1 - (win.boarderHeight * (win.yP / win.yH)),
+                                    win.xP + ((win.boarderWidth * (win.xP/win.xW)) * 2),
+                                    win.yP + ((win.boarderHeight * (win.yP / win.yH)) * 2));
+                }
+            }
+        }
+    }

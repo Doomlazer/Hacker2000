@@ -7,7 +7,7 @@ let gUsers = [];
 let player;
 let locations = [];
 let map = [];
-let mapScale = 3;
+let mapScale = 1.5;
 let mapXOff;;
 let mapYOff;
 let mapColor = '#c8cac8';

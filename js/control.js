@@ -12,12 +12,15 @@ mouseDetail = 0;
 function doWheel(e) {
     let adjustedWindow = false;
     // scale the cast member if mouse hover
-    for (let w = 0; w < cast.length; w ++) {
-        let c = cast[w];
+    // but if windows overlap at mouse X/Y, only do the top most (pri 0)
+    let s = cast.toSorted((a, b) => a.pri - a.pri);
+    for (let w = 0; w < s.length; w ++) {
+        let c = s[w];
         if (mouseX > c.x1 &&
             mouseX < c.x1 + c.xW &&
             mouseY > c.y1 &&
-            mouseY < c.y1 + c.yH) {
+            mouseY < c.y1 + c.yH &&
+            !adjustedWindow) {
 
             adjustedWindow = true;
 
@@ -44,39 +47,17 @@ function doWheel(e) {
             // clear
             ctxMarkers.fillStyle = '#000000';
             ctxMarkers.fillRect(0, 0, c.width, c.height);
-            //c.updateMap = true;
-            ``
-            //c.displayLines = [];
-            //c.setText(c.text, false);
-
-            //mapSteps = 1;
-            //mapInc = 1;
-            //mapCitiesSteps = 0;
-            //mapNodeSteps = 0;
-            //mapNodeStackSteps = 0;
         }
     }
-    // or scale the map
+    // otherwise scale the map
     if (!adjustedWindow) {
         mapScale -= e.deltaY/100;
         if (mapScale < 1) {
             mapScale = 1;
         }
-        /*
-        if (mapXOff < 0) {
-            mapXOff = 0;
-        }
-        if (mapYOff < 0) {
-            mapYOff = 0;
-        }
-        if (mapXOff > c.width) {
-            mapXOff = c.width;
-        }
-        if (mapYOff > c.height) {
-            mapYOff = c.heigth;
-        }*/
-        mapSteps = 1;
-        mapInc = 1;
+
+        mapSteps = 0;
+        mapInc = 0;
         mapCitiesSteps = 0;
         mapNodeSteps = 0;
         mapNodeStackSteps = 0;
@@ -94,22 +75,19 @@ function doMouseMove(e) {
             // drag windows
             for (let w = 0; w < cast.length; w ++) {
                 let c = cast[w];
-                if (mouseX > c.x1 &&
-                    mouseX < c.x1 + c.xW &&
-                    mouseY > c.y1 &&
-                    mouseY < c.y1 + c.yH &&
-                    c.mouseDrag) { // moving this window
+                if (c.mouseDrag) { // moving this window
 
                     adjustedWindow = true;
-                    c.x1 = oldOffX - ((mouseDownX - mouseX));
-                    c.y1 = oldOffY - ((mouseDownY - mouseY));
+                    c.x1 = mouseX + oldOffX ;
+                    c.y1 = mouseY + oldOffY ;
+
+                    // save the updated proxy and reader windows loc so
+                    // they respawn where the user closed them
                     if (c.type == "proxy") {
-                        //console.log("proxy")
                         cast[0].pX1 = c.x1;
                         cast[0].pY1 = c.y1;
                     }
                     if (c.type == "reader") {
-                        //console.log("proxy")
                         cast[0].rX1 = c.x1;
                         cast[0].rY1 = c.y1;
                     }
@@ -123,12 +101,6 @@ function doMouseMove(e) {
                     // clear
                     ctxMarkers.fillStyle = '#000000';
                     ctxMarkers.fillRect(0, 0, c.width, c.height);
-                    //mapSteps = 1;
-                    //mapInc = 1;
-                    //mapCitiesSteps = 0;
-                    //mapNodeSteps = 0;
-                    //mapNodeStackSteps = 0;
-                    //drawMap();
                 }
             }
         }
@@ -161,19 +133,32 @@ function doMouseDown(e) {
     movingMap = false;
     mouseDown = true;
     mouseDetail = e.detail;
-
     let notFound = true;
-    for (let w = 0; w < cast.length; w++) {
-        let c = cast[w];
+
+    let s = cast.toSorted((a, b) => a.pri - b.pri);
+    for (let w = 0; w < s.length; w++) {
+        let c = s[w];
         if (mouseX > c.x1 &&
             mouseX < c.x1 + c.xW &&
             mouseY > c.y1 &&
             mouseY < c.y1 + c.yH) {
-                oldOffX = -(c.xW/2);
-                oldOffY = -(c.yH/2);
-                notFound = false;
-                c.mouseDrag = true;
-                drawMap();
+
+            notFound = false;
+            oldOffX = c.x1 - mouseX;
+            oldOffY = c.y1 - mouseY;
+            c.mouseDrag = true;
+            // draw this window on top now
+            if (c.pri != 0) {
+                c.pri = cast.length; // set max pri
+                // downgrade the others
+                for (let i = 0; i < cast.length; i++) {
+                    if (cast.indexOf(c) != i) {
+                        cast[i].pri --;
+                        cast[i].mouseDrag = false;
+                    }
+                }
+            }
+            drawMap();
         }
     }
     if (notFound) {
