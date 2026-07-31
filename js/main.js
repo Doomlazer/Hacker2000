@@ -8,7 +8,7 @@ let player;
 let locations = [];
 let map = [];
 let mapScale = 1.5;
-let mapXOff;;
+let mapXOff;
 let mapYOff;
 let mapColor = '#c8cac8';
 let updateMap = true;

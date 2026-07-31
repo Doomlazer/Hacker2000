@@ -51,7 +51,14 @@ function doWheel(e) {
     }
     // otherwise scale the map
     if (!adjustedWindow) {
-        mapScale -= e.deltaY/100;
+        // zoom map at mouse position
+        const oldScale = mapScale;
+        mapScale -= e.deltaY / 100;
+        mapScale = Math.max(0.1, mapScale);
+        const ratio = mapScale / oldScale;
+        mapXOff = mouseX - (mouseX - mapXOff) * ratio;
+        mapYOff = mouseY - (mouseY - mapYOff) * ratio;
+        // limit map reduction
         if (mapScale < 1) {
             mapScale = 1;
         }

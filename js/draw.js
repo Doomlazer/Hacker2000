@@ -17,7 +17,7 @@ function draw() {
 function drawCoords(coords) {
 
     function drawLine(points) {
-        if (points.length < 2) return;
+        if (points.length < 3) return;
 
         mapStepsMax = Math.max(mapStepsMax, points.length - 1);
 
@@ -30,8 +30,8 @@ function drawCoords(coords) {
                 drawLineMap([
                     points[i][0] * mapScale + mapXOff,
                     -points[i][1] * mapScale + mapYOff,
-                    points[i][0] * mapScale + mapXOff+2,
-                    -points[i][1] * mapScale + mapYOff+2
+                    points[i][0] * mapScale + mapXOff+1,
+                    -points[i][1] * mapScale + mapYOff+1
                 ]);
             } else {
                 drawLineMap([
