@@ -24,18 +24,13 @@
     <canvas id="canvasMarkers" width="1" height="1" style="border:2px solid #000000; display: none;">
       Your browser does not support the HTML5 canvas tag.
     </canvas>
+    <canvas id="canvasGL" width="1" height="1" style="border:2px solid #000000; display: none;">
+      Your browser does not support the HTML5 canvas tag.
+    </canvas>
   </div>
-
-  <script>
-    const c = document.getElementById("canvas");
-    const ctx = c.getContext("2d");
-    const cMap = document.getElementById("canvasMap");
-    const ctxMap = cMap.getContext("2d");
-    const cMarkers = document.getElementById("canvasMarkers");
-    const ctxMarkers = cMap.getContext("2d");
-  </script>
-
   <link rel="preload" href="Hyperspace.ttf" as="font" type="font/ttf" crossorigin="anonymous"/>
+  <script type="text/javascript" src="./js/GameTimer.js"></script>
+  <script type="text/javascript" src="./js/GLRenderer.js"></script>
   <script type="text/javascript" src="./js/main.js"></script>
   <script type="text/javascript" src="./js/util.js"></script>
   <script type="text/javascript" src="./js/draw.js"></script>
@@ -50,5 +45,21 @@
   <script type="tex.javascript" src="./data/countries.json"></script>
   <script type="tex.javascript" src="./data/cities.json"></script>
   <script type="tex.javascript" src="./data/nodes.json"></script>
+
+  <script>
+    const c = document.getElementById("canvas");
+    const ctx = c.getContext("2d");
+    const cMap = document.getElementById("canvasMap");
+    const ctxMap = cMap.getContext("2d");
+    const cMarkers = document.getElementById("canvasMarkers");
+    const ctxMarkers = cMap.getContext("2d");
+    const glCanvas = document.getElementById("canvasGL");
+    const renderer = new GLRenderer(glCanvas);
+    let cameraMatrix = new Float32Array([
+        2 / cMap.width, 0, 0,
+        0, -2 / cMap.height, 0,
+        -1, 1, 1
+    ]);
+  </script>
 </body>
 </html>

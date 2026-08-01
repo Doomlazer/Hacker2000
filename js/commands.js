@@ -1,7 +1,7 @@
 function commandHandler(win) {
     const command = win.inputStr.split(" ");
     win.inputStr = "";
-    console.log(`sent command ${command}`)
+    //console.log(`sent command ${command}`)
 
     // all systems must have an exit command, approved commands and admins are optional
     if (win.approvedComands.includes(command[0].toLowerCase())
@@ -76,7 +76,24 @@ function commandHandler(win) {
                     win.setText("Incorrect. Enter password");
                 }
             }
-        
+        } else if (command[0].toLowerCase() == 'help') {
+            let rw = new aniRect(win.rX1, win.rY1, win.rXW, win.rYH);
+                //console.log("2nf " + cast[cast.length-1]);
+                rw.fontSize = win.readerFontSize;
+                rw.acceptInput = false;
+                rw.backgroundColor = win.readerBackgroundColor;
+                rw.rectColor = win.readerRectColor;
+                rw.textColor = win.readerTextColor
+                rw.isRounded = win.readerIsRounded;
+                rw.hasBoarder = win.readerHasBoarder;
+                rw.type = "reader";
+                cast.push(rw);
+                player.readerWindow.push(rw);
+                file = "HElp text will go here some day"
+                rw.setText(file, false);
+                win.setText("Opening...");
+        } else if (command[0].toLowerCase() == 'date') {
+            cast[0].setText(gameTimer.formatted());
         } else if (command[0].toLowerCase() == 'fullscreen') {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen();
@@ -133,13 +150,13 @@ function commandHandler(win) {
                 }
             } else {
                 player.musicOn = true;
-                win.setText("Playing...");
-                playMusic();
+                let r = playMusic(win);
+                win.setText("Buffering aduio..." + r);
             }
 
         } else if (command[0].toLowerCase() == "read") {
             // read files in scrolling window
-            if (player.readerWindow.length < 1) {
+            //if (player.readerWindow.length < 1) {
                 let rw = new aniRect(win.rX1, win.rY1, win.rXW, win.rYH);
                 //console.log("2nf " + cast[cast.length-1]);
                 rw.fontSize = win.readerFontSize;
@@ -154,7 +171,7 @@ function commandHandler(win) {
                 player.readerWindow.push(rw);
                 rw.setText(file, false);
                 win.setText("Opening...");
-            }
+            //}
         } else if (command[0].toLowerCase() == "cd") {
             console.log(player.authAccountIndex);
             win.setText(fs.changeDirectory(command[1], player.authAccountIndex));

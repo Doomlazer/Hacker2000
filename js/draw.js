@@ -27,6 +27,7 @@ function drawCoords(coords) {
             if (mapSteps < 2) {
                 // some countrys have a short first line, other are very long. 
                 // Keep them all the same while moving the map
+                ctxMap.lineWidth = 3;
                 drawLineMap([
                     points[i][0] * mapScale + mapXOff,
                     -points[i][1] * mapScale + mapYOff,
@@ -71,43 +72,49 @@ function drawCoords(coords) {
 function drawMap() {
     let mouseLabel = "";
     if (updateMap || mapSteps < mapStepsMax) {
+        updateMap = false;
+        //console.log(`Updating Map. mapSteps: ${mapSteps}`);
+
         // draw map a bit at a time
         mapSteps += mapInc;
         mapInc ++;
-        //mapInc = mapInc + (mapInc/8);
-        if (mapSteps > mapStepsMax) {mapSteps = mapStepsMax}
-        updateMap = false;
 
+        /*if (mapSteps > mapStepsMax) {
+            mapSteps = mapStepsMax;
+        }*/
+
+        // clear map context
         ctxMap.fillStyle = '#000000';
         ctxMap.fillRect(0, 0, c.width, c.height);
         ctxMap.lineWidth = 1;
         ctxMap.strokeStyle = mapColor;
+
+        // send each country's line data
         for (let i = 0; i < map.length; i++) {
             const f = map[i];
-            if (f.properties.name != "") {
-                //console.log("Drawling country: " + f.properties.name);
+            //if (f.properties.name != "") {
+            if (true) {
                 const cords = f.geometry.coordinates;
-                //let cl = cords.length;
+                // the player's selected contry needed to be drawn on top to 
+                // avoid overlaps with neighbors
                 if (f.properties.name == player.selcountry) {
                     mapSel = cords;
                 }
                 drawCoords(cords);
             }
         }
-        // highlight the selected country
-        ctxMap.strokeStyle = '#c04202';
-        drawCoords(mapSel);
-        //console.log("mapSel (" + player.selcountry + "):");
-        //console.log(mapSel);
-        //console.log("mapInc: " + mapInc + ", mapSteps: " + mapSteps + ", mapStepsMax: " + mapStepsMax);
 
-        // outer map rect
-        ctxMap.strokeStyle = '#3bd607';
+        // Draw the player selected country
+        ctxMap.strokeStyle = this.mapSelCountryColor;
+        drawCoords(mapSel);
+
+        // Draw the map's boarder
+        ctxMap.strokeStyle = this.mapBoarderColor;
+        ctxMap.lineWidth = this.mapBoarderLineWidth;
         ctxMap.strokeRect(-180 * mapScale + mapXOff,
                         (-90 * mapScale) + mapYOff,
                         360 * mapScale,
                         (180 * mapScale));
-        ctxMap.lineWidth = 1;
     }
 
     ctx.drawImage(cMap, 0, 0);

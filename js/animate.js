@@ -1,5 +1,7 @@
 class aniRect {
     constructor(x, y, width, height) {
+        this.glowEffect = true;
+        this.glowEffectWidth = 10;
         this.isRounded = true;
         this.cornerRad = 20;
         this.rectLineWidth = 1;
@@ -41,8 +43,17 @@ class aniRect {
         this.proxyWindow = [];
         this.type = "none";
         this.wheelOff = 0; // scroll wheel offset
-        this.text = `Welcome to the mal-90 OS\nIt's ${this.date}`;
+        console.log=
+        this.text = `Welcome to the mal-90 OS\nIt's ${gameTimer.formatted()}\nMight I suggest some MUSIC or asking for HELP if you need it.`;
         this.pri = cast.length; // draw priority
+        // map defaults
+        this.drawMap = true
+        this.mapHasBoarder = true;
+        this.mapLineWidth = 1;
+        this.mapBoarderLineWidth = 2;
+        this.mapBoarderColor = '#00ba00';
+        this.mapdefaultColor = '#FFFFFF';
+        this.mapSelCountryColor = '#FF9900'
         // proxy defaults
         this.proxyFontSize = 12;
         this.proxyText = "Proxy List:\n"
