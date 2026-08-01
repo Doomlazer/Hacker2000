@@ -44,7 +44,7 @@ class aniRect {
         this.type = "none";
         this.wheelOff = 0; // scroll wheel offset
         console.log=
-        this.text = `Welcome to the mal-90 OS\nIt's ${gameTimer.formatted()}\nMight I suggest some MUSIC or asking for HELP if you need it.`;
+        this.text = `Welcome to the mal-90 OS\nDate: ${gameTimer.formatted()}\nMight I suggest some MUSIC or asking for HELP if you need it.`;
         this.pri = cast.length; // draw priority
         // map defaults
         this.drawMap = true
@@ -257,8 +257,7 @@ class aniRect {
 
     closedState() {
         this.textDisplayChar = 0;
-        console.log("CloedState");
-        console.log(`cast[cast.indexOf(this)]: ${cast[cast.indexOf(this)]}`)
+        //console.log(`cast[cast.indexOf(this)]: ${cast[cast.indexOf(this)]}`)
         if (cast.indexOf(this) == 0) {
             // always reopen players computer
              this.toOpen = true;
@@ -278,7 +277,7 @@ class aniRect {
                     player.proxyWindow.pop();
                 }
             } else if (this.type = "reader") {
-                console.log(`player.readerWindow: ${player.readerWindow}`);
+                //console.log(`player.readerWindow: ${player.readerWindow}`);
                 if (this == player.readerWindow[0]) {
                     player.readerWindow.pop();
                 }
