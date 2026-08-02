@@ -97,7 +97,6 @@ function playMusic(window, url="", s="") {
         sources.push("https://archive.org/download/1757030366_windowlicker/Windowlicker/01%20Aphex%20Twin%20-%20Windowlicker.mp3");
         sources.push("https://archive.org/download/Squarepusher19970724JapanTokyo/Squarepusher%20-%201997-07-24%20Japan-Tokyo.mp3");
         sources.push("https://archive.org/download/Squarepusher19970724JapanTokyo/Squarepusher%20-%201997-07-24%20Japan-Tokyo.mp3");
-
     } else if (s == "talk") {
         // defcon 2000
         sources.push("https://archive.org/download/defcon-real-media-collection/2000_Defcon_V01-Arthur_Money-Meet_The_Fed_Panel-audio.mp3");

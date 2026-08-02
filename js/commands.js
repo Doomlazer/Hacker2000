@@ -141,8 +141,7 @@ function commandHandler(win) {
                 }
             }
             win.setText(str);
-        } else if (command[0].toLowerCase() == "audio
-        ") {
+        } else if (command[0].toLowerCase() == "audio") {
             if (player.musicOn && command[1] == "stop") {
                 player.musicOn = false;
                 win.setText("Stopping Music audio...");
@@ -175,9 +174,17 @@ function commandHandler(win) {
                         }
                     } else {
                         // pass user provided url
+                        while (backgroundMusic.length > 0) {
+                            backgroundMusic[backgroundMusic.length - 1].stop();
+                            backgroundMusic.pop();
+                        }
                         playMusic(win, command[1]);
                     }
                 } else {
+                    while (backgroundMusic.length > 0) {
+                        backgroundMusic[backgroundMusic.length - 1].stop();
+                        backgroundMusic.pop();
+                    }
                     playMusic(win);
                 }
             }
