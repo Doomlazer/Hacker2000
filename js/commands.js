@@ -1,5 +1,6 @@
 function commandHandler(win) {
     const command = win.inputStr.split(" ");
+    console.log(command)
     win.inputStr = "";
     //console.log(`sent command ${command}`)
 
@@ -140,18 +141,45 @@ function commandHandler(win) {
                 }
             }
             win.setText(str);
-        } else if (command[0].toLowerCase() == "music") {
-            if (player.musicOn) {
+        } else if (command[0].toLowerCase() == "audio
+        ") {
+            if (player.musicOn && command[1] == "stop") {
                 player.musicOn = false;
-                win.setText("Stopping...");
+                win.setText("Stopping Music audio...");
                 while (backgroundMusic.length > 0) {
                     backgroundMusic[backgroundMusic.length - 1].stop();
                     backgroundMusic.pop();
                 }
             } else {
+                while (backgroundMusic.length > 0) {
+                    backgroundMusic[backgroundMusic.length - 1].stop();
+                    backgroundMusic.pop();
+                }
                 player.musicOn = true;
-                let r = playMusic(win);
-                win.setText("Buffering aduio..." + r);
+                //console.log(command)
+                if (command.length > 1) {
+                    if (command[1] == "talk") {
+                        if (command.length > 2 && command[2] == "stop") {
+                            win.setText("Stopping Music audio...");
+                            while (talkRadio.length > 0) {
+                                talkRadio[talkRadio.length - 1].stop();
+                                talkRadio.pop();
+                            }
+                        } else {
+                            // pull from the talk mp3s
+                            while (talkRadio.length > 0) {
+                                talkRadio[talkRadio.length - 1].stop();
+                                talkRadio.pop();
+                            }
+                            playMusic(win, "", "talk");
+                        }
+                    } else {
+                        // pass user provided url
+                        playMusic(win, command[1]);
+                    }
+                } else {
+                    playMusic(win);
+                }
             }
 
         } else if (command[0].toLowerCase() == "read") {
@@ -226,7 +254,7 @@ function commandHandler(win) {
                     player.tryAuthName = addr[0];
                     ip = addr[1];
                 }
-                console.log(`sshing to: ${player.tryAuthName}@${ip}`)
+                console.log(`sshing to: ${player.tryAuthName}@${ip}`);
                 // find the ip address
                 let notFound = true;
                 for (let i of nodes) {

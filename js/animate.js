@@ -43,7 +43,6 @@ class aniRect {
         this.proxyWindow = [];
         this.type = "none";
         this.wheelOff = 0; // scroll wheel offset
-        console.log=
         this.text = `Welcome to the mal-90 OS\nDate: ${gameTimer.formatted()}\nMight I suggest some MUSIC or asking for HELP if you need it.`;
         this.pri = cast.length; // draw priority
         // map defaults
@@ -96,8 +95,27 @@ class aniRect {
         
         // add the input prompt
         if (prompt) {
-        this.displayLines.push(this.promptChar);
+            this.displayLines.push(this.promptChar);
         }
+
+        // why not scroll instead?
+        /*/console.log(this.displayLines.length)
+        if (player.sendToReaderThreshold < this.displayLines.length) {
+            let rw = new aniRect(this.rX1, this.rY1, this.rXW, this.rYH);
+            //console.log("2nf " + cast[cast.length-1]);
+            rw.fontSize = this.readerFontSize;
+            rw.acceptInput = false;
+            rw.backgroundColor = this.readerBackgroundColor;
+            rw.rectColor = this.readerRectColor;
+            rw.textColor = this.readerTextColor
+            rw.isRounded = this.readerIsRounded;
+            rw.hasBoarder = this.readerHasBoarder;
+            rw.type = "reader";
+            cast.push(rw);
+            player.readerWindow.push(rw);
+            rw.setText((this.displayLines + theText), false);
+            //win.setText("Opening...");
+        }*/
     }
 
     clickHandler(e) {
@@ -113,6 +131,7 @@ class aniRect {
         if (e.key == "Enter") {
             // execute entered string
             this.lastInput = this.inputStr;
+            console.log("Enter: " + this.inputStr);
             commandHandler(this);
 
         } else if (e.key == "ArrowUp") {
@@ -324,8 +343,20 @@ class aniRect {
                 currentLine += word;
               }
             } else {
-                // to do deal with super long words
                 lines.push(currentLine);
+
+                // breakup urls and other long words
+                while (ctx.measureText(word).width > maxWidth) {
+                    let c = word.length;
+
+                    while (ctx.measureText(word.slice(0, c)).width > maxWidth) {
+                        c--;
+                    }
+
+                    lines.push(word.slice(0, c));
+                    word = word.slice(c);
+                }
+
                 currentLine = word;
             }
           }

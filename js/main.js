@@ -19,12 +19,13 @@ let mapSel = [];
 let cities = [];
 let nodes = [];
 let backgroundMusic = [];
+let talkRadio = [];
 let phoneAudio = [];
 let mapCitiesSteps = 0;
 let mapNodeSteps = 0;
 let mapNodeStackSteps = 0;
 let movingMap = false;
-const gameTimer = new GameTimer("1999-10-31T03:30:33");
+const gameTimer = new GameTimer("2000-7-5");
 
 function init() {
     window.addEventListener('click', doClick);
@@ -35,6 +36,14 @@ function init() {
     window.addEventListener('wheel', doWheel);
     //window.addEventListener("keyup", kUp);
     window.addEventListener('resize', doResize);
+    window.addEventListener("paste", (event) => {
+        let text = event.clipboardData.getData("text");
+        for (let i = 0; i < text.length; i++) {
+            let e = {"key": text[i]}
+            cast[0].keyHandler(e);
+        }
+    //console.log(text);
+});
 
     document.addEventListener("gesturestart", e => e.preventDefault(), { passive: false });
     doResize();

@@ -1,8 +1,17 @@
 class GameTimer {
-constructor(startDate) {
-    this.startDate = new Date(startDate);
-    this.realStartTime = Date.now();
-}
+    constructor(startDate) {
+        const now = new Date();
+
+        this.startDate = new Date(startDate);
+        this.startDate.setHours(
+            now.getHours(),
+            now.getMinutes(),
+            now.getSeconds(),
+            now.getMilliseconds()
+        );
+
+        this.realStartTime = Date.now();
+    }
 
     elapsed() {
         const ms = Date.now() - this.startTime;
@@ -13,6 +22,17 @@ constructor(startDate) {
             minutes: Math.floor(ms / 60000),
             hours: Math.floor(ms / 3600000),
             days: Math.floor(ms / 86400000)
+        };
+    }
+
+    realTime() {
+        const ms = Date.now();
+
+        return {
+            milliseconds: ms,
+            seconds: Math.floor(ms / 1000),
+            minutes: Math.floor(ms / 60000),
+            hours: Math.floor(ms / 3600000)
         };
     }
     
