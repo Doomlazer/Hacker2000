@@ -6,4 +6,4 @@ CURRENTLY IN ALPHA
 
 # Play alpha version in browser
 
-[Click Here](https://doomlazer.github.io/Hacker2026)
+[Click Here](https://doomlazer.github.io/Hacker2000)
