@@ -76,13 +76,16 @@ function loadCities() {
             gUsers.push(player);
             //playMusic(); // background musics
 
-            let playersComp = new aniRect(getWidth()/20, getHeight()/8, getWidth()/3, getHeight()/1.5);
-            playersComp.admins.push(0); // add player as admin to own computer
-            cast.push(playersComp);
-            ctx.font = scaleFont(playersComp.textScale * playersComp.xW, playersComp.textFont);
-            loadNodes()
+            loadNodes();
+            //ctx.font = scaleFont(playersWindow.textScale * playersWindow.xW, playersWindow.textFont);
         })
         .catch(error => console.error('Error loading cities JSON file', error));
+}
+
+function attachNode(window, node) {
+    window.node = node;
+    window.promptChar = node.promptChar;
+    window.text = node.text;
 }
 
 function createAccounts(n) {
@@ -110,6 +113,35 @@ function createAccounts(n) {
         nodes[n].lastAuthAccount = -1;
 
         nodes[n].telephone = generatePhoneNumber(nodes[n].country);
+
+        const fs = new FileSystem();
+
+        nodes[n].logFile = "C:\\Windows\\logs\\logs.txt";
+
+        // Create folders
+        fs.createFolder("C:\\Games", 1);
+        if (n == 0) {
+            fs.createFolder("C:\\Games\\DOOM", 1);
+        }
+        fs.createFolder("C:\\Windows", 0);
+        fs.createFolder("C:\\Windows\\System32", 0);
+        fs.createFolder("C:\\Windows\\logs", 0);
+
+        // Create files
+        fs.createFile("C:\\config.cfg", 0, "This is a config file");
+        fs.createFile("C:\\Windows\\logs\\logs.txt", 0, "LOG FILE:\n");
+        fs.createFile("C:\\Windows\\System32\\kernel.dll", 0, "f34jfw9084j3948349fj834fj49fdj8w");
+
+        // Make Windows read-only
+        fs.setAttributes(
+            "C:\\Windows",
+            {
+                readOnly: true,
+                system: true
+            }
+        );
+
+        nodes[n].fileSystem = fs;
     }
 }
 
@@ -121,12 +153,18 @@ function loadNodes() {
             //console.log("nodes: " + nodes);
             shuffle(nodes);
             for (let i = 0; i < nodes.length; i++) {
+                nodes[i].id = i;
                 nodes[i].city = cities[i].name;
                 nodes[i].country = cities[i].country;
                 nodes[i].latitude = cities[i].lat;
                 nodes[i].longitude = cities[i].lon;
                 nodes[i].dicovered = false;
+                nodes[i].fileSystem = [];
+                nodes[i].type = "mal-90.";
+                nodes[i].text = `Welcome to the mal-90.${i} OS\nDate: ${gameTimer.formatted()}\nMight I suggest some AUDIO or asking for HELP if you need it.`;
+                nodes[i].promptChar = ">";
                 createAccounts(i);
+                
             }
             loadMap();
         })
@@ -140,6 +178,13 @@ function loadMap() {
         .then(result => {
             //console.log(map);
             map = map.features;
+
+            let playersWindow = new aniRect(getWidth()/20, getHeight()/8, getWidth()/3, getHeight()/1.5);
+            attachNode(playersWindow, nodes[0]);
+
+            playersWindow.admins.push(0); // add player as admin to own computer
+            cast.push(playersWindow);
+
             requestAnimationFrame(frame);
         })
         .catch(error => console.error('Error loading map JSON file', error));

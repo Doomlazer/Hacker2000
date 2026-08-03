@@ -355,7 +355,9 @@ class FileSystem {
 
     readFile(path, userID = 0) {
 
-        const file = this.getFile(path);
+        path = this.resolvePath(path);
+        console.log(path)
+        const file = this.getItem(path);
 
         if (!file) {
             return "File not found";
@@ -365,12 +367,13 @@ class FileSystem {
             return "Access denied";
         }
 
+        console.log(file.content);
         return file.content;
     }
 
     writeFile(path, text, userID = 0) {
-
-        const file = this.getFile(path);
+        path = this.resolvePath(path);
+        const file = this.getItem(path);
 
         if (!file) {
             return "File not found";
@@ -387,8 +390,8 @@ class FileSystem {
     }
 
     appendFile(path, text, userID = 0) {
-
-        const file = this.getFile(path);
+        path = this.resolvePath(path);
+        const file = this.getItem(path);
 
         if (!file) {
             return "File not found";
@@ -668,7 +671,7 @@ class FileSystem {
 
 //=========================================================
 // Example Usage
-//=========================================================
+/*/=========================================================
 
 const fs = new FileSystem();
 
@@ -725,7 +728,7 @@ fs.print();
 
 //console.log(fs.toJSON());
 
-
+*/
 
 
 

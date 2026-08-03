@@ -38,6 +38,7 @@ function commandHandler(win) {
                     player.askedForName = false;
                     win.authTries = 0;
                     player.nodeStack.pop();
+                    attachNode(win, nodes[player.nodeStack.length-1]);
                     win.setProxyText();
                 } else {
                     win.setText("Invalid user. Enter username");
@@ -59,7 +60,7 @@ function commandHandler(win) {
                     node.compromisedAccounts.push(player.authAccountIndex);
                 }
                 node.lastAuthAccount = player.authAccountIndex; // remember who is signed in.
-                fs.changeDirectory("\\"); //clear file path
+                win.node.fileSystem.changeDirectory("\\"); //clear file path
                 player.askedForPwd = false;
                 win.authTries = 0;
                 notFound = false;
@@ -70,6 +71,7 @@ function commandHandler(win) {
                 if (win.authTries >= 3) {
                     win.setText("Invalid password. Too many attempts\nDisconnected...");
                     player.nodeStack.pop();
+                    attachNode(win, nodes[player.nodeStack.length-1]);
                     win.authTries = 0;
                     win.setProxyText();
                     win.askedForPwd = false;
@@ -117,11 +119,11 @@ function commandHandler(win) {
                 // foget logged in user on system
                 let node = nodes[player.nodeStack[player.nodeStack.length-1]];
                 node.lastAuthAccount = -1;
-                fs.changeDirectory("\\");
 
                 // remove from stack
                 player.nodeStack.pop();
-                player.proxyWindow[0].wheelOff --; // needed?
+                attachNode(win, nodes[player.nodeStack.length-1]);
+                //player.proxyWindow[0].wheelOff --; // needed?
                 win.setProxyText()
                 // set preious authenticated user
                 node = nodes[player.nodeStack[player.nodeStack.length-1]];
@@ -150,10 +152,6 @@ function commandHandler(win) {
                     backgroundMusic.pop();
                 }
             } else {
-                while (backgroundMusic.length > 0) {
-                    backgroundMusic[backgroundMusic.length - 1].stop();
-                    backgroundMusic.pop();
-                }
                 player.musicOn = true;
                 //console.log(command)
                 if (command.length > 1) {
@@ -204,28 +202,40 @@ function commandHandler(win) {
                 rw.type = "reader";
                 cast.push(rw);
                 player.readerWindow.push(rw);
-                rw.setText(file, false);
+                if (command.length > 1) {
+                    // read [path]
+                    if (command[1].toLowerCase() == "log" ||
+                        command[1].toLowerCase() == "logs" ||
+                        command[1].toLowerCase() == "logfile") {
+                        rw.setText(win.node.fileSystem.readFile(win.node.logFile, player.authAccountIndex));
+                    } else {
+                        rw.setText(win.node.fileSystem.readFile(command[1], player.authAccountIndex));
+                    }
+                } else {
+                    //rw.setText(file, false);
+                    rw.setText("New File", false);
+                }
                 win.setText("Opening...");
             //}
         } else if (command[0].toLowerCase() == "cd") {
-            console.log(player.authAccountIndex);
-            win.setText(fs.changeDirectory(command[1], player.authAccountIndex));
+            //console.log(player.authAccountIndex);
+            win.setText(win.node.fileSystem.changeDirectory(command[1], player.authAccountIndex));
         } else if (command[0].toLowerCase() == "ls") {
             let bool = false;
-            let path = fs.currectPath;
+            let path = win.node.fileSystem.currectPath;
             if (command.length > 1) {
                 if (command[1] == "-a") {
                     bool = true
                     if (command.length > 2) {
-                        path = fs.resolvePath(command[2]);
+                        path = win.node.fileSystem.resolvePath(command[2]);
                     }
                 } else {
-                    path = fs.resolvePath(command[1]);
+                    path = win.node.fileSystem.resolvePath(command[1]);
                 }
             }
-            win.setText(fs.list(path, player.authAccountIndex, bool));
+            win.setText(win.node.fileSystem.list(path, player.authAccountIndex, bool));
         } else if (command[0].toLowerCase() == "pwd") {
-            win.setText(fs.getCurrentDirectory());
+            win.setText(win.node.fileSystem.getCurrentDirectory());
         } else if (command[0].toLowerCase() == "ssh") {
             // accepts either ip or uNam@ip
             // spawn proxy window if one doesn't exist
@@ -270,6 +280,15 @@ function commandHandler(win) {
                         //console.log(i)
                         player.nodeStack.push(i.id);
                         win.setProxyText();
+                        let prevIP = win.node.ip_address;
+                        let str = `${gameTimer.formatted()} - connection to ${i.ip_address}`
+                        win.node.fileSystem.appendFile(win.node.logFile, str)
+                        console.log("2 " + win.node.logFile);
+                        console.log("3 " + win.node.fileSystem.readFile(win.node.logFile))
+                    
+                        attachNode(win, nodes[i.id]);
+                        str = `${gameTimer.formatted()} - connection from ${prevIP}`
+                        win.node.fileSystem.appendFile(win.node.logFile, str);
                         //console.log(`player.nodestack ${player.nodeStack}`);
                         notFound = false;
                     }
@@ -286,7 +305,7 @@ function commandHandler(win) {
                         win.setText("Auto authenticating " + node.accounts[player.authAccountIndex].user + "...", false);
                         win.setText(`Welcome, ${node.accounts[player.authAccountIndex].user}`);
                         node.lastAuthAccount = node.compromisedAccounts[0];
-                        fs.changeDirectory("\\");
+                        win.node.fileSystem.changeDirectory("\\");
                         //player.nodeStack.push(win.id);
                     } else {
                         // free account info - testing only

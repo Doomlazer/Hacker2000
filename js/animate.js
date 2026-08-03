@@ -1,5 +1,6 @@
 class aniRect {
     constructor(x, y, width, height) {
+        this.node = [];
         this.glowEffect = true;
         this.glowEffectWidth = 10;
         this.isRounded = true;
@@ -38,12 +39,11 @@ class aniRect {
         this.inputStr = "";
         this.acceptInput = true;
         this.lastInput = "";
-        this.promptChar = ">";
-        this.authTries = 0;
         this.proxyWindow = [];
         this.type = "none";
         this.wheelOff = 0; // scroll wheel offset
-        this.text = `Welcome to the mal-90 OS\nDate: ${gameTimer.formatted()}\nMight I suggest some MUSIC or asking for HELP if you need it.`;
+        this.text = "";
+        this.authTries = 0;
         this.pri = cast.length; // draw priority
         // map defaults
         this.drawMap = true
