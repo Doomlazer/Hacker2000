@@ -1,9 +1,9 @@
-# Hacker2026
+# Hacker2000
 
 Retro hacking sim with vector graphics.
 
 CURRENTLY IN ALPHA
 
-# Play beta version in browser
+# Play alpha version in browser
 
 [Click Here](https://doomlazer.github.io/Hacker2026)
