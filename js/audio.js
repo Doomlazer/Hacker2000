@@ -41,7 +41,27 @@ function playTone(digit, dur) {
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-function setAudioSource(path, array = phoneAudio) {
+function setAudioSource(url, array = phoneAudio) {
+    const audio = new Audio();
+    audio.crossOrigin = "anonymous";
+    audio.src = url;
+    audio.load();
+
+    const source = audioContext.createMediaElementSource(audio);
+
+    source.connect(audioContext.destination);
+
+    array.push({
+        audio,
+        source
+    });
+
+    console.log(audio)
+    console.log(audio.play());
+    return audio;
+}
+
+/*/function setAudioSource(path, array = phoneAudio) {
     // Create a new buffer source
     console.log("path: " + path);
     const source = audioContext.createBufferSource();
@@ -70,7 +90,7 @@ function setAudioSource(path, array = phoneAudio) {
             });
         })
         .catch(error => console.error('Error loading audio:', error));
-}
+}*/
 
 function playMusic(window, url="", s="") {
     //console.log("playMusic url: " + url);
