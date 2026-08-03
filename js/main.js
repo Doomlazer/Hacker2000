@@ -129,7 +129,7 @@ function createAccounts(n) {
 
         // Create files
         fs.createFile("C:\\config.cfg", 0, "This is a config file");
-        fs.createFile("C:\\Windows\\logs\\logs.txt", 0, "LOG FILE:\n");
+        fs.createFile("C:\\Windows\\logs\\logs.txt", 0, nodes[n].ip_address + "\nLOG FILE:\n");
         fs.createFile("C:\\Windows\\System32\\kernel.dll", 0, "f34jfw9084j3948349fj834fj49fdj8w");
 
         // Make Windows read-only

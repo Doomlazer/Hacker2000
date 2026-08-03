@@ -1,6 +1,6 @@
 function commandHandler(win) {
     const command = win.inputStr.split(" ");
-    console.log(command)
+    //console.log(command)
     win.inputStr = "";
     //console.log(`sent command ${command}`)
 
@@ -37,8 +37,17 @@ function commandHandler(win) {
                     win.setText("Invalid user. Too many attempts\nDisconnected...");
                     player.askedForName = false;
                     win.authTries = 0;
+                    // log ssh
+                    let prevIP = nodes[player.nodeStack.length-1].ip_address;
+                    let destIP = nodes[player.nodeStack.length-2].ip_address;
+                    let str = `${gameTimer.formatted()} - ${destIP} dropped connection\n`
+                    nodes[player.nodeStack.length-1].fileSystem.appendFile(nodes[player.nodeStack.length-1].logFile, str)
+                    str = `${gameTimer.formatted()} - disconnected from ${prevIP}\n`
+                    nodes[player.nodeStack.length-2].fileSystem.appendFile(nodes[player.nodeStack.length-2].logFile, str);
+                    //nodes[player.nodeStack.length-1].fileSystem.readFile(nodes[player.nodeStack.length-1].logFile)
+                    //nodes[player.nodeStack.length-2].fileSystem.readFile(nodes[player.nodeStack.length-2].logFile)
+                    // end log ssh
                     player.nodeStack.pop();
-                    attachNode(win, nodes[player.nodeStack.length-1]);
                     win.setProxyText();
                 } else {
                     win.setText("Invalid user. Enter username");
@@ -56,6 +65,8 @@ function commandHandler(win) {
             //console.log("node.accounts[player.authAccountIndex].pwd: " + node.accounts[player.authAccountIndex].pwd + ", player.tryAuthPwd: " + player.tryAuthPwd);
             if (node.accounts[player.authAccountIndex].pwd == player.tryAuthPwd) {
                 win.setText(`Welcome, ${node.accounts[player.authAccountIndex].user}`);
+                let str = `${gameTimer.formatted()} - ${nodes[player.nodeStack.length-2].ip_address} authenitcated with account ${node.accounts[player.authAccountIndex].user}\n`
+                nodes[player.nodeStack.length-1].fileSystem.appendFile(nodes[player.nodeStack.length-1].logFile, str)
                 if (!node.compromisedAccounts.includes(player.authAccountIndex)) {
                     node.compromisedAccounts.push(player.authAccountIndex);
                 }
@@ -70,8 +81,16 @@ function commandHandler(win) {
                 win.authTries ++;
                 if (win.authTries >= 3) {
                     win.setText("Invalid password. Too many attempts\nDisconnected...");
+                    // log ssh
+                    let prevIP = nodes[player.nodeStack.length-1].ip_address;
+                    let destIP = nodes[player.nodeStack.length-2].ip_address;
+                    let str = `${gameTimer.formatted()} - ${destIP} dropped connection\n`
+                    nodes[player.nodeStack.length-1].fileSystem.appendFile(nodes[player.nodeStack.length-1].logFile, str)
+                    str = `${gameTimer.formatted()} - disconnected from ${prevIP}\n`
+                    nodes[player.nodeStack.length-2].fileSystem.appendFile(nodes[player.nodeStack.length-2].logFile, str);
+                    console.log(nodes[player.nodeStack.length-2].fileSystem.readFile(nodes[player.nodeStack.length-2].logFile))
+                    // end log ssh
                     player.nodeStack.pop();
-                    attachNode(win, nodes[player.nodeStack.length-1]);
                     win.authTries = 0;
                     win.setProxyText();
                     win.askedForPwd = false;
@@ -119,12 +138,20 @@ function commandHandler(win) {
                 // foget logged in user on system
                 let node = nodes[player.nodeStack[player.nodeStack.length-1]];
                 node.lastAuthAccount = -1;
+                // log ssh disconnect
+                let prevIP = nodes[player.nodeStack.length-1].ip_address;
+                let destIP = nodes[player.nodeStack.length-2].ip_address;
+                let str = `${gameTimer.formatted()} - ssh closed from ${destIP}\n`
+                nodes[player.nodeStack.length-1].fileSystem.appendFile(nodes[player.nodeStack.length-1].logFile, str);
+                str = `${gameTimer.formatted()} - ssh closed from ${prevIP}\n`
+                nodes[player.nodeStack.length-2].fileSystem.appendFile(nodes[player.nodeStack.length-2].logFile, str);
+                // end log ssh
 
                 // remove from stack
                 player.nodeStack.pop();
                 attachNode(win, nodes[player.nodeStack.length-1]);
-                //player.proxyWindow[0].wheelOff --; // needed?
                 win.setProxyText()
+
                 // set preious authenticated user
                 node = nodes[player.nodeStack[player.nodeStack.length-1]];
                 node.authAccountIndex = node.lastAuthAccount;
@@ -207,9 +234,9 @@ function commandHandler(win) {
                     if (command[1].toLowerCase() == "log" ||
                         command[1].toLowerCase() == "logs" ||
                         command[1].toLowerCase() == "logfile") {
-                        rw.setText(win.node.fileSystem.readFile(win.node.logFile, player.authAccountIndex));
+                        rw.setText(nodes[player.nodeStack.length-1].fileSystem.readFile(nodes[player.nodeStack.length-1].logFile, player.authAccountIndex), false);
                     } else {
-                        rw.setText(win.node.fileSystem.readFile(command[1], player.authAccountIndex));
+                        rw.setText(wnodes[player.nodeStack.length-1].fileSystem.readFile(command[1], player.authAccountIndex), false);
                     }
                 } else {
                     //rw.setText(file, false);
@@ -280,15 +307,18 @@ function commandHandler(win) {
                         //console.log(i)
                         player.nodeStack.push(i.id);
                         win.setProxyText();
-                        let prevIP = win.node.ip_address;
-                        let str = `${gameTimer.formatted()} - connection to ${i.ip_address}`
-                        win.node.fileSystem.appendFile(win.node.logFile, str)
-                        console.log("2 " + win.node.logFile);
-                        console.log("3 " + win.node.fileSystem.readFile(win.node.logFile))
-                    
+                        // log ssh
                         attachNode(win, nodes[i.id]);
-                        str = `${gameTimer.formatted()} - connection from ${prevIP}`
-                        win.node.fileSystem.appendFile(win.node.logFile, str);
+                        let destIP = nodes[player.nodeStack.length-1].ip_address;
+                        let prevIP = nodes[player.nodeStack.length-2].ip_address;
+                        let str = `${gameTimer.formatted()} - ssh inbound from ${prevIP}\n`
+                        nodes[player.nodeStack.length-1].fileSystem.appendFile(nodes[player.nodeStack.length-1].logFile, str)
+                        str = `${gameTimer.formatted()} - ssh oubound to ${destIP}\n`
+                        nodes[player.nodeStack.length-2].fileSystem.appendFile(nodes[player.nodeStack.length-2].logFile, str);
+
+                        nodes[player.nodeStack.length-1].fileSystem.readFile(nodes[player.nodeStack.length-1].logFile, str)
+                        nodes[player.nodeStack.length-2].fileSystem.readFile(nodes[player.nodeStack.length-2].logFile, str)
+                        // end log ssh
                         //console.log(`player.nodestack ${player.nodeStack}`);
                         notFound = false;
                     }
@@ -305,7 +335,6 @@ function commandHandler(win) {
                         win.setText("Auto authenticating " + node.accounts[player.authAccountIndex].user + "...", false);
                         win.setText(`Welcome, ${node.accounts[player.authAccountIndex].user}`);
                         node.lastAuthAccount = node.compromisedAccounts[0];
-                        win.node.fileSystem.changeDirectory("\\");
                         //player.nodeStack.push(win.id);
                     } else {
                         // free account info - testing only
