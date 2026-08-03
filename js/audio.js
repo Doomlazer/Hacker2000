@@ -49,7 +49,14 @@ function setAudioSource(path, array = phoneAudio) {
 
     // Load audio data
     fetch(path)
-        .then(response => response.arrayBuffer())
+        //.then(response => response.arrayBuffer())
+        .then(response => {
+            console.log(response.status, response.statusText);
+            if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+            }
+            return response.arrayBuffer();
+        })
         .then(data => audioContext.decodeAudioData(data))
         .then(buffer => {
             source.buffer = buffer; // Set the buffer to the source
