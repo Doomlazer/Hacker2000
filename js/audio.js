@@ -80,7 +80,6 @@ function playMusic(window, url="", s="") {
         sources.push("https://archive.org/download/selected-dnb-1/Intelligent%20Drum%20%26%20Bass%20-%20Selected%20Works%20%281994-2000%29-1zGaTE2AmsU.mp3");
         sources.push("https://archive.org/download/selected-dnb-1/Jungle%20Mix%20-%20psiX%20-%20Room%2099-lfcehfutGBM.mp3");
         sources.push("https://archive.org/download/selected-dnb-1/Peshay%20Studio%20Set%20%281996%29-JK8ilaPZbKE.mp3");
-        sources.push("https://archive.org/download/rf1-jumpstylemix-1/DJ%20GYROTTA%20ZAO%20-%20%E2%96%AF%E2%96%AF%20%5BXLeQxa2JzZw%5D.mp3");
         sources.push("https://archive.org/download/NinjaGaijinStaringIntoTheEyesOfDeathBREAKCORE15Feb2014/Ninja_Gaijin_-_Staring_Into_The_Eyes_Of_Death_%28BREAKCORE-15Feb2014%29.mp3");
         sources.push("https://archive.org/download/NinjaGaijinGuardiansOfSunshineJUNGLE27May2014/Ninja_Gaijin_-_Guardians_of_Sunshine_%28JUNGLE-27May2014%29.mp3");
         sources.push("https://archive.org/download/NinjaGaijinTheLegacyofthe47RoninJUNGLE/Ninja%20Gaijin%20-%20The%20Legacy%20of%20the%2047%20Ronin%20%28JUNGLE-10Nov2014%29.mp3");
