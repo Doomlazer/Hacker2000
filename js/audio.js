@@ -54,13 +54,13 @@ async function setAudioSource(url, array = phoneAudio) {
             });
         }
 
-        const source = audioContext.createMediaElementSource(audio);
+        //const source = audioContext.createMediaElementSource(audio);
 
-        source.connect(audioContext.destination);
+        //source.connect(audioContext.destination);
 
         array.push({
             audio,
-            source
+            //source
         });
 
         audio.play();
@@ -68,6 +68,7 @@ async function setAudioSource(url, array = phoneAudio) {
         // replace exisiting
         array[0].audio.pause();
         array[0].audio.src = url;
+        array[0].audio.load();
         await array[0].audio.play();
     }
     document.getElementById("canvas").style.cursor = "none";
