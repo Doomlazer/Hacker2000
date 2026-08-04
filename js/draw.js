@@ -124,6 +124,10 @@ function drawMap() {
         ctxMarkers.fillStyle = '#000000';
         ctxMarkers.fillRect(0, 0, c.width, c.height);
     }
+
+    // size of node/city sqaures
+    let bSize = 0.5;
+
     // Draw Cities
     if (mapSteps >= mapStepsMax && player.drawCities) {
         mapCitiesSteps += 1 + mapCitiesSteps/4;
@@ -132,17 +136,19 @@ function drawMap() {
                 // loc
                 ctxMarkers.strokeStyle = '#0048ff';
                 ctxMarkers.lineWidth = 1;
-                ctxMarkers.strokeRect(((cities[i].lon) * mapScale) + mapXOff,
-                                (-(cities[i].lat) * mapScale) + mapYOff,
-                                1 * mapScale, 1 * mapScale);
-                //console.log(locations[player.uid].address.country);
+                ctxMarkers.strokeRect(
+                    (cities[i].lon * mapScale) + mapXOff - (bSize * mapScale/2),
+                    (-(cities[i].lat) * mapScale) + mapYOff  - (bSize * mapScale/2),
+                    bSize * mapScale,
+                    bSize * mapScale
+                );
 
-                if (mouseX > (cities[i].lon * mapScale) + mapXOff &&
-                    mouseX < (cities[i].lon * mapScale) + mapXOff + (1 * mapScale) &&
-                    mouseY > (-(cities[i].lat) * mapScale) + mapYOff &&
-                    mouseY < (-(cities[i].lat) * mapScale) + mapYOff + (1 * mapScale)) {
+                if (mouseX > (cities[i].lon * mapScale) + mapXOff - (bSize * mapScale/2) &&
+                    mouseX < (cities[i].lon * mapScale) + mapXOff + (bSize * mapScale) &&
+                    mouseY > (-(cities[i].lat) * mapScale) + mapYOff  - (bSize * mapScale/2) &&
+                    mouseY < (-(cities[i].lat) * mapScale) + mapYOff + (bSize * mapScale)) {
                     // move map to named location
-                    // //mouseDeatil is number of clicks, we wait for two or more
+                    // mouseDeatil is number of clicks, we wait for two or more
                     if (mouseDetail > 1) {
                         mapScale = 30;
                         mapXOff = (getWidth()/3*2) - ((cities[i].lon) * mapScale);
@@ -170,16 +176,19 @@ function drawMap() {
         mapNodeSteps += 1 + mapNodeSteps/4;
         for (let i = 0; i < nodes.length; i++) {
             if (i < mapNodeSteps && nodes[i].discovered) {
-                if (mouseX > (nodes[i].longitude * mapScale) + mapXOff &&
-                    mouseX < (nodes[i].longitude * mapScale) + mapXOff + (1 * mapScale) &&
-                    mouseY > (-(nodes[i].latitude) * mapScale) + mapYOff &&
-                    mouseY < (-(nodes[i].latitude) * mapScale) + mapYOff + (1 * mapScale)) {
+                if (mouseX > (nodes[i].longitude * mapScale) + mapXOff - (bSize * mapScale/2) &&
+                    mouseX < (nodes[i].longitude * mapScale) + mapXOff + (bSize * mapScale) &&
+                    mouseY > (-(nodes[i].latitude) * mapScale) + mapYOff  - (bSize * mapScale/2) &&
+                    mouseY < (-(nodes[i].latitude) * mapScale) + mapYOff + (bSize * mapScale)) {
                     // draw highlighted loc marker
-                    ctxMarkers.strokeStyle = '#35e60e';
+                    ctxMarkers.strokeStyle = '#e60ed4';
                     ctxMarkers.lineWidth = 3;
-                    ctxMarkers.strokeRect(((nodes[i].longitude) * mapScale) + mapXOff,
-                                    (-(nodes[i].latitude) * mapScale) + mapYOff,
-                                    1 * mapScale, 1 * mapScale); 
+                    ctxMarkers.strokeRect(
+                        (nodes[i].longitude * mapScale) + mapXOff - (bSize * mapScale/2),
+                        (-(nodes[i].latitude) * mapScale) + mapYOff - (bSize * mapScale/2),
+                        bSize * mapScale,
+                        bSize * mapScale
+                    ); 
                     // move map to named loc
                     if (mouseDetail > 1) {
                         mapScale = 50;
@@ -199,23 +208,24 @@ function drawMap() {
                     }
 
                     // text label
+                    //
+                    //  not sure this works
+                    //
                     ctxMarkers.fillStyle = '#c37105d8';
                     ctxMarkers.font = scaleFont(0.018, "arial");
-                    /*ctxMarkers.fillText(nodes[i].city + ", " + nodes[i].country +
-                                ", " + (nodes[i].router.manufacturer) +
-                                " " + (nodes[i].router.model),
-                                ((nodes[i].longitude) * mapScale) + mapXOff,
-                                (-(nodes[i].latitude) * mapScale) + mapYOff);*/
                     mouseLabel = nodes[i].city + ", " + nodes[i].country +
                                 ", " + (nodes[i].router.manufacturer) +
                                 " " + (nodes[i].router.model)
                 } else {
                     // standard node marker color
-                    ctxMarkers.strokeStyle = '#d4ff00';
+                    ctxMarkers.strokeStyle = '#9edb04';
                     ctxMarkers.lineWidth = 1;
-                    ctxMarkers.strokeRect(((nodes[i].longitude) * mapScale) + mapXOff,
-                                    (-(nodes[i].latitude) * mapScale) + mapYOff,
-                                    1 * mapScale, 1 * mapScale);
+                    ctxMarkers.strokeRect(
+                        (nodes[i].longitude * mapScale) + mapXOff - (bSize * mapScale/2),
+                        (-(nodes[i].latitude) * mapScale) + mapYOff - (bSize * mapScale/2),
+                        bSize * mapScale,
+                        bSize * mapScale
+                    );
                 } 
             }          
         }
@@ -244,7 +254,7 @@ function drawMap() {
     //label network proxy connection cities
     if (mapSteps >= mapStepsMax && player.drawNodes) {
         let g = 155;
-        ctx.lineWidth = 2;
+        ctx.lineWidth = mapScale * 0.5;
         if (player.nodeStack.length > 1) {
             for (let i = 0; i < player.nodeStack.length - 1; i++) {
                 if (i < mapNodeStackSteps) {
@@ -278,19 +288,31 @@ function drawMap() {
 
     // draw the mouse hover label
     player.windowHover = true;
-        for (let w = 0; w < cast.length; w ++) {
-                let c = cast[w];
-                if (mouseX > c.x1 &&
-                    mouseX < c.x1 + c.xW &&
-                    mouseY > c.y1 &&
-                    mouseY < c.y1 + c.yH) {
-                        player.windowHover = false;
-                }
+    // but not if mousing over a window
+    for (let w = 0; w < cast.length; w ++) {
+        let c = cast[w];
+        if (mouseX > c.x1 &&
+            mouseX < c.x1 + c.xW &&
+            mouseY > c.y1 &&
+            mouseY < c.y1 + c.yH
+        ) {
+            player.windowHover = false;
         }
+    }
     if (player.windowHover) {
+        ctx.save();
+        ctx.beginPath;
+        ctx.rect(
+            -180 * mapScale + mapXOff,
+            (-90 * mapScale) + mapYOff,
+            360 * mapScale,
+            (180 * mapScale)
+        );
+        ctx.clip();
         ctx.fillStyle = '#ff3838';
-        ctx.font = scaleFont(0.018, "arial");
+        ctx.font = Math.max(6, Math.min(30, 12 * mapScale)) + "px courier";
         ctx.fillText(mouseLabel, mouseX, mouseY);
+        ctx.restore();
     }
 
     if (player.selectedCity && mapCitiesSteps > 1) {
@@ -299,9 +321,12 @@ function drawMap() {
         // loc marker
         ctx.strokeStyle = '#00FF00';
         ctx.lineWidth = 4;
-        ctx.strokeRect((city.lon * mapScale) + mapXOff,
-                        (-(city.lat) * mapScale) + mapYOff,
-                        1 * mapScale, 1 * mapScale);
+        ctx.strokeRect(
+            (city.lon * mapScale) + mapXOff - (bSize * mapScale/2),
+            (-(city.lat) * mapScale) + mapYOff - (bSize * mapScale/2),
+            bSize * mapScale,
+            bSize * mapScale
+        );
 
         // loc label
         ctx.fillStyle = '#20974c';
@@ -312,15 +337,18 @@ function drawMap() {
                     (-(city.lat) * mapScale) + mapYOff);
     }
 
+    // selected node marker
     if (player.selectedNode && mapNodeSteps > 1) {
         let node = nodes[player.selNodeNum];
 
         // loc marker
         ctx.strokeStyle = '#f1700d';
-        ctx.lineWidth = 4;
-        ctx.strokeRect((node.longitude * mapScale) + mapXOff,
-                        (-(node.latitude) * mapScale) + mapYOff,
-                        1 * mapScale, 1 * mapScale);
+        ctx.lineWidth = 3;
+        ctx.strokeRect(
+            (node.longitude * mapScale) + mapXOff - (bSize * mapScale/2),
+            (-(node.latitude) * mapScale) + mapYOff - (bSize * mapScale/2),
+            bSize * mapScale,
+            bSize * mapScale);
 
         // loc label
         ctx.fillStyle = '#20974c';

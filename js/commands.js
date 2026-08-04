@@ -1,8 +1,11 @@
 function commandHandler(win) {
     const command = win.inputStr.split(" ").filter(Boolean);
-    //console.log(command)
     win.inputStr = "";
-    //console.log(`sent command ${command}`)
+
+    // user typed nothing
+    if (command.length < 1) {
+       command.push("");
+    }
 
     // all systems must have an exit command, approved commands and admins are optional
     if (win.approvedComands.includes(command[0].toLowerCase())
