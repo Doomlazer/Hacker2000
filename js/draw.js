@@ -456,12 +456,14 @@ function winDraw(win) { // draw a window
             }
 
             // main rect
-            if (win.isRounded) {
-                ctx.beginPath();
-                ctx.roundRect(win.x1, win.y1, win.xP, win.yP, win.cornerRad);
-                ctx.stroke();
-            } else {
-                ctx.strokeRect(win.x1, win.y1, win.xP, win.yP);
+            if (win.type != "audio") {
+                if (win.isRounded) {
+                    ctx.beginPath();
+                    ctx.roundRect(win.x1, win.y1, win.xP, win.yP, win.cornerRad);
+                    ctx.stroke();
+                } else {
+                    ctx.strokeRect(win.x1, win.y1, win.xP, win.yP);
+                }
             }
 
             // boarder
@@ -482,5 +484,307 @@ function winDraw(win) { // draw a window
                                     win.yP + ((win.boarderHeight * (win.yP / win.yH)) * 2));
                 }
             }
+
+            if (win.type == "audio") {
+                ctx.save();
+
+                const px = win.x1;
+                const py = win.y1;
+                const pw = win.xP;
+                const ph = win.yP;
+
+                const accent = brighten(win.backgroundColor, 20);
+
+                // ----------------------
+                // Player background
+                // ----------------------
+                const radius = Math.min(pw, ph) * 0.06;
+
+                ctx.fillStyle = "#111";
+                ctx.beginPath();
+                ctx.roundRect(px, py, pw, ph, radius);
+                ctx.fill();
+
+                ctx.strokeStyle = accent;
+                ctx.lineWidth = Math.max(1, pw * 0.01);
+                ctx.stroke();
+
+
+                // ----------------------
+                // Song title display
+                // ----------------------
+                const marginX = pw * 0.05;
+                const titleX = px + marginX;
+                const titleY = py + ph * 0.12;
+                const titleW = pw - marginX * 2;
+                const titleH = ph * 0.25;
+
+                const gradient = ctx.createLinearGradient(
+                    titleX,
+                    titleY,
+                    titleX,
+                    titleY + titleH
+                );
+
+                gradient.addColorStop(0, "#292929");
+                gradient.addColorStop(1, "#151515");
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.roundRect(
+                    titleX,
+                    titleY,
+                    titleW,
+                    titleH,
+                    radius * 0.6
+                );
+                ctx.fill();
+
+                ctx.strokeStyle = brighten(win.backgroundColor, 30);
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+
+                // ----------------------
+                // Song title text
+                // ----------------------
+                ctx.save();
+
+                ctx.beginPath();
+                ctx.rect(titleX, titleY, titleW, titleH);
+                ctx.clip();
+
+                ctx.fillStyle = "#fff";
+                ctx.font = `${titleH * 0.45}px sans-serif`;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+
+                drawSongTitle(
+                    titleX,
+                    titleY,
+                    titleW,
+                    titleH,
+                    decodeURIComponent(backgroundMusic[0].audio.src),
+                    win
+                );
+
+                ctx.restore();
+
+
+                // ----------------------
+                // Buttons
+                // ----------------------
+                const buttons = [
+                    "<<",
+                    "▶",
+                    "⏹",
+                    ">>"
+                ];
+
+                const buttonAreaY = titleY + titleH + ph * 0.12;
+                const buttonAreaH = ph * 0.28;
+
+                const gap = pw * 0.025;
+                const buttonSize = Math.min(
+                    buttonAreaH,
+                    (pw * 0.85 - gap * 3) / 4
+                );
+
+                const totalButtonsW =
+                    buttonSize * buttons.length +
+                    gap * (buttons.length - 1);
+
+                const startX =
+                    px + (pw - totalButtonsW) / 2;
+
+                buttons.forEach((text, i) => {
+
+                    const bx = startX + i * (buttonSize + gap);
+                    const by = buttonAreaY;
+
+                    if (!win.audioButtons) {
+                        win.audioButtons = [];
+                    }
+
+                    win.audioButtons[i] = {
+                        x: bx,
+                        y: by,
+                        w: buttonSize,
+                        h: buttonSize,
+                        action: i
+                    };
+
+                    ctx.save();
+
+                    ctx.shadowColor = "black";
+                    ctx.shadowBlur = buttonSize * 0.15;
+                    ctx.shadowOffsetY = buttonSize * 0.08;
+
+                    if (mouseDown &&
+                        mouseX >= bx &&
+                        mouseX <= bx + buttonSize &&
+                        mouseY >= by &&
+                        mouseY <= by + buttonSize
+                    ) {
+                        ctx.fillStyle = brighten(win.backgroundColor, 25);
+                    } else {
+                        ctx.fillStyle = "#222";
+                    }
+                    ctx.beginPath();
+                    ctx.roundRect(
+                        bx,
+                        by,
+                        buttonSize,
+                        buttonSize,
+                        buttonSize * 0.2
+                    );
+                    ctx.fill();
+
+                    ctx.restore();
+
+
+                    ctx.strokeStyle = brighten(
+                        win.backgroundColor,
+                        25
+                    );
+
+                    ctx.lineWidth = Math.max(1, buttonSize * 0.04);
+
+                    ctx.beginPath();
+                    ctx.roundRect(
+                        bx,
+                        by,
+                        buttonSize,
+                        buttonSize,
+                        buttonSize * 0.2
+                    );
+                    ctx.stroke();
+
+
+                    ctx.fillStyle = "#eee";
+                    ctx.font = `${buttonSize * 0.4}px sans-serif`;
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+
+                    ctx.fillText(
+                        text,
+                        bx + buttonSize / 2,
+                        by + buttonSize / 2
+                    );
+                });
+
+
+                // ----------------------
+                // Progress bar
+                // ----------------------
+                const audio = backgroundMusic[0]?.audio;
+
+                let progress = 0;
+
+                if (audio && audio.duration && !isNaN(audio.duration)) {
+                    progress = audio.currentTime / audio.duration;
+                }
+
+                progress = Math.max(0, Math.min(1, progress));
+
+                const barW = pw * 0.8;
+                const barH = Math.max(4, ph * 0.015);
+
+                const barX = px + (pw - barW) / 2;
+                const barY = py + ph * 0.88;
+
+                // save bar for clicking
+                win.progressBar = {
+                    x: barX,
+                    y: barY,
+                    w: barW,
+                    h: barH
+                };
+
+
+                // background
+                ctx.fillStyle = "#333";
+                ctx.beginPath();
+                ctx.roundRect(
+                    barX,
+                    barY,
+                    barW,
+                    barH,
+                    barH / 2
+                );
+                ctx.fill();
+
+
+                // progress
+                ctx.fillStyle = accent;
+                ctx.beginPath();
+                ctx.roundRect(
+                    barX,
+                    barY,
+                    barW * progress,
+                    barH,
+                    barH / 2
+                );
+                ctx.fill();
+
+
+                ctx.restore();
+            }
         }
+    }
+
+    function drawSongTitle(titleX, titleY, titleW, titleH, title, win) {
+        ctx.save();
+
+        // Clip to title display area
+        ctx.beginPath();
+        ctx.rect(titleX, titleY, titleW, titleH);
+        ctx.clip();
+
+        ctx.fillStyle = "#fff";
+        ctx.font = `${titleH * 0.45}px sans-serif`;
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "center";
+
+        const textWidth = ctx.measureText(title).width;
+
+        const centerX = titleX + titleW / 2;
+        const centerY = titleY + titleH / 2;
+
+        if (textWidth > titleW - 20) {
+            ctx.textAlign = "left";
+
+            win.songScrollOffset -= win.songScrollSpeed;
+
+            if (win.songScrollOffset < -textWidth - 50) {
+                win.songScrollOffset = titleW;
+            }
+
+            ctx.fillText(
+                title,
+                titleX + win.songScrollOffset,
+                centerY
+            );
+        } else {
+            ctx.textAlign = "center";
+
+            ctx.fillText(
+                title,
+                centerX,
+                centerY
+            );
+        }
+
+        ctx.restore();
+    }
+
+    function brighten(hex, percent) {
+        const num = parseInt(hex.slice(1), 16);
+        const amt = Math.round(255 * (percent / 100));
+
+        let r = Math.min(255, (num >> 16) + amt);
+        let g = Math.min(255, ((num >> 8) & 0x00FF) + amt);
+        let b = Math.min(255, (num & 0x0000FF) + amt);
+
+        return `rgb(${r}, ${g}, ${b})`;
     }

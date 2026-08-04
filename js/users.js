@@ -36,7 +36,10 @@ class Player extends User{
         this.unactivated = false;
         this.musicOn = false;
         this.musicVol = 50;
-        this.audioPlayer;
+        this.audioPlayer = 0;
+        this.audioTrack = 0;
+        this.audioPlaylist = [];
+        this.phoneMessage = "";
         this.sendToReaderThreshold = 9;
     }
 }

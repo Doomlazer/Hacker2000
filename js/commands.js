@@ -1,5 +1,5 @@
 function commandHandler(win) {
-    const command = win.inputStr.split(" ");
+    const command = win.inputStr.split(" ").filter(Boolean);
     //console.log(command)
     win.inputStr = "";
     //console.log(`sent command ${command}`)
@@ -174,46 +174,34 @@ function commandHandler(win) {
             if (player.musicOn && command[1] == "stop") {
                 player.musicOn = false;
                 win.setText("Stopping Music audio...");
-                while (backgroundMusic.length > 0) {
-                    backgroundMusic[backgroundMusic.length - 1].stop();
-                    backgroundMusic.pop();
-                }
+               backgroundMusic[0].audio.pause();
             } else {
                 player.musicOn = true;
+                if (player.audioPlayer == 0) {
+                    let aw = new aniRect(win.aX1, win.aY1, win.aXW, win.aYH);
+                    aw.fontSize = win.audioFontSize;
+                    aw.acceptInput = false;
+                    aw.backgroundColor = win.audioBackgroundColor;
+                    aw.rectColor = win.audioRectColor;
+                    aw.textColor = win.audioTextColor
+                    aw.isRounded = win.audioIsRounded;
+                    aw.hasBoarder = win.audioHasBoarder;
+                    aw.type = "audio";
+                    aw.setText("");
+                    player.audioPlayer = aw;
+                    cast.push(aw);
+                }
                 //console.log(command)
                 if (command.length > 1) {
-                    if (command[1] == "talk") {
-                        if (command.length > 2 && command[2] == "stop") {
-                            win.setText("Stopping Music audio...");
-                            while (talkRadio.length > 0) {
-                                talkRadio[talkRadio.length - 1].stop();
-                                talkRadio.pop();
-                            }
-                        } else {
-                            // pull from the talk mp3s
-                            while (talkRadio.length > 0) {
-                                talkRadio[talkRadio.length - 1].stop();
-                                talkRadio.pop();
-                            }
-                            playMusic(win, "", "talk");
-                        }
-                    } else {
-                        // pass user provided url
-                        while (backgroundMusic.length > 0) {
-                            backgroundMusic[backgroundMusic.length - 1].stop();
-                            backgroundMusic.pop();
-                        }
+                    // pass user provided url
+                    if (command[1].length > 0) {
                         playMusic(win, command[1]);
                     }
                 } else {
-                    while (backgroundMusic.length > 0) {
-                        backgroundMusic[backgroundMusic.length - 1].stop();
-                        backgroundMusic.pop();
-                    }
+                    // pick random
                     playMusic(win);
                 }
             }
-
         } else if (command[0].toLowerCase() == "read") {
             // read files in scrolling window
             //if (player.readerWindow.length < 1) {
@@ -236,7 +224,7 @@ function commandHandler(win) {
                         command[1].toLowerCase() == "logfile") {
                         rw.setText(nodes[player.nodeStack.length-1].fileSystem.readFile(nodes[player.nodeStack.length-1].logFile, player.authAccountIndex), false);
                     } else {
-                        rw.setText(wnodes[player.nodeStack.length-1].fileSystem.readFile(command[1], player.authAccountIndex), false);
+                        rw.setText(nodes[player.nodeStack.length-1].fileSystem.readFile(command[1], player.authAccountIndex), false);
                     }
                 } else {
                     //rw.setText(file, false);
@@ -355,14 +343,8 @@ function commandHandler(win) {
                 }
             }
         } else if (command[0].toLowerCase() == "hangup") {
-            while (audio.length > 1) {
-                //console.log(audio[audio.length - 1])
-                phoneAudio[phoneAudio.length - 1].stop();
-                phoneAudio.pop();
-                //console.log(phoneAudio);
-            }
             //console.log(`phoneAudio ${phoneAudio}`);
-            setAudioSource("./sfx/phone/click.mp3");
+            setAudioSource("./sfx/phone/click.mp3", phoneAudio);
             win.setText("Disconnected...")
 
         } else if (command[0].toLowerCase() == "dial") {
@@ -380,18 +362,10 @@ function commandHandler(win) {
                 "freesound_community-noanswer-33477.mp3",
                 "lucadialessandro-unavailable-phone-192489.mp3"];
             
-            // stop previous if needed
-            while (phoneAudio.length > 1) {
-                //console.log(audio[audio.length - 1])
-                phoneAudio[phoneAudio.length - 1].stop();
-                phoneAudio.pop();
-            }
-            if (phoneAudio.length > 0) {
-                phoneAudio[0] = `./sfx/phone/${samples[getRandInt(samples.length)]}`;
-            } else {
-                phoneAudio.push(`./sfx/phone/${samples[getRandInt(samples.length)]}`);
-            }
+
+            player.phoneMessage = `./sfx/phone/${samples[getRandInt(samples.length)]}`;
             win.setText(`Dailing... ${command[1]}`);
+            // filter non-numbers
             let number = command[1].replace(/\D/g,'');
             // play dtmf, as short ring, then the audio queue
             playDTMF(number+"rh");

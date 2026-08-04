@@ -137,6 +137,7 @@ function doClick(e) {
 }
 
 function doMouseDown(e) {
+    e.preventDefault();
     movingMap = false;
     mouseDown = true;
     mouseDetail = e.detail;
@@ -153,6 +154,7 @@ function doMouseDown(e) {
             notFound = false;
             oldOffX = c.x1 - mouseX;
             oldOffY = c.y1 - mouseY;
+
             c.mouseDrag = true;
             // draw this window on top now
             if (c.pri != 0) {
@@ -165,6 +167,41 @@ function doMouseDown(e) {
                     }
                 }
             }
+
+            // audio player buttons
+            if (c.type == "audio") {
+                const bar = c.progressBar;
+
+                if (
+                    mouseX >= bar.x &&
+                    mouseX <= bar.x + bar.w &&
+                    mouseY >= bar.y &&
+                    mouseY <= bar.y + bar.h
+                ) {
+                    const audio = backgroundMusic[0].audio;
+
+                    if (audio.duration && !isNaN(audio.duration)) {
+                        const percent = (mouseX - bar.x) / bar.w;
+
+                        audio.currentTime =
+                            percent * audio.duration;
+                    }
+                }
+                // audio controls    
+                for (const button of c.audioButtons) {
+
+                    if (
+                        mouseX >= button.x &&
+                        mouseX <= button.x + button.w &&
+                        mouseY >= button.y &&
+                        mouseY <= button.y + button.h
+                    ) {
+                        handleAudioButton(button.action);
+                        break;
+                    }
+                }
+            }
+
             drawMap();
         }
     }
@@ -201,5 +238,41 @@ function doKeyDown(e) {
     }
     if (e.key === " ") {
 
+    }
+}
+
+function handleAudioButton(button) {
+    const audio = backgroundMusic[0].audio;
+
+    switch (button) {
+
+        case 0: // previous
+            player.audioTrack --;
+            if (player.audioTrack < 0) {
+                player.audioTrack = player.audioPlaylist.length - 1;
+            }
+            setAudioSource(player.audioPlaylist[player.audioTrack], backgroundMusic);
+            break;
+
+        case 1: // play/pause
+            if (audio.paused) {
+                audio.play();
+            } else {
+                audio.pause();
+            }
+            break;
+
+        case 2: // stop
+            audio.pause();
+            audio.currentTime = 0;
+            break;
+
+        case 3: // next
+            player.audioTrack ++;
+            if (player.audioTrack > player.audioPlaylist.length-1) {
+                player.audioTrack = 0;
+            }
+            setAudioSource(player.audioPlaylist[player.audioTrack], backgroundMusic);
+            break;
     }
 }

@@ -77,6 +77,20 @@ class aniRect {
         this.rY1 = getHeight()/8;
         this.rXW = getWidth()/2.5;
         this.rYH = getHeight()/1.5;
+        // audio player defaults
+        this.audioFontSize = 12;
+        this.audioText = ""
+        this.audioBackgroundColor = '#390ed2'
+        this.audioRectColor = '#3952f7'
+        this.audioTextColor = '#f7faf8'
+        this.audioIsRounded = false;
+        this.audioHasBoarder = false;
+        this.aX1 = getWidth()/25 * 11;
+        this.aY1 = getHeight()/8;
+        this.aXW = getWidth()/5;
+        this.aYH = getHeight()/5;
+        this.songScrollOffset = 0;
+        this.songScrollSpeed = 1;
     }
 
     setText(theText, prompt = true) {
@@ -212,9 +226,6 @@ class aniRect {
     setProxyText() {
         let text = this.proxyText;
         for (let i = 0; i < player.nodeStack.length; i++) {
-            //console.log(`player.nodeStack.length: ${player.nodeStack.length}`);
-            //console.log(player.nodeStack);
-            //console.log(`player.nodeStack[${i}]: ${player.nodeStack[i]}`);
             let str = nodes[player.nodeStack[i]].ip_address + 
             " " +  nodes[player.nodeStack[i]].country + "\n";
             // expand width working?
@@ -226,13 +237,7 @@ class aniRect {
 
         player.proxyWindow[0].displayLines = [];
         player.proxyWindow[0].text = text;
-        //console.log(player.proxyWindow[0].text)
         player.proxyWindow[0].setText(text, false);
-
-        //player.proxyWindow[0].text = text;
-        //player.proxyWindow[0].setText(player.proxyWindow[0].text, false);
-
-        //console.log(`player.nodestack ${player.nodeStack}`);
     }
     
     openedState() {
@@ -246,7 +251,7 @@ class aniRect {
         ctx.fillStyle = this.textColor;
         ctx.font = this.fontSize + "px " + this.textFont;
 
-        // remove overflow lines, but don't crop schooling windows
+        // remove overflow lines, but don't crop scrolling windows
         if (this.type != "proxy" && this.type != "reader") {
             while (this.displayLines.length > this.textMaxLines) {
                 this.displayLines.shift();
@@ -254,31 +259,35 @@ class aniRect {
         }
         
         // draw the text
-        if (this.wheelOff > this.displayLines.length - this.textMaxLines) {
-            this.wheelOff = this.displayLines.length - this.textMaxLines;
-        }
-        if (this.wheelOff < 0) {
-            this.wheelOff = 0;
-        }
-        let max;
-        if (this.textMaxLines < this.displayLines.length) {
-            max = this.textMaxLines
+        if (this.type == "audio") {
+            // special handling 
+
         } else {
-            max = this.displayLines.length;
-        }
-        for (let i = this.wheelOff; i <  this.displayLines.length; i++) {
-            if (i - this.wheelOff < this.textMaxLines) {
-            ctx.fillText(this.displayLines[i], this.x1 + this.fontSize/2, 
-                        this.y1 + (this.fontSize) + (this.fontSize * 1.25 * (i-this.wheelOff)));
+            // non-audio window text
+            if (this.wheelOff > this.displayLines.length - this.textMaxLines) {
+                this.wheelOff = this.displayLines.length - this.textMaxLines;
+            }
+            if (this.wheelOff < 0) {
+                this.wheelOff = 0;
+            }
+            let max;
+            if (this.textMaxLines < this.displayLines.length) {
+                max = this.textMaxLines
+            } else {
+                max = this.displayLines.length;
+            }
+            for (let i = this.wheelOff; i <  this.displayLines.length; i++) {
+                if (i - this.wheelOff < this.textMaxLines) {
+                ctx.fillText(this.displayLines[i], this.x1 + this.fontSize/2, 
+                            this.y1 + (this.fontSize) + (this.fontSize * 1.25 * (i-this.wheelOff)));
+                }
             }
         }
     }
 
     closedState() {
-        this.textDisplayChar = 0;
-        //console.log(`cast[cast.indexOf(this)]: ${cast[cast.indexOf(this)]}`)
         if (cast.indexOf(this) == 0) {
-            // always reopen players computer
+            // always reopen player's computer win
              this.toOpen = true;
              this.delete = false;
              this.xW = getWidth()/2;
@@ -287,14 +296,16 @@ class aniRect {
              this.yP = 1;
         } else if (this.delete) {
             // flush it
-            const s = cast.splice(cast.indexOf(this)[0], 1);
-            cast = s;
+            const index = cast.indexOf(this);
+            if (index > -1) cast.splice(index, 1);
 
             if (this.type == "proxy") {
-                console.log(`player.proxyWindow: ${player.proxyWindow}`);
+                //console.log(`player.proxyWindow: ${player.proxyWindow}`);
                 if (this == player.proxyWindow[0]) {
                     player.proxyWindow.pop();
                 }
+            } else if (this.type = "audio") {
+                player.audioPlayer = 0;
             } else if (this.type = "reader") {
                 //console.log(`player.readerWindow: ${player.readerWindow}`);
                 if (this == player.readerWindow[0]) {

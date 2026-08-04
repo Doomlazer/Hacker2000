@@ -19,7 +19,6 @@ let mapSel = [];
 let cities = [];
 let nodes = [];
 let backgroundMusic = [];
-let talkRadio = [];
 let phoneAudio = [];
 let mapCitiesSteps = 0;
 let mapNodeSteps = 0;
