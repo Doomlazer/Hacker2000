@@ -505,18 +505,18 @@ function mapCommand(win, command) {
         mapInc = 1;
         win.setText("Map reset to defaults");
     } else if (command[1].toLowerCase() == "zoom") {
-        if (command[1] < 0 || command[1] > 0) {
+        if (parseInt(command[2]) > 0) {
             mapScale = parseInt(command[2]);
+            mapSteps = 0;
+            mapCitiesSteps = 0;
+            mapNodeSteps = 0;
+            mapNodeStackSteps = 0;
+            mapInc = 1;
+            win.text = `Map Zoom is now ${mapScale}`;
+            win.setText(win.text);
         } else {
             win.setText("USAGE: map zoom [level]");
         }
-        mapSteps = 0;
-        mapCitiesSteps = 0;
-        mapNodeSteps = 0;
-        mapNodeStackSteps = 0;
-        mapInc = 1;
-        win.text = `Map Zoom is now ${mapScale}`;
-        win.setText(win.text);
     } else {
         // the supplied argument doesn't exist, 
         // show map command help string
