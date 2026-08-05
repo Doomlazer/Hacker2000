@@ -79,8 +79,6 @@ function playMusic(window, url="") {
     player.audioPlaylist.push("https://archive.org/download/raveforce1-jungle-breakcore/%5B%20JUNGLE_BREAKCORE%20%5D%20_%20JAMIN%20NIMJAH%20_%20ERROR404%20VISUAL%20MIX%20_%20002-kyXx-nGxqpQ.mp3");
     player.audioPlaylist.push("https://archive.org/download/raveforce1-jungle-breakcore/%5BMachineKool%5D%202%20Hour%20Dark%20DnB%20to%20Jungle%20%2C%20Breakcore%20Mix%20%5BMachinekool%5D%202014%202hr-Xj9Hvmspej8.mp3");
     player.audioPlaylist.push("https://archive.org/download/raveforce1-sextrancemix/%5B2022%5D%20Exodia%20-%20Valkyria-fd6ZF1UJ9oM.mp3");
-    player.audioPlaylist.push("https://archive.org/download/raveforce1-sextrancemix/%5B2022%5D%20isyti%20-%20bootleg-AURcBIKXRX0.mp3");
-    player.audioPlaylist.push("https://archive.org/download/raveforce1-sextrancemix/%5B2022%5D%20sienna%20sleep%20-%20live%20dj%20set%20for%20sextrance%20worldwide-zdQgbjgucwI.mp3");
     player.audioPlaylist.push("https://archive.org/download/selected-dnb-1/Inner-Vation%20-%20Movements%20%281999%29-DU3Rezgt-TE.mp3");
     player.audioPlaylist.push("https://archive.org/download/selected-dnb-1/Intelligent%20Drum%20%26%20Bass%20-%20Selected%20Works%20%281994-2000%29-1zGaTE2AmsU.mp3");
     player.audioPlaylist.push("https://archive.org/download/selected-dnb-1/Jungle%20Mix%20-%20psiX%20-%20Room%2099-lfcehfutGBM.mp3");
@@ -98,8 +96,6 @@ function playMusic(window, url="") {
     player.audioPlaylist.push("https://archive.org/download/Sinapz-liquidLightMix3/LiquidLight3.mp3");
     player.audioPlaylist.push("https://archive.org/download/1757030366_windowlicker/Windowlicker/01%20Aphex%20Twin%20-%20Windowlicker.mp3");
     player.audioPlaylist.push("https://archive.org/download/Squarepusher19970724JapanTokyo/Squarepusher%20-%201997-07-24%20Japan-Tokyo.mp3");
-    player.audioPlaylist.push("https://archive.org/download/Squarepusher19970724JapanTokyo/Squarepusher%20-%201997-07-24%20Japan-Tokyo.mp3");
-    player.audioPlaylist.push("https://archive.org/download/obliviongrimes/03-Oblivion.mp3");
 
 
     /*/ defcon 2000
