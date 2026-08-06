@@ -160,4 +160,9 @@ function createAccounts(n) {
         nodes[n].fileSystem = createFS(n);
     }
 }
-   
+
+function attachNode(window, node) {
+    window.node = node;
+    window.promptChar = node.promptChar;
+    window.text = node.text;
+}

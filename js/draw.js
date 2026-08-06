@@ -71,17 +71,16 @@ function drawCoords(coords) {
 
 function drawMap() {
     let mouseLabel = "";
+
+    // only update the map context if 
+    // needed because it's expensive
     if (updateMap || mapSteps < mapStepsMax) {
         updateMap = false;
-        //console.log(`Updating Map. mapSteps: ${mapSteps}`);
 
-        // draw map a bit at a time
+        // draw map a bit at a time, 
+        // but increasingly faster
         mapSteps += mapInc;
         mapInc ++;
-
-        /*if (mapSteps > mapStepsMax) {
-            mapSteps = mapStepsMax;
-        }*/
 
         // clear map context
         ctxMap.fillStyle = '#000000';
@@ -89,10 +88,9 @@ function drawMap() {
         ctxMap.lineWidth = 1;
         ctxMap.strokeStyle = mapColor;
 
-        // send each country's line data
+        // do each country's line data
         for (let i = 0; i < map.length; i++) {
             const f = map[i];
-            //if (f.properties.name != "") {
             if (true) {
                 const cords = f.geometry.coordinates;
                 // the player's selected contry needed to be drawn on top to 
@@ -117,6 +115,7 @@ function drawMap() {
                         (180 * mapScale));
     }
 
+    // copy map to main ctx
     ctx.drawImage(cMap, 0, 0);
 
     // clear mapMarkers ctx if map reset
@@ -128,163 +127,9 @@ function drawMap() {
     // size of node/city sqaures
     let bSize = 0.5;
 
-    // Draw Cities
-    if (mapSteps >= mapStepsMax && player.drawCities) {
-        mapCitiesSteps += 1 + mapCitiesSteps/4;
-        for (let i = 0; i < cities.length; i++) {
-            if (i < mapCitiesSteps) {
-                // loc
-                ctxMarkers.strokeStyle = '#0048ff';
-                ctxMarkers.lineWidth = 1;
-                ctxMarkers.strokeRect(
-                    (cities[i].lon * mapScale) + mapXOff - (bSize * mapScale/2),
-                    (-(cities[i].lat) * mapScale) + mapYOff  - (bSize * mapScale/2),
-                    bSize * mapScale,
-                    bSize * mapScale
-                );
-
-                if (mouseX > (cities[i].lon * mapScale) + mapXOff - (bSize * mapScale/2) &&
-                    mouseX < (cities[i].lon * mapScale) + mapXOff + (bSize * mapScale) &&
-                    mouseY > (-(cities[i].lat) * mapScale) + mapYOff  - (bSize * mapScale/2) &&
-                    mouseY < (-(cities[i].lat) * mapScale) + mapYOff + (bSize * mapScale)) {
-                    // move map to named location
-                    // mouseDeatil is number of clicks, we wait for two or more
-                    if (mouseDetail > 1) {
-                        mapScale = 30;
-                        mapXOff = (getWidth()/3*2) - ((cities[i].lon) * mapScale);
-                        mapYOff = (getHeight()/2) - (-(cities[i].lat) * mapScale);
-                        mapSteps = 1;
-                        mapNodeSteps = 1;
-                        mapInc = 2;
-                        player.selcountry = cities[i].country;
-                        cast[0].text = `Selected ${cities[i].name}, ${cities[i].country}`;
-                        cast[0].setText(cast[0].text);
-                        cast[0].textDisplayChar = 0;
-                        player.selectedCity = cities[i];
-                        updateMap = true;
-                        drawMap();
-                    }
-                    mouseLabel = cities[i].name + ", " + cities[i].country +
-                                ", population: " + (cities[i].population);
-                }
-            }           
-        }
-    }
-
-    // draw network nodes
-    if (mapSteps >= mapStepsMax && player.drawNodes) {
-        mapNodeSteps += 1 + mapNodeSteps/4;
-        for (let i = 0; i < nodes.length; i++) {
-            if (i < mapNodeSteps && nodes[i].discovered) {
-                if (mouseX > (nodes[i].longitude * mapScale) + mapXOff - (bSize * mapScale/2) &&
-                    mouseX < (nodes[i].longitude * mapScale) + mapXOff + (bSize * mapScale) &&
-                    mouseY > (-(nodes[i].latitude) * mapScale) + mapYOff  - (bSize * mapScale/2) &&
-                    mouseY < (-(nodes[i].latitude) * mapScale) + mapYOff + (bSize * mapScale)) {
-                    // draw highlighted loc marker
-                    ctxMarkers.strokeStyle = '#e60ed4';
-                    ctxMarkers.lineWidth = 3;
-                    ctxMarkers.strokeRect(
-                        (nodes[i].longitude * mapScale) + mapXOff - (bSize * mapScale/2),
-                        (-(nodes[i].latitude) * mapScale) + mapYOff - (bSize * mapScale/2),
-                        bSize * mapScale,
-                        bSize * mapScale
-                    ); 
-                    // move map to named loc
-                    if (mouseDetail > 1) {
-                        mapScale = 50;
-                        mapXOff = (getWidth()/3*2) - ((nodes[i].longitude) * mapScale);
-                        mapYOff = (getHeight()/2) - (-(nodes[i].latitude) * mapScale);
-                        mapSteps = 0;
-                        mapNodeSteps = 0;
-                        mapInc = 2;
-                        player.selcountry = nodes[i].country;
-                        cast[0].text = `Selected node: ${nodes[i].city}, ${nodes[i].country} \n
-                                        ${nodes[i].router.manufacturer} ${nodes[i].router.model} 
-                                        IP: ${nodes[i].ip_address} `;
-                        cast[0].setText(cast[0].text);
-                        cast[0].textDisplayChar = 0;
-                        player.selectedNode = nodes[i];
-                        drawMap();
-                    }
-
-                    // text label
-                    //
-                    //  not sure this works
-                    //
-                    ctxMarkers.fillStyle = '#c37105d8';
-                    ctxMarkers.font = scaleFont(0.018, "arial");
-                    mouseLabel = nodes[i].city + ", " + nodes[i].country +
-                                ", " + (nodes[i].router.manufacturer) +
-                                " " + (nodes[i].router.model)
-                } else {
-                    // standard node marker color
-                    ctxMarkers.strokeStyle = '#9edb04';
-                    ctxMarkers.lineWidth = 1;
-                    ctxMarkers.strokeRect(
-                        (nodes[i].longitude * mapScale) + mapXOff - (bSize * mapScale/2),
-                        (-(nodes[i].latitude) * mapScale) + mapYOff - (bSize * mapScale/2),
-                        bSize * mapScale,
-                        bSize * mapScale
-                    );
-                } 
-            }          
-        }
-    }
-
-    ctx.drawImage(cMarkers, 0, 0);
-
-    // draw network proxy connections on map
-    if (mapSteps >= mapStepsMax && player.drawNodes) {
-        let g = 155;
-        if (player.nodeStack.length > 1) {
-            for (let i = 0; i < player.nodeStack.length - 1; i++) {
-                //console.log(g/(player.nodeStack.length-i))
-                ctx.strokeStyle = `rgb(${(g/player.nodeStack.length)*(i+1)+100}, 20, 20)`;
-                let l1 = nodes[player.nodeStack[i]];
-                let l2 = nodes[player.nodeStack[i+1]];
-                mapNodeStackSteps += 0.02;
-                if (i < mapNodeStackSteps) {
-                    ctx.lineWidth = 1 * mapScale;
-                    drawLine([(l1.longitude * mapScale) + mapXOff, -(l1.latitude * mapScale) + mapYOff, 
-                              (l2.longitude * mapScale) + mapXOff, -(l2.latitude * mapScale) + mapYOff]);
-                }
-            }
-        }
-    }
-    //label network proxy connection cities
-    if (mapSteps >= mapStepsMax && player.drawNodes) {
-        let g = 155;
-        ctx.lineWidth = mapScale * 0.5;
-        if (player.nodeStack.length > 1) {
-            for (let i = 0; i < player.nodeStack.length - 1; i++) {
-                if (i < mapNodeStackSteps) {
-                    let node = nodes[player.nodeStack[i+1]];
-                    if (node.compromisedAccounts.length > 0) {
-                        // node aquired
-                        ctx.strokeStyle = `rgb(19, 195, 39)`;
-                    } else {
-                        // un hacked
-                        ctx.strokeStyle = `rgb(138, 6, 6)`;
-                    }
-                    // ring
-                    ctx.beginPath();
-                    ctx.arc((node.longitude * mapScale) + mapXOff,
-                            -(node.latitude * mapScale) + mapYOff,
-                            1 * mapScale,
-                            0,
-                            2 * Math.PI); // x, y, radius, startAngle, endAngle
-                    ctx.stroke();
-
-                    // country, city label
-                    let label = node.country + ", " + node.city;
-                    ctx.fillStyle = '#f4eded';
-                    ctx.font = scaleFont(0.010, "arial");
-                    ctx.fillText(label, (node.longitude * mapScale) + mapXOff,
-                                        -(node.latitude * mapScale) + mapYOff);
-                }
-            }
-        }
-    }
+    drawCities(bSize);
+    drawNodes(bSize);
+    drawProxyConnections();
 
     // draw the mouse hover label
     player.windowHover = true;
@@ -331,10 +176,10 @@ function drawMap() {
         // loc label
         ctx.fillStyle = '#20974c';
         ctx.font = scaleFont(0.018, "arial");
-        let lt = city.name + ", " + city.country + ", population: " + (city.population);
-        ctx.fillText(lt,
+        let str = city.name + ", " + city.country + ", population: " + (city.population);
+        ctx.fillText(str,
                     (city.lon * mapScale) + mapXOff,
-                    (-(city.lat) * mapScale) + mapYOff);
+                    (-city.lat * mapScale) + mapYOff);
     }
 
     // selected node marker
@@ -346,7 +191,7 @@ function drawMap() {
         ctx.lineWidth = 3;
         ctx.strokeRect(
             (node.longitude * mapScale) + mapXOff - (bSize * mapScale/2),
-            (-(node.latitude) * mapScale) + mapYOff - (bSize * mapScale/2),
+            (-node.latitude * mapScale) + mapYOff - (bSize * mapScale/2),
             bSize * mapScale,
             bSize * mapScale);
 
@@ -356,10 +201,174 @@ function drawMap() {
         let lt = node.country + ", ip: " + node.ip_address;
         ctx.fillText(lt,
                     (node.longitude * mapScale) + mapXOff,
-                    (-(node.latitude) * mapScale) + mapYOff);
+                    (-node.latitude * mapScale) + mapYOff);
+    }
+}
+
+function drawCities(bSize) {
+    if (mapSteps >= mapStepsMax && player.drawCities) {
+        mapCitiesSteps += 1 + mapCitiesSteps / 4;
+        for (let i = 0; i < cities.length; i++) {
+            if (i < mapCitiesSteps) {
+                let city = cities[i];
+
+                // gradient effect
+                ctxMarkers.strokeStyle = brighten('#0048ff', city.lat * 0.4 - 20);
+                ctxMarkers.lineWidth = 1;
+                ctxMarkers.strokeRect(
+                    (city.lon * mapScale) + mapXOff - (bSize * mapScale/2),
+                    (-city.lat * mapScale) + mapYOff  - (bSize * mapScale/2),
+                    bSize * mapScale,
+                    bSize * mapScale
+                );
+
+                if (mouseX > (city.lon * mapScale) + mapXOff - (bSize * mapScale/2) &&
+                    mouseX < (city.lon * mapScale) + mapXOff + (bSize * mapScale) &&
+                    mouseY > (-city.lat * mapScale) + mapYOff - (bSize * mapScale/2) &&
+                    mouseY < (-city.lat * mapScale) + mapYOff + (bSize * mapScale)) {
+                    // mouseDeatil is number of clicks, move 
+                    // map to named location on doubleclick
+                    if (mouseDetail > 1) {
+                        mapScale = 30;
+                        mapXOff = (getWidth()/3*2) - (city.lon * mapScale);
+                        mapYOff = (getHeight()/2) - (-city.lat * mapScale);
+                        mapSteps = 0;
+                        mapNodeSteps = 0;
+                        mapInc = 2;
+                        player.selcountry = city.country;
+                        cast[0].text = `Selected ${city.name}, ${city.country}`;
+                        cast[0].setText(cast[0].text);
+                        player.selectedCity = city;
+                        updateMap = true;
+                        drawMap();
+                    }
+                    mouseLabel = city.name + ", " + city.country +
+                                ", population: " + (city.population);
+                }
+            }           
+        }
+    }
+}
+
+function drawNodes(bSize) {
+    if (mapSteps >= mapStepsMax && player.drawNodes) {
+        mapNodeSteps += 1 + mapNodeSteps/4;
+        for (let i = 0; i < nodes.length; i++) {
+            let node = nodes[i];
+            if (i < mapNodeSteps && node.discovered) {
+                if (mouseX > (node.longitude * mapScale) + mapXOff - (bSize * mapScale/2) &&
+                    mouseX < (node.longitude * mapScale) + mapXOff + (bSize * mapScale) &&
+                    mouseY > (-node.latitude * mapScale) + mapYOff  - (bSize * mapScale/2) &&
+                    mouseY < (-node.latitude * mapScale) + mapYOff + (bSize * mapScale)) {
+                    // draw highlighted node marker
+                    ctxMarkers.strokeStyle = '#e60ed4';
+                    ctxMarkers.lineWidth = 3;
+                    ctxMarkers.strokeRect(
+                        (node.longitude * mapScale) + mapXOff - (bSize * mapScale/2),
+                        (-node.latitude * mapScale) + mapYOff - (bSize * mapScale/2),
+                        bSize * mapScale,
+                        bSize * mapScale
+                    ); 
+                    // mouseDeatil is number of clicks, move 
+                    // map to named node on doubleclick
+                    if (mouseDetail > 1) {
+                        mapScale = 50;
+                        mapXOff = (getWidth()/3*2) - (node.longitude * mapScale);
+                        mapYOff = (getHeight()/2) - (-node.latitude * mapScale);
+                        mapSteps = 0;
+                        mapNodeSteps = 0;
+                        mapInc = 2;
+                        player.selcountry = node.country;
+                        cast[0].text = `Selected node: ${node.city}, ${node.country} \n
+                                        ${node.router.manufacturer} ${node.router.model} 
+                                        IP: ${node.ip_address}`;
+                        cast[0].setText(cast[0].text);
+                        cast[0].textDisplayChar = 0;
+                        player.selectedNode = nodes[i];
+                        drawMap();
+                    }
+
+                    // text label, not sure this works. 
+                    // it's reusing mouseLabel, which seems wrong. 
+                    // ckeck it later
+                    ctxMarkers.fillStyle = '#c37105d8';
+                    ctxMarkers.font = scaleFont(0.018, "arial");
+                    mouseLabel = node.city + ", " + node.country +
+                                ", " + (node.router.manufacturer) +
+                                " " + (node.router.model)
+                } else {
+                    // standard node marker color with gradient
+                    ctxMarkers.strokeStyle = brighten('#9edb04', node.lat * 0.4 - 20);
+                    ctxMarkers.lineWidth = 1;
+                    ctxMarkers.strokeRect(
+                        (node.longitude * mapScale) + mapXOff - (bSize * mapScale/2),
+                        (-node.latitude * mapScale) + mapYOff - (bSize * mapScale/2),
+                        bSize * mapScale,
+                        bSize * mapScale
+                    );
+                } 
+            }          
+        }
     }
 
-    //drawIcon();
+    // copy the markers to the main ctx
+    ctx.drawImage(cMarkers, 0, 0);
+}
+
+function drawProxyConnections() {
+    // draw lines between network proxy connections on map
+    if (mapSteps >= mapStepsMax && player.drawNodes) {
+        let g = 155;
+        if (player.nodeStack.length > 1) {
+            for (let i = 0; i < player.nodeStack.length - 1; i++) {
+                //console.log(g/(player.nodeStack.length-i))
+                ctx.strokeStyle = `rgb(${(g/player.nodeStack.length)*(i+1)+100}, 20, 20)`;
+                let l1 = nodes[player.nodeStack[i]];
+                let l2 = nodes[player.nodeStack[i+1]];
+                mapNodeStackSteps += 0.02;
+                if (i < mapNodeStackSteps) {
+                    ctx.lineWidth = 1 * mapScale;
+                    drawLine([(l1.longitude * mapScale) + mapXOff, -(l1.latitude * mapScale) + mapYOff, 
+                              (l2.longitude * mapScale) + mapXOff, -(l2.latitude * mapScale) + mapYOff]);
+                }
+            }
+        }
+    }
+
+    //label network proxy connection cities
+    if (mapSteps >= mapStepsMax && player.drawNodes) {
+        let g = 155;
+        ctx.lineWidth = mapScale * 0.5;
+        if (player.nodeStack.length > 1) {
+            for (let i = 0; i < player.nodeStack.length - 1; i++) {
+                if (i < mapNodeStackSteps) {
+                    let node = nodes[player.nodeStack[i+1]];
+                    if (node.compromisedAccounts.length > 0) {
+                        // node aquired
+                        ctx.strokeStyle = `rgb(19, 195, 39)`;
+                    } else {
+                        // un hacked
+                        ctx.strokeStyle = `rgb(138, 6, 6)`;
+                    }
+                    // ring
+                    ctx.beginPath();
+                    ctx.arc((node.longitude * mapScale) + mapXOff,
+                            -(node.latitude * mapScale) + mapYOff,
+                            1 * mapScale,
+                            0,
+                            2 * Math.PI); // x, y, radius, startAngle, endAngle
+                    ctx.stroke();
+
+                    // country, city label
+                    let label = node.country + ", " + node.city;
+                    ctx.fillStyle = '#f4eded';
+                    ctx.font = scaleFont(0.010, "arial");
+                    ctx.fillText(label, (node.longitude * mapScale) + mapXOff,
+                                        -(node.latitude * mapScale) + mapYOff);
+                }
+            }
+        }
+    }
 }
 
 function drawCursor() {

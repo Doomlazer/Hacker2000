@@ -48,6 +48,7 @@ function commandHandler(win) {
                 win.authTries = 0;
                 logSSHDisconnect(win, node);
                 player.nodeStack.pop();
+                attachNode(win, nodes[stack.length-1]);
                 win.setProxyText();
             } else {
                 win.setText("Invalid user. Enter username");
@@ -96,9 +97,10 @@ function commandHandler(win) {
             win.authTries ++;
             if (win.authTries >= 3) {
                 win.setText("Invalid password. Too many attempts\nDisconnected...");
+                win.authTries = 0;
                 logSSHDisconnect(win);
                 player.nodeStack.pop();
-                win.authTries = 0;
+                attachNode(win, nodes[stack.length-1]);
                 win.setProxyText();
                 win.askedForPwd = false;
             } else {
@@ -225,7 +227,7 @@ function fullscreenCommand(win) {
 }
 
 function exitCommand(win) {
-    win.setText("Goodbye...");
+    win.setText("Goodbye..."); // never displayed
     if (player.nodeStack.length > 1) {
         let stack = player.nodeStack;
         let node = nodes[stack[stack.length-1]];
@@ -237,7 +239,7 @@ function exitCommand(win) {
         // remove from stack
         stack.pop();
         attachNode(win, nodes[stack.length-1]);
-        win.setProxyText()
+        win.setProxyText();
 
         // set authenticated user from the computer returned to by exiting
         node = nodes[stack[stack.length-1]];
@@ -370,9 +372,9 @@ function sshCommand(win, command) {
         for (let i of nodes) {
             if (ip == i.ip_address) {
                 player.nodeStack.push(i.id);
-                win.setProxyText();
-                attachNode(win, nodes[i.id]);
                 logSSH(win);
+                attachNode(win, nodes[i.id]);
+                win.setProxyText();
                 notFound = false;
             }
         }
