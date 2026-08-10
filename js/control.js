@@ -24,7 +24,7 @@ function doWheel(e) {
 
             adjustedWindow = true;
 
-            if (c.type == "proxy" || c.type == "reader") {
+            if (c.type == "proxy" || c.type == "reader" || c.type == "browser") {
                 c.wheelOff += e.deltaY;
                 //console.log(`wheelOff ; ${c.wheelOff} ${c.type}`)
             } else {
@@ -74,8 +74,8 @@ function doWheel(e) {
 
 function doMouseMove(e) {
     let adjustedWindow = false;
-    mouseX = e.x - 2//- 10;
-    mouseY = e.y - 17//- 25;
+    mouseX = e.x - 10; // - 2
+    mouseY = e.y - 25;// -17
     mouseDetail = e.detail;
     if (mouseDown) {
         if (!movingMap) {

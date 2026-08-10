@@ -189,6 +189,12 @@ function commandHandler(win) {
                     // show registerd user
                     regCommand(win);
                     break;
+                case 'setparam':
+                    setparamCommand(win, command);
+                    break;
+                case 'speak':
+                    speakCommand(win, command);
+                    break;
                 default:
                     win.text = `ERROR: ${command[0]} - Unknown Command`;
                     win.setText(win.text);  
@@ -303,11 +309,18 @@ function readCommand(win, command) {
                 command[1], player.authAccountIndex
             );
         }
+        spawnReadWin(win, text);
     } else {
-        text = "New File";
+        text = `READ - read text from a file
+
+                \tread [file || path]
+
+                ex. read Config.cfg
+
+                Note: The command READ LOG will display the system log files from any directory`;
+        win.setText(text);
     }
 
-    spawnReadWin(win, text);
 }
 
 function cdCommand(win, command) {
@@ -350,8 +363,11 @@ function sshCommand(win, command) {
         // ssh command HELP string
         win.setText(
             `ssh \- OpenSSH remote login client
+
             \tssh [ip address]
-            \tssh [user]@[ip address]`
+            \tssh [user]@[ip address]
+            
+            ex. ssh jdoe@198.51.100.5`
         );
     } else {
         let addr = command[1].split("@");
@@ -480,10 +496,12 @@ function mapCommand(win, command) {
         if (player.drawCities) {
             player.drawCities = false;
             win.setText("Hide Cities");
+            mapCitiesSteps = 0;
+            mapSteps = 1000;
         } else {
             player.drawCities = true;
             mapCitiesSteps = 0
-            win.setText("Show Cities");
+            win.setText(`Show Cities (Pop.Threshold: ${player.cityPopulationThreshold})`);
         }
     } else if (command[1].toLowerCase() == "center") {
         // re-center the map on screen
@@ -519,6 +537,15 @@ function mapCommand(win, command) {
         } else {
             win.setText("USAGE: map zoom [level]");
         }
+    } else if (command[1].toLowerCase() == "pop") {
+        if (isNaN(command[2])) {
+            player.cityPopulationThreshold = 0;
+        } else {
+            player.cityPopulationThreshold = parseInt(command[2]);
+        }
+        mapSteps = 0;
+        mapCitiesSteps = 10000;
+        win.setText(`Set population threshold to ${player.cityPopulationThreshold}`);
     } else {
         // the supplied argument doesn't exist, 
         // show map command help string
@@ -593,6 +620,7 @@ function scanCommand(win, command) {
             }
         }
         win.text += "Scan Complete"
+        win.setText(win.text);
     }
 }
 
@@ -640,5 +668,22 @@ function setparamCommand(win, command) {
     } else {
         this[command[1]] = command[2];
         win.setText(`RESULT [${command[1]}] is ${this[command[1]]}`);
+    }
+}
+
+function speakCommand(win, command){
+    if (command.length < 2) {
+        if (player.t2s) {
+            player.t2s = false;
+        } else {
+            player.t2s = true;
+        }
+        win.setText(`Text2Speach is now ${player.t2s}`);
+    } else {
+        player.t2s = true;
+        let fs = win.node.fileSystem;
+        let str = `speaking file [${command[1]}]...` + 
+                    fs.readFile(command[1], player.authAccountIndex);
+        win.setText(str);
     }
 }

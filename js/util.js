@@ -56,3 +56,33 @@ function shuffle(array) {
         l--;
     }
 }
+
+function speak(text, queue = 0, voice = 0) {
+    if (!queue) {
+        window.speechSynthesis.cancel();
+    }
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    const voices = window.speechSynthesis.getVoices();
+    utterance.onend = function(event) {
+        if (debug) {
+            console.log('Speech has finished after ' + event.elapsedTime + ' seconds.');
+        }
+    };
+    
+    // Set voice
+    if (voices.length > voice) {
+        utterance.voice = voices[voice];
+    } else {
+        console.log('selected voice not available');
+    }
+    window.speechSynthesis.speak(utterance);
+}
+
+function createJSON(content, fileName, contentType) {
+    var a = document.createElement("a");
+    var file = new Blob([content], {type: contentType});
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+}

@@ -7,7 +7,7 @@ let gUsers = [];
 let player;
 let locations = [];
 let map = [];
-let mapScale = 1.5;
+let mapScale = 5;
 let mapXOff;
 let mapYOff;
 let mapColor = '#c8cac8';
@@ -48,7 +48,7 @@ function init() {
     //document.addEventListener("gesturestart", e => e.preventDefault(), { passive: false });
 
     doResize();
-    mapXOff = getWidth()/3 * 2;
+    mapXOff = getWidth()/2;  //3 * 2;
     mapYOff = getHeight()/2;
     ctx.fillStyle = '#f4eded';
 
@@ -142,6 +142,16 @@ function loadMap() {
             attachNode(playersWindow, nodes[0]);
             playersWindow.admins.push(0); // add player as admin to own computer
             cast.push(playersWindow);
+
+            /*/ broswer test
+            let browser = new CanvasBrowser(
+                100,
+                100,
+                600,
+                400
+            );
+            cast.push(browser);
+            browser.open("./js/browser/test.html");*/
 
             requestAnimationFrame(frame);
         })

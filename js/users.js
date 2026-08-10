@@ -28,6 +28,7 @@ class Player extends User{
         this.drawCities = true;
         this.drawNodes = true;
         this.drawNodeStack = true;
+        this.cityPopulationThreshold = 500000;
         this.connectTo = 0;
         this.selCountry = locations[gUsers.length].address.country;
         this.selectedCountry;
@@ -41,5 +42,6 @@ class Player extends User{
         this.audioPlaylist = [];
         this.phoneMessage = "";
         this.sendToReaderThreshold = 9;
+        this.t2s = false;
     }
 }

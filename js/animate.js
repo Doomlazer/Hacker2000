@@ -1,8 +1,9 @@
 class aniRect {
     constructor(x, y, width, height) {
         this.node = [];
-        this.glowEffect = true;
-        this.glowEffectWidth = 10;
+        //this.glowEffect = true;
+        //this.glowEffectWidth = 10;
+        this.alpha = 0.75;
         this.isRounded = true;
         this.cornerRad = 20;
         this.rectLineWidth = 1;
@@ -21,12 +22,12 @@ class aniRect {
         this.yP = 0;
         this.xW = width; // max
         this.yH = height;
-        this.rectColor = '#028220';
-        this.textColor = '#ffffff';
+        this.rectColor = '#28d406';
+        this.textColor = '#28d406';
         this.fontSize = 18;
         this.textFont = "Courier New"; // "Hyperspace";
         this.opaqueBackground = true;
-        this.backgroundColor = '#404141';
+        this.backgroundColor = '#060606';
         this.textLines = []
         this.textMaxLines = 0;
         this.admins = [];
@@ -68,9 +69,9 @@ class aniRect {
         // reader defaults
         this.readerFontSize = 16;
         this.readerText = "Proxy List:\n"
-        this.readerBackgroundColor = '#2e2d2d'
+        this.readerBackgroundColor = '#180377'
         this.readerRectColor = '#152272'
-        this.readerTextColor = '#03a631'
+        this.readerTextColor = '#bad606'
         this.readerIsRounded = false;
         this.readerHasBoarder = true;
         this.rX1 = getWidth()/25 * 10.5;
@@ -94,6 +95,11 @@ class aniRect {
     }
 
     setText(theText, prompt = true) {
+
+        if (player.t2s) {
+            speak(theText);
+        }
+        
         // Set font and text color
         ctx.fillStyle = this.textColor;
         ctx.font = this.fontSize + "px " + this.textFont;

@@ -1,3 +1,5 @@
+let mouseLabel = "";
+
 function draw() {
     // clear
     ctx.fillStyle = '#000000';
@@ -8,7 +10,7 @@ function draw() {
     // draw windows based on priority, highest is top most window
     let s = cast.toSorted((a, b) => a.pri - b.pri);
     for (let i = 0; i < s.length; i++) {
-       winDraw(s[i]);
+       drawWin(s[i]);
     }
 
     drawCursor();
@@ -70,7 +72,6 @@ function drawCoords(coords) {
 }
 
 function drawMap() {
-    let mouseLabel = "";
 
     // only update the map context if 
     // needed because it's expensive
@@ -155,7 +156,7 @@ function drawMap() {
         );
         ctx.clip();
         ctx.fillStyle = '#ff3838';
-        ctx.font = Math.max(6, Math.min(30, 12 * mapScale)) + "px courier";
+        ctx.font = Math.max(6, Math.min(20, 12 * mapScale)) + "px courier";
         ctx.fillText(mouseLabel, mouseX, mouseY);
         ctx.restore();
     }
@@ -208,42 +209,45 @@ function drawMap() {
 function drawCities(bSize) {
     if (mapSteps >= mapStepsMax && player.drawCities) {
         mapCitiesSteps += 1 + mapCitiesSteps / 4;
+        mouseLabel = "";
         for (let i = 0; i < cities.length; i++) {
             if (i < mapCitiesSteps) {
                 let city = cities[i];
 
-                // gradient effect
-                ctxMarkers.strokeStyle = brighten('#0048ff', city.lat * 0.4 - 20);
-                ctxMarkers.lineWidth = 1;
-                ctxMarkers.strokeRect(
-                    (city.lon * mapScale) + mapXOff - (bSize * mapScale/2),
-                    (-city.lat * mapScale) + mapYOff  - (bSize * mapScale/2),
-                    bSize * mapScale,
-                    bSize * mapScale
-                );
+                if (city.population > player.cityPopulationThreshold) {
+                    // gradient effect
+                    ctxMarkers.strokeStyle = brighten('#0048ff', city.lat * 0.4 - 20);
+                    ctxMarkers.lineWidth = 1;
+                    ctxMarkers.strokeRect(
+                        (city.lon * mapScale) + mapXOff - (bSize * mapScale/2),
+                        (-city.lat * mapScale) + mapYOff  - (bSize * mapScale/2),
+                        bSize * mapScale,
+                        bSize * mapScale
+                    );
 
-                if (mouseX > (city.lon * mapScale) + mapXOff - (bSize * mapScale/2) &&
-                    mouseX < (city.lon * mapScale) + mapXOff + (bSize * mapScale) &&
-                    mouseY > (-city.lat * mapScale) + mapYOff - (bSize * mapScale/2) &&
-                    mouseY < (-city.lat * mapScale) + mapYOff + (bSize * mapScale)) {
-                    // mouseDeatil is number of clicks, move 
-                    // map to named location on doubleclick
-                    if (mouseDetail > 1) {
-                        mapScale = 30;
-                        mapXOff = (getWidth()/3*2) - (city.lon * mapScale);
-                        mapYOff = (getHeight()/2) - (-city.lat * mapScale);
-                        mapSteps = 0;
-                        mapNodeSteps = 0;
-                        mapInc = 2;
-                        player.selcountry = city.country;
-                        cast[0].text = `Selected ${city.name}, ${city.country}`;
-                        cast[0].setText(cast[0].text);
-                        player.selectedCity = city;
-                        updateMap = true;
-                        drawMap();
+                    if (mouseX > (city.lon * mapScale) + mapXOff - (bSize * mapScale/2) &&
+                        mouseX < (city.lon * mapScale) + mapXOff + (bSize * mapScale) &&
+                        mouseY > (-city.lat * mapScale) + mapYOff - (bSize * mapScale/2) &&
+                        mouseY < (-city.lat * mapScale) + mapYOff + (bSize * mapScale)) {
+                        // mouseDeatil is number of clicks, move 
+                        // map to named location on doubleclick
+                        if (mouseDetail > 1) {
+                            mapScale = 30;
+                            mapXOff = (getWidth()/3*2) - (city.lon * mapScale);
+                            mapYOff = (getHeight()/2) - (-city.lat * mapScale);
+                            mapSteps = 0;
+                            mapNodeSteps = 0;
+                            mapInc = 2;
+                            player.selCountry = city.country;
+                            cast[0].text = `Selected ${city.name}, ${city.country}`;
+                            cast[0].setText(cast[0].text);
+                            player.selectedCity = city;
+                            updateMap = true;
+                            drawMap();
+                        }
+                        mouseLabel = city.name + ", " + city.country +
+                                    ", population: " + (city.population);
                     }
-                    mouseLabel = city.name + ", " + city.country +
-                                ", population: " + (city.population);
                 }
             }           
         }
@@ -269,6 +273,13 @@ function drawNodes(bSize) {
                         bSize * mapScale,
                         bSize * mapScale
                     ); 
+
+                    let label = node.ip_address + ", " + node.city;
+                    ctx.fillStyle = '#f4eded';
+                    ctx.font = scaleFont(0.010, "arial");
+                    ctx.fillText(label, (node.longitude * mapScale) + mapXOff,
+                                        -(node.latitude * mapScale) + mapYOff + bSize);
+
                     // mouseDeatil is number of clicks, move 
                     // map to named node on doubleclick
                     if (mouseDetail > 1) {
@@ -291,15 +302,17 @@ function drawNodes(bSize) {
                     // text label, not sure this works. 
                     // it's reusing mouseLabel, which seems wrong. 
                     // ckeck it later
-                    ctxMarkers.fillStyle = '#c37105d8';
-                    ctxMarkers.font = scaleFont(0.018, "arial");
-                    mouseLabel = node.city + ", " + node.country +
-                                ", " + (node.router.manufacturer) +
-                                " " + (node.router.model)
+                    
+                    //ctxMarkers.fillStyle = '#c37105d8';
+                    //ctxMarkers.font = scaleFont(0.018, "arial");
+                    //mouseLabel = node.city + ", " + node.country +
+                    //            ", " + (node.router.manufacturer) +
+                    //            " " + (node.router.model)
                 } else {
                     // standard node marker color with gradient
-                    ctxMarkers.strokeStyle = brighten('#9edb04', node.lat * 0.4 - 20);
-                    ctxMarkers.lineWidth = 1;
+                    //ctxMarkers.strokeStyle = brighten('#7dad06', node.lat * 0.4 - 20);
+                    ctxMarkers.strokeStyle = '#a40396';
+                    ctxMarkers.lineWidth = 4;
                     ctxMarkers.strokeRect(
                         (node.longitude * mapScale) + mapXOff - (bSize * mapScale/2),
                         (-node.latitude * mapScale) + mapYOff - (bSize * mapScale/2),
@@ -372,11 +385,15 @@ function drawProxyConnections() {
 }
 
 function drawCursor() {
-    ctx.strokeStyle = '#FFFFFF';
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 3;
     let x = mouseX,
     y = mouseY;
     const line = [x,y,x,y+10,x+5,y+10,x+8,y+15,x+5,y+10,x+10,y+10,x,y];
+    drawLine(line);
+
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineWidth = 2;
     drawLine(line);
 
     if (debug) {
@@ -423,7 +440,7 @@ function drawIcon() {
     }
 }
 
-function winDraw(win) { // draw a window
+function drawWin(win) { // draw a window
         // update the animation, blit the rect and boarders if fully open draw text.
         if (win.toOpen) {
             // is opening
@@ -481,6 +498,9 @@ function winDraw(win) { // draw a window
         if (win.xP > 0 || win.yP > 0) {
             // background
             if (win.opaqueBackground) {
+                if (win.type != "reader") {
+                    ctx.globalAlpha = win.alpha;
+                }
                 ctx.fillStyle = win.backgroundColor;
                 if (win.isRounded) {
                     ctx.beginPath();
@@ -489,7 +509,15 @@ function winDraw(win) { // draw a window
                 } else {
                     ctx.fillRect(win.x1, win.y1, win.xP, win.yP);
                 }
-    
+                ctx.globalAlpha = 1;
+            }
+
+            if (win.type == "browser") {
+
+                drawBrowserWindow(win);
+
+                return;
+
             }
 
             // main rect
@@ -537,10 +565,12 @@ function winDraw(win) { // draw a window
                 // ----------------------
                 const radius = Math.min(pw, ph) * 0.06;
 
+                ctx.globalAlpha = 0.25;
                 ctx.fillStyle = "#111";
                 ctx.beginPath();
                 ctx.roundRect(px, py, pw, ph, radius);
                 ctx.fill();
+                ctx.globalAlpha = 1;
 
                 ctx.strokeStyle = accent;
                 ctx.lineWidth = Math.max(1, pw * 0.01);
@@ -634,6 +664,8 @@ function winDraw(win) { // draw a window
                 const startX =
                     px + (pw - totalButtonsW) / 2;
 
+                const audio = backgroundMusic[0]?.audio;
+
                 buttons.forEach((text, i) => {
 
                     const bx = startX + i * (buttonSize + gap);
@@ -703,6 +735,13 @@ function winDraw(win) { // draw a window
                     ctx.textAlign = "center";
                     ctx.textBaseline = "middle";
 
+                    // play/paused button icon
+                    if (i == 1) {
+                        if (audio && !audio.paused) {
+                            text = "⏸";
+                        }
+                    }
+
                     ctx.fillText(
                         text,
                         bx + buttonSize / 2,
@@ -714,7 +753,6 @@ function winDraw(win) { // draw a window
                 // ----------------------
                 // Progress bar
                 // ----------------------
-                const audio = backgroundMusic[0]?.audio;
 
                 let progress = 0;
 
@@ -791,7 +829,9 @@ function winDraw(win) { // draw a window
         if (textWidth > titleW - 20) {
             ctx.textAlign = "left";
 
-            win.songScrollOffset -= win.songScrollSpeed;
+            if (!backgroundMusic[0].audio.paused) {
+                win.songScrollOffset -= win.songScrollSpeed;
+            }
 
             if (win.songScrollOffset < -textWidth - 50) {
                 win.songScrollOffset = titleW;
@@ -825,3 +865,42 @@ function winDraw(win) { // draw a window
 
         return `rgb(${r}, ${g}, ${b})`;
     }
+
+    function drawBrowserWindow(win) {
+
+    ctx.save();
+
+    ctx.beginPath();
+
+    ctx.rect(
+        win.x1,
+        win.y1,
+        win.xW,
+        win.yH
+    );
+
+    ctx.clip();
+
+
+    ctx.drawImage(
+        win.surface,
+        win.x1,
+        win.y1,
+        win.xW,
+        win.yH
+    );
+
+
+    ctx.restore();
+
+
+    ctx.strokeStyle = win.rectColor;
+
+    ctx.strokeRect(
+        win.x1,
+        win.y1,
+        win.xW,
+        win.yH
+    );
+
+}
