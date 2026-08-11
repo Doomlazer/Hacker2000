@@ -53,7 +53,7 @@ class aniRect {
         this.mapBoarderLineWidth = 2;
         this.mapBoarderColor = '#00ba00';
         this.mapdefaultColor = '#FFFFFF';
-        this.mapSelCountryColor = '#FF9900'
+        this.mapSelCountryColor = '#a06000'
         // proxy defaults
         this.proxyFontSize = 12;
         this.proxyText = "Proxy List:\n"

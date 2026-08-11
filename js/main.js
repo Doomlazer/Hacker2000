@@ -88,12 +88,6 @@ function loadCities() {
             //console.log(cities);
             shuffle(cities);
 
-            //player = new user(prompt("enter player name:"));
-            player = new Player("Robort Copeland");
-            locations[0].homeowner = player.name;
-            //player.askedForName = true;
-            gUsers.push(player);
-
             loadNodes();
         })
         .catch(error => console.error('Error loading cities JSON file', error));
@@ -125,6 +119,13 @@ function loadNodes() {
                 createAccounts(i);
                 
             }
+
+            //player = new user(prompt("enter player name:"));
+            player = new Player("Robort Copeland");
+            locations[0].homeowner = player.name;
+            //player.askedForName = true;
+            gUsers.push(player);
+
             loadMap();
         })
         .catch(error => console.error('Error loading node JSON file', error));

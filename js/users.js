@@ -23,15 +23,13 @@ class Player extends User{
         super();
         this.name = name;
         this.uName = this.name.split(" ")[0].substring(0,1).toLowerCase() + this.name.split(" ")[1].toLowerCase();
-        this.selCountry = locations[gUsers.length].address.country; // selected country on map
+        this.selCountry = nodes[0].country; // selected country on map, start at player's location
         this.focus;
         this.drawCities = true;
         this.drawNodes = true;
         this.drawNodeStack = true;
-        this.cityPopulationThreshold = 500000;
+        this.cityPopulationThreshold = 100000;
         this.connectTo = 0;
-        this.selCountry = locations[gUsers.length].address.country;
-        this.selectedCountry;
         this.proxyWindow = [];
         this.readerWindow = [];
         this.unactivated = false;

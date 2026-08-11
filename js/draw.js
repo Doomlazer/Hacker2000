@@ -72,6 +72,7 @@ function drawCoords(coords) {
 }
 
 function drawMap() {
+    let win = cast[0];
 
     // only update the map context if 
     // needed because it's expensive
@@ -96,7 +97,7 @@ function drawMap() {
                 const cords = f.geometry.coordinates;
                 // the player's selected contry needed to be drawn on top to 
                 // avoid overlaps with neighbors
-                if (f.properties.name == player.selcountry) {
+                if (f.properties.name == player.selCountry) {
                     mapSel = cords;
                 }
                 drawCoords(cords);
@@ -104,12 +105,13 @@ function drawMap() {
         }
 
         // Draw the player selected country
-        ctxMap.strokeStyle = this.mapSelCountryColor;
+        ctxMap.strokeStyle = win.mapSelCountryColor;
+        ctxMap.lineWidth = 2;
         drawCoords(mapSel);
 
         // Draw the map's boarder
-        ctxMap.strokeStyle = this.mapBoarderColor;
-        ctxMap.lineWidth = this.mapBoarderLineWidth;
+        ctxMap.strokeStyle = win.mapBoarderColor;
+        ctxMap.lineWidth = win.mapBoarderLineWidth;
         ctxMap.strokeRect(-180 * mapScale + mapXOff,
                         (-90 * mapScale) + mapYOff,
                         360 * mapScale,
@@ -239,6 +241,7 @@ function drawCities(bSize) {
                             mapNodeSteps = 0;
                             mapInc = 2;
                             player.selCountry = city.country;
+                            console.log(player.selCountry);
                             cast[0].text = `Selected ${city.name}, ${city.country}`;
                             cast[0].setText(cast[0].text);
                             player.selectedCity = city;
@@ -289,7 +292,8 @@ function drawNodes(bSize) {
                         mapSteps = 0;
                         mapNodeSteps = 0;
                         mapInc = 2;
-                        player.selcountry = node.country;
+                        player.selCountry = node.country;
+                        console.log(player.selcountry)
                         cast[0].text = `Selected node: ${node.city}, ${node.country} \n
                                         ${node.router.manufacturer} ${node.router.model} 
                                         IP: ${node.ip_address}`;
