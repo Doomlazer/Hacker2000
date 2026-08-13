@@ -79,10 +79,16 @@ function speak(text, queue = 0, voice = 0) {
     window.speechSynthesis.speak(utterance);
 }
 
-function createJSON(content, fileName, contentType) {
-    var a = document.createElement("a");
-    var file = new Blob([content], {type: contentType});
-    a.href = URL.createObjectURL(file);
-    a.download = fileName;
+function createJSON(data, filename, mimeType = "application/json") {
+    const json = JSON.stringify(data, null, 2);
+
+    const blob = new Blob([json], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
     a.click();
+
+    URL.revokeObjectURL(url);
 }

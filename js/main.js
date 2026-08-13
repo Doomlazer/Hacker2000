@@ -25,6 +25,7 @@ let mapNodeSteps = 0;
 let mapNodeStackSteps = 0;
 let movingMap = false;
 let passwords = [];
+let ip_addresses = [];
 const gameTimer = new GameTimer("2000-7-5");
 
 function init() {
@@ -55,6 +56,7 @@ function init() {
     // Indicate the game is loading to the player
     ctx.font = scaleFont(0.01, "arial");
     ctx.fillText("Loading game. Please wait...", 20,20);
+    //indexedDB.deleteDatabase("VirtualFileSystemDB");
 
     fetch('data/locations.json')
         .then(response => response.json())
@@ -71,7 +73,6 @@ function loadPasswords() {
         .then(response => response.json())
         .then(data => passwords = data)
         .then(result => {
-            console.log(passwords[0])
             loadCities();
         })
         .catch(error => {
@@ -100,6 +101,8 @@ function loadNodes() {
         .then(result => {
             shuffle(nodes);
 
+            ip_addresses = generateIPs();
+            shuffle(ip_addresses);
             // need to update node info for the time being. 
             // To Do: Update the json instead
             for (let i = 0; i < nodes.length; i++) {
@@ -107,6 +110,7 @@ function loadNodes() {
                 let city = cities[i];
 
                 node.id = i;
+                node.ip_address = ip_addresses[i];
                 node.city = city.name;
                 node.country = city.country;
                 node.latitude = city.lat;
@@ -117,9 +121,7 @@ function loadNodes() {
                 node.text = `Welcome to the mal-90.${i} OS\nDate: ${gameTimer.formatted()}\nMight I suggest some AUDIO or asking for HELP if you need it.`;
                 node.promptChar = ">";
                 createAccounts(i);
-                
             }
-
             //player = new user(prompt("enter player name:"));
             player = new Player("Robort Copeland");
             locations[0].homeowner = player.name;

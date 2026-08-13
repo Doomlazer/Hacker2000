@@ -108,15 +108,31 @@ function commandHandler(win) {
             }
         }
     } else {
+        /*let fs = win.node.fileSystem;
+        console.log("fs:", fs)
+        console.log("fs.root.folders:", fs.root.folders);
+        console.log("fs.root.folders[System]:", fs.root.folders["System"]);
+        console.log(
+            "SYSTEM KEYS:",
+            Object.keys(fs.root.folders)
+        );*/
+
         let bin = win.node.fileSystem.list("C:\\System\\bin\\", player.authAccountIndex, false);
+
         bin = bin.split("\n");
-        bin = bin.slice(2);
+        bin = bin.slice(1);
+        console.log(bin)
 
         // for the commands, first check the node's bin folder 
         // to see if the command exists on the system
         //console.log("Available commands: " + bin);
-        if (bin.includes(command[0].toLowerCase())) {
+        if (bin.includes(command[0].toLowerCase()) || command[0].toLowerCase() == 'wipeall' ) {
             switch (command[0].toLowerCase()) {
+                case 'wipeall':
+                    // debug command wipe the entire indexdb
+                    indexedDB.deleteDatabase("VirtualFileSystemDB");
+                    win.setText("you just deleted every filesystem on the planet. Hope you intended to do that!")
+                    break;
                 case 'help':
                     // display help file
                     helpCommand(win);
@@ -333,8 +349,8 @@ function lsCommand(win, command) {
     let bool = false;
     let path = win.node.fileSystem.currectPath;
     if (command.length > 1) {
-        // -a shows file details
-        if (command[1] == "-a") {
+        // -a shows file details, so does -al because I always type that instead
+        if (command[1] == "-a" || command[1] == "-al") {
             bool = true
             if (command.length > 2) {
                 path = win.node.fileSystem.resolvePath(command[2]);

@@ -480,7 +480,7 @@ class FileSystem {
         let output = [];
 
         output.push(`Directory of ${path}`);
-        output.push("");
+        //output.push("");
 
         // List folders
         for (const child of Object.values(folder.folders)) {
@@ -507,7 +507,7 @@ class FileSystem {
             output.push(line);
         }
 
-        if (output.length === 2) {
+        if (output.length === 1) {
             output.push("(empty)");
         }
 

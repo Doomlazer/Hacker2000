@@ -20,7 +20,320 @@ function generateGiberish(length) {
     return str;
 }
 
-function createFS(n) {
+async function createFS(n) {
+
+    const fs =
+        await FileSystem.load(n);
+
+
+    if (fs.existsOnDisk) {
+        //console.log(`${n} already exists`)
+        return fs;
+    }
+
+
+    const user =
+        nodes[n].accounts[1].user;
+
+
+    //==================================================
+    // Folders
+    //==================================================
+
+    fs.createFolder(
+        "C:\\Users",
+        0,
+        0
+    );
+
+    fs.createFolder(
+        "C:\\Users\\root",
+        0,
+        0
+    );
+
+    fs.createFolder(
+        `C:\\Users\\${user}`,
+        1,
+        0
+    );
+
+    fs.createFolder(
+        `C:\\Users\\${user}\\Desktop`,
+        1,
+        0
+    );
+
+    fs.createFolder(
+        `C:\\Users\\${user}\\Documents`,
+        1,
+        0
+    );
+
+    fs.createFolder(
+        `C:\\Users\\${user}\\Music`,
+        1,
+        0
+    );
+
+
+    fs.createFolder(
+        "C:\\System",
+        0,
+        0
+    );
+
+    fs.createFolder(
+        "C:\\System\\logs",
+        0,
+        0
+    );
+
+    fs.createFolder(
+        "C:\\System\\bin",
+        0,
+        0
+    );
+
+
+    //==================================================
+    // Files
+    //==================================================
+
+    fs.createFile(
+        "C:\\config.cfg",
+        0,
+        0,
+        generateGiberish(
+            getRandInt(200) + 200
+        ),
+        0
+    );
+
+
+    fs.createFile(
+        "C:\\System\\logs\\logs.txt",
+        0,
+        0,
+        nodes[n].ip_address +
+        "\nLOG FILE:\n",
+        0
+    );
+
+
+    //==================================================
+    // Standard commands
+    //==================================================
+
+    fs.createFile(
+        "C:\\System\\bin\\exit",
+        0,
+        0,
+        generateGiberish(32),
+        0
+    );
+
+    fs.createFile(
+        "C:\\System\\bin\\ls",
+        0,
+        0,
+        generateGiberish(63),
+        0
+    );
+
+    fs.createFile(
+        "C:\\System\\bin\\ulist",
+        0,
+        0,
+        generateGiberish(23),
+        0
+    );
+
+    fs.createFile(
+        "C:\\System\\bin\\read",
+        0,
+        0,
+        generateGiberish(113),
+        0
+    );
+
+    fs.createFile(
+        "C:\\System\\bin\\cd",
+        0,
+        0,
+        generateGiberish(12),
+        0
+    );
+
+    fs.createFile(
+        "C:\\System\\bin\\pwd",
+        0,
+        0,
+        generateGiberish(42),
+        0
+    );
+
+    fs.createFile(
+        "C:\\System\\bin\\ssh",
+        0,
+        0,
+        generateGiberish(32),
+        0
+    );
+
+    fs.createFile(
+        "C:\\System\\bin\\clear",
+        0,
+        0,
+        generateGiberish(32),
+        0
+    );
+
+    fs.createFile(
+        "C:\\System\\bin\\su",
+        0,
+        0,
+        generateGiberish(32),
+        0
+    );
+
+    fs.createFile(
+        "C:\\System\\bin\\reg",
+        0,
+        0,
+        generateGiberish(42),
+        0
+    );
+
+    fs.createFile(
+        "C:\\System\\bin\\date",
+        0,
+        0,
+        generateGiberish(102),
+        0
+    );
+
+
+    //==================================================
+    // Player computer
+    //==================================================
+
+    if (n === 0) {
+
+        fs.createFile(
+            "C:\\System\\bin\\setparam",
+            0,
+            0,
+            generateGiberish(62),
+            0
+        );
+
+        fs.createFile(
+            "C:\\System\\bin\\fullscreen",
+            0,
+            0,
+            generateGiberish(142),
+            0
+        );
+
+        fs.createFile(
+            "C:\\System\\bin\\scan",
+            0,
+            0,
+            generateGiberish(172),
+            0
+        );
+
+        fs.createFile(
+            "C:\\System\\bin\\map",
+            0,
+            0,
+            generateGiberish(372),
+            0
+        );
+
+        fs.createFile(
+            "C:\\System\\bin\\speak",
+            0,
+            0,
+            generateGiberish(113),
+            0
+        );
+
+        fs.createFile(
+            "C:\\System\\bin\\hangup",
+            0,
+            0,
+            generateGiberish(32),
+            0
+        );
+
+        fs.createFile(
+            "C:\\System\\bin\\dial",
+            0,
+            0,
+            generateGiberish(32),
+            0
+        );
+
+        fs.createFile(
+            "C:\\System\\bin\\audio",
+            0,
+            0,
+            generateGiberish(234),
+            0
+        );
+
+        fs.createFile(
+            "C:\\System\\bin\\help",
+            0,
+            0,
+            generateGiberish(23),
+            0
+        );
+
+        fs.createFile(
+            `C:\\Users\\${user}\\Documents\\phrack.txt`,
+            0,
+            0,
+            phrack,
+            0
+        );
+    }
+
+
+    //==================================================
+    // Attributes
+    //==================================================
+
+    fs.setAttributes(
+        "C:\\System",
+        {
+            readOnly: false,
+            system: true
+        },
+        0
+    );
+
+
+    fs.setAttributes(
+        "C:\\Users\\root",
+        {
+            readOnly: false,
+            system: true
+        },
+        0
+    );
+
+
+    await fs.save();
+
+    return fs;
+}
+
+
+
+/*function createFS(n) {
     const fs = new FileSystem();
 
     // Create folders
@@ -87,7 +400,7 @@ function createFS(n) {
     );
 
     return fs;
-}
+}*/
 
 function spawnReadWin(win, text) {
     // a text reader window
@@ -142,10 +455,30 @@ function createAccounts(n) {
     let a = [{"user": "root", "pwd":"password1234", "admin": true, "userId":0}];
 
     if (n < locations.length) {
-        let f = locations[n].homeowner.split(" ")[0].substring(0,1).toLowerCase();
-        let last = locations[n].homeowner.split(" ")[1].toLowerCase()
-        let uname = f + last;
+        let f;
+        let last;
+        let uname;
         let pwd; 
+
+        // Vary generated usernames 
+        let r = getRandInt(100);
+        if (r < 50) {
+            // first inital + lastname
+            f = locations[n].homeowner.split(" ")[0].substring(0,1).toLowerCase();
+            last = locations[n].homeowner.split(" ")[1].toLowerCase();
+            uname = f + last;
+        } else if (r < 75){
+            // full first + full last
+            f = locations[n].homeowner.split(" ")[0].toLowerCase();
+            last = locations[n].homeowner.split(" ")[1].toLowerCase();
+            uname = f + last;
+        } else if (r < 85) {
+            // just last name
+            uname = locations[n].homeowner.split(" ")[1].substring(0,1).toLowerCase();
+        } else {
+            // just first name
+            uname = locations[n].homeowner.split(" ")[0].toLowerCase();
+        }
 
         // some passwords will match if run against the password table 
         // others have random numbers on the end, which are harder to crack
@@ -168,15 +501,77 @@ function createAccounts(n) {
 
         nodes[n].logFile = "C:\\System\\logs\\logs.txt";
 
-        nodes[n].fileSystem = createFS(n);
+        ugh(n);
     }
+}
+
+async function ugh(n) {
+    nodes[n].fileSystem = await createFS(n);
 }
 
 function attachNode(window, node) {
     window.node = node;
     window.promptChar = node.promptChar;
     window.text = node.text;
+    window.fileSystem = FileSystem[node.id];
 }
+
+
+function generateIPs(count = 10_000) {
+  const ips = new Set();
+
+  // Ranges that should not be generated for fake WAN addresses.
+  const reserved = [
+    [0, 0, 0, 255],       // 0.0.0.0/8
+    [10, 0, 0, 255],      // 10.0.0.0/8
+    [100, 64, 0, 255],    // 100.64.0.0/10
+    [127, 0, 0, 255],     // 127.0.0.0/8
+    [169, 254, 0, 255],   // 169.254.0.0/16
+    [172, 16, 31, 255],   // 172.16.0.0/12
+    [192, 0, 0, 255],     // 192.0.0.0/24
+    [192, 0, 2, 255],     // TEST-NET-1
+    [192, 168, 0, 255],   // 192.168.0.0/16
+    [198, 18, 19, 255],   // benchmark networks
+    [198, 51, 100, 255],  // TEST-NET-2
+    [203, 0, 113, 255],   // TEST-NET-3
+    [224, 0, 0, 255],     // multicast+
+  ];
+
+  function isReserved(a, b, c) {
+    return (
+      a === 0 ||
+      a === 10 ||
+      a === 127 ||
+      a === 224 ||
+      a >= 240 ||
+      (a === 100 && b >= 64 && b <= 127) ||
+      (a === 169 && b === 254) ||
+      (a === 172 && b >= 16 && b <= 31) ||
+      (a === 192 && b === 168) ||
+      (a === 192 && b === 0) ||
+      (a === 198 && (b === 18 || b === 19 || b === 51)) ||
+      (a === 203 && b === 0)
+    );
+  }
+
+  while (ips.size < count) {
+    const a = 1 + Math.floor(Math.random() * 223);
+    const b = Math.floor(Math.random() * 256);
+    const c = Math.floor(Math.random() * 256);
+    const d = Math.floor(Math.random() * 256);
+
+    if (!isReserved(a, b, c)) {
+      ips.add(`${a}.${b}.${c}.${d}`);
+    }
+    if (ips.size % 100 == 0) {
+        //console.log(ips.size)
+    }
+  }
+
+  return [...ips];
+}
+
+
 
 let phrack = `
                                   _  _       _______
