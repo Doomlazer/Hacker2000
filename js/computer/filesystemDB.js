@@ -362,6 +362,224 @@ class FileSystem {
 
 
     //=====================================================
+    // Path Tab Completion
+    //=====================================================
+
+    tabComplete(
+        input,
+        userID = 0
+    ) {
+
+        input =
+            String(input)
+                .replace(/\//g, "\\");
+
+
+        /*
+        * Determine the directory being searched and
+        * the partial path segment being completed.
+        *
+        * Examples:
+        *
+        *   "Doc"
+        *       directory = "."
+        *       partial   = "Doc"
+        *
+        *   "Documents\\Pro"
+        *       directory = "Documents"
+        *       partial   = "Pro"
+        *
+        *   "C:\\Documents\\Pro"
+        *       directory = "C:\\Documents"
+        *       partial   = "Pro"
+        */
+
+        const lastSlash =
+            input.lastIndexOf("\\");
+
+
+        let directory;
+        let partial;
+
+
+        if (lastSlash === -1) {
+
+            directory = ".";
+
+            partial = input;
+
+        } else {
+
+            directory =
+                input.slice(
+                    0,
+                    lastSlash
+                );
+
+            partial =
+                input.slice(
+                    lastSlash + 1
+                );
+
+            /*
+            * "C:\\" means the root directory.
+            */
+            if (
+                directory === "C:"
+            ) {
+
+                directory = "C:\\";
+
+            }
+
+        }
+
+
+        /*
+        * Resolve the directory portion relative to
+        * the current working directory.
+        */
+        const directoryPath =
+            this.resolvePath(
+                directory || "."
+            );
+
+
+        /*
+        * Get the directory while respecting permissions.
+        */
+        const folder =
+            this.getFolderForUser(
+                directoryPath,
+                userID
+            );
+
+
+        if (!folder) {
+
+            return [];
+
+        }
+
+
+        /*
+        * Listing a directory requires read permission.
+        */
+        if (
+            !this.hasPermission(
+                folder,
+                userID,
+                "read"
+            )
+        ) {
+
+            return [];
+
+        }
+
+
+        const lowerPartial =
+            partial.toLowerCase();
+
+        const matches = [];
+
+
+        /*
+        * Complete folders.
+        */
+        for (
+            const name of
+            Object.keys(folder.folders)
+        ) {
+
+            if (
+                name
+                    .toLowerCase()
+                    .startsWith(
+                        lowerPartial
+                    )
+            ) {
+
+                matches.push({
+
+                    name,
+
+                    type: "folder",
+
+                    path:
+                        directoryPath === "C:\\"
+                            ? `C:\\${name}`
+                            : `${directoryPath}\\${name}`
+
+                });
+
+            }
+
+        }
+
+
+        /*
+        * Complete files.
+        */
+        for (
+            const name of
+            Object.keys(folder.files)
+        ) {
+
+            if (
+                name
+                    .toLowerCase()
+                    .startsWith(
+                        lowerPartial
+                    )
+            ) {
+
+                matches.push({
+
+                    name,
+
+                    type: "file",
+
+                    path:
+                        directoryPath === "C:\\"
+                            ? `C:\\${name}`
+                            : `${directoryPath}\\${name}`
+
+                });
+
+            }
+
+        }
+
+
+        /*
+        * Sort folders before files.
+        */
+        matches.sort(
+            (a, b) => {
+
+                if (
+                    a.type !== b.type
+                ) {
+
+                    return a.type === "folder"
+                        ? -1
+                        : 1;
+
+                }
+
+                return a.name.localeCompare(
+                    b.name
+                );
+
+            }
+        );
+
+
+        return matches;
+    }
+
+    //=====================================================
     // Object Creation
     //=====================================================
 

@@ -154,6 +154,82 @@ class aniRect {
             console.log("Enter: " + this.inputStr);
             commandHandler(this);
 
+        } else if (e.key == "Tab") {
+            e.preventDefault();
+
+            let node = cast[0].node;
+
+            // Split input into everything before the path and the path itself.
+            let lastSpace = this.inputStr.lastIndexOf(" ");
+
+            let prefix = lastSpace >= 0
+                ? this.inputStr.substring(0, lastSpace + 1)
+                : "";
+
+            let p = lastSpace >= 0
+                ? this.inputStr.substring(lastSpace + 1)
+                : this.inputStr;
+
+            console.log("p: " + p);
+
+            let val = node.fileSystem.tabComplete(
+                p,
+                player.authAccountIndex
+            );
+
+            console.log("got back: " + JSON.stringify(val));
+
+            // No matches
+            if (val.length === 0) {
+                return;
+            }
+
+            // Multiple matches
+            if (val.length > 1) {
+                let matches = val.map(x => x.name).join("\n");
+
+                // Display possible completions
+                this.setText(matches);
+
+                // Replace the newly-added empty prompt with the current input
+                this.displayLines[this.displayLines.length - 1] =
+                    node.promptChar + this.inputStr;
+                
+                this.lastInput = this.inputStr;
+
+                return;
+            }
+
+            // Exactly one match
+            let parts = p.split("\\");
+            let filePart = parts.pop();
+            let prevPath = parts.join("\\");
+
+            // Preserve leading "\" for absolute paths
+            let isAbsolute = p.startsWith("\\");
+
+            if (isAbsolute && prevPath !== "") {
+                prevPath = "\\" + prevPath;
+            }
+
+            let completedPath;
+
+            if (prevPath === "") {
+                completedPath = val[0].name;
+            } else if (prevPath === "\\") {
+                completedPath = "\\" + val[0].name;
+            } else {
+                completedPath = prevPath + "\\" + val[0].name;
+            }
+
+            this.inputStr = prefix + completedPath;
+
+            this.displayLines[this.displayLines.length - 1] =
+                node.promptChar + this.inputStr;
+
+            //console.log("filePart: " + filePart);
+            //console.log("prevPath: " + prevPath);
+            //console.log("completedPath: " + completedPath);
         } else if (e.key == "ArrowUp") {
             // redo last command 
             this.inputStr = this.lastInput;
@@ -195,6 +271,8 @@ class aniRect {
             if (e.key != "Control" &&
                 e.key != "Meta" &&
                 e.key != "Shift" &&
+                e.key != "Alt" &&
+                e.key != "CapsLock" &&
                 e.key != "ArrowLeft" &&
                 e.key != "ArrowRight") {
                 // add character to input    
