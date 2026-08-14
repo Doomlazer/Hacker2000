@@ -117,25 +117,6 @@ class aniRect {
         if (prompt) {
             this.displayLines.push(this.promptChar);
         }
-
-        // why not scroll instead?
-        /*/console.log(this.displayLines.length)
-        if (player.sendToReaderThreshold < this.displayLines.length) {
-            let rw = new aniRect(this.rX1, this.rY1, this.rXW, this.rYH);
-            //console.log("2nf " + cast[cast.length-1]);
-            rw.fontSize = this.readerFontSize;
-            rw.acceptInput = false;
-            rw.backgroundColor = this.readerBackgroundColor;
-            rw.rectColor = this.readerRectColor;
-            rw.textColor = this.readerTextColor
-            rw.isRounded = this.readerIsRounded;
-            rw.hasBoarder = this.readerHasBoarder;
-            rw.type = "reader";
-            cast.push(rw);
-            player.readerWindow.push(rw);
-            rw.setText((this.displayLines + theText), false);
-            //win.setText("Opening...");
-        }*/
     }
 
     clickHandler(e) {
@@ -155,81 +136,109 @@ class aniRect {
             commandHandler(this);
 
         } else if (e.key == "Tab") {
-            e.preventDefault();
+                e.preventDefault();
 
-            let node = cast[0].node;
+                let node = cast[0].node;
 
-            // Split input into everything before the path and the path itself.
-            let lastSpace = this.inputStr.lastIndexOf(" ");
+                // ---------------------------------------------------------
+                // Command completion
+                // ---------------------------------------------------------
+                // If there is no space, we're completing the command.
+                if (!this.inputStr.includes(" ")) {
+                    let commandPrefix = this.inputStr;
 
-            let prefix = lastSpace >= 0
-                ? this.inputStr.substring(0, lastSpace + 1)
-                : "";
+                    let val = node.fileSystem.tabComplete(
+                        "C:\\System\\bin\\" + commandPrefix,
+                        player.authAccountIndex
+                    );
 
-            let p = lastSpace >= 0
-                ? this.inputStr.substring(lastSpace + 1)
-                : this.inputStr;
+                    // No matches
+                    if (val.length === 0) {
+                        return;
+                    }
 
-            console.log("p: " + p);
+                    // Multiple matches
+                    if (val.length > 1) {
+                        let matches = val.map(x => x.name).join("\n");
 
-            let val = node.fileSystem.tabComplete(
-                p,
-                player.authAccountIndex
-            );
+                        this.setText(matches);
 
-            console.log("got back: " + JSON.stringify(val));
+                        this.displayLines[this.displayLines.length - 1] =
+                            node.promptChar + this.inputStr;
 
-            // No matches
-            if (val.length === 0) {
-                return;
-            }
+                        this.lastInput = this.inputStr;
 
-            // Multiple matches
-            if (val.length > 1) {
-                let matches = val.map(x => x.name).join("\n");
+                        return;
+                    }
 
-                // Display possible completions
-                this.setText(matches);
+                    // Exactly one match
+                    this.inputStr = val[0].name;
 
-                // Replace the newly-added empty prompt with the current input
+                    this.displayLines[this.displayLines.length - 1] =
+                        node.promptChar + this.inputStr;
+
+                    return;
+                }
+
+                // ---------------------------------------------------------
+                // Path argument completion
+                // ---------------------------------------------------------
+
+                let lastSpace = this.inputStr.lastIndexOf(" ");
+
+                let prefix = this.inputStr.substring(0, lastSpace + 1);
+                let p = this.inputStr.substring(lastSpace + 1);
+
+                let val = node.fileSystem.tabComplete(
+                    p,
+                    player.authAccountIndex
+                );
+
+                // No matches
+                if (val.length === 0) {
+                    return;
+                }
+
+                // Multiple matches
+                if (val.length > 1) {
+                    let matches = val.map(x => x.name).join("\n");
+
+                    this.setText(matches);
+
+                    this.displayLines[this.displayLines.length - 1] =
+                        node.promptChar + this.inputStr;
+
+                    this.lastInput = this.inputStr;
+
+                    return;
+                }
+
+                // Exactly one match
+                let parts = p.split("\\");
+                let filePart = parts.pop();
+                let prevPath = parts.join("\\");
+
+                // Preserve leading "\" for absolute paths
+                let isAbsolute = p.startsWith("\\");
+
+                if (isAbsolute && prevPath !== "") {
+                    prevPath = "\\" + prevPath;
+                }
+
+                let completedPath;
+
+                if (prevPath === "") {
+                    completedPath = val[0].name;
+                } else if (prevPath === "\\") {
+                    completedPath = "\\" + val[0].name;
+                } else {
+                    completedPath = prevPath + "\\" + val[0].name;
+                }
+
+                this.inputStr = prefix + completedPath;
+
                 this.displayLines[this.displayLines.length - 1] =
                     node.promptChar + this.inputStr;
-                
-                this.lastInput = this.inputStr;
-
-                return;
-            }
-
-            // Exactly one match
-            let parts = p.split("\\");
-            let filePart = parts.pop();
-            let prevPath = parts.join("\\");
-
-            // Preserve leading "\" for absolute paths
-            let isAbsolute = p.startsWith("\\");
-
-            if (isAbsolute && prevPath !== "") {
-                prevPath = "\\" + prevPath;
-            }
-
-            let completedPath;
-
-            if (prevPath === "") {
-                completedPath = val[0].name;
-            } else if (prevPath === "\\") {
-                completedPath = "\\" + val[0].name;
-            } else {
-                completedPath = prevPath + "\\" + val[0].name;
-            }
-
-            this.inputStr = prefix + completedPath;
-
-            this.displayLines[this.displayLines.length - 1] =
-                node.promptChar + this.inputStr;
-
-            //console.log("filePart: " + filePart);
-            //console.log("prevPath: " + prevPath);
-            //console.log("completedPath: " + completedPath);
         } else if (e.key == "ArrowUp") {
             // redo last command 
             this.inputStr = this.lastInput;

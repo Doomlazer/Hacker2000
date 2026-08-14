@@ -324,7 +324,11 @@ function readCommand(win, command) {
                 command[1], player.authAccountIndex
             );
         }
-        spawnReadWin(win, text);
+        if (text == "File not found") {
+            win.setText(text);
+        } else {
+            spawnReadWin(win, text);
+        }
     } else {
         text = `READ - read text from a file
 
