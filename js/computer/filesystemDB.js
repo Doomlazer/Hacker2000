@@ -1069,9 +1069,6 @@ class FileSystem {
 
         };
 
-
-        //this.save();
-
         return true;
     }
 
@@ -1121,9 +1118,6 @@ class FileSystem {
         delete item.permissions[
             targetUserID
         ];
-
-
-        //this.save();
 
         return true;
     }
@@ -1194,9 +1188,6 @@ class FileSystem {
             item.attributes,
             attrs
         );
-
-
-        //this.save();
 
         return true;
     }
@@ -1309,9 +1300,6 @@ class FileSystem {
                 owner
             );
 
-
-        //this.save();
-
         return true;
     }
 
@@ -1398,9 +1386,6 @@ class FileSystem {
         delete current.folders[
             folderName
         ];
-
-
-        //this.save();
 
         return true;
     }
@@ -1558,9 +1543,6 @@ class FileSystem {
         file.size =
             file.content.length;
 
-
-        //this.save();
-
         return "File updated";
     }
 
@@ -1638,9 +1620,6 @@ class FileSystem {
 
         file.size =
             file.content.length;
-
-
-        //this.save();
 
         return "Text appended";
     }
@@ -1780,9 +1759,6 @@ class FileSystem {
                 content
             );
 
-
-        //this.save();
-
         return true;
     }
 
@@ -1864,9 +1840,6 @@ class FileSystem {
         delete current.files[
             filename
         ];
-
-
-        //this.save();
 
         return true;
     }
@@ -2054,9 +2027,6 @@ class FileSystem {
 
         this.currentPath =
             "C:\\";
-
-
-        //this.save();
 
         return true;
     }

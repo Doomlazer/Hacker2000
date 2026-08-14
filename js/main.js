@@ -55,7 +55,7 @@ function init() {
 
     // Indicate the game is loading to the player
     ctx.font = scaleFont(0.01, "arial");
-    ctx.fillText("Loading game. Please wait...", 20,20);
+    //ctx.fillText("Loading game. Please wait...", 20,20);
     //indexedDB.deleteDatabase("VirtualFileSystemDB");
 
     fetch('data/locations.json')
@@ -103,9 +103,16 @@ function loadNodes() {
 
             ip_addresses = generateIPs();
             shuffle(ip_addresses);
+
+            player = new Player("Robort Copeland");
+            locations[0].homeowner = player.name;
+            //player = new user(prompt("enter player name:"));
+            //player.askedForName = true;
+            gUsers.push(player);
+
             // need to update node info for the time being. 
             // To Do: Update the json instead
-            for (let i = 0; i < nodes.length; i++) {
+            for (let i = 0; i < locations.length; i++) {
                 let node = nodes[i];
                 let city = cities[i];
 
@@ -122,15 +129,39 @@ function loadNodes() {
                 node.promptChar = ">";
                 createAccounts(i);
             }
-            //player = new user(prompt("enter player name:"));
-            player = new Player("Robort Copeland");
-            locations[0].homeowner = player.name;
-            //player.askedForName = true;
-            gUsers.push(player);
 
-            loadMap();
+            createAllFS();
+            
         })
         .catch(error => console.error('Error loading node JSON file', error));
+}
+
+async function createAllFS() {
+
+    const concurrency = 50;
+
+    for (let i = 0; i < locations.length; i += concurrency) {
+
+        const end = Math.min(
+            i + concurrency,
+            locations.length
+        );
+
+        await Promise.all(
+            Array.from(
+                { length: end - i },
+                (_, j) => createFS(i + j).then(
+                    fs => nodes[i + j].fileSystem = fs
+                )
+            )
+        );
+
+        drawFSProgress(end, locations.length);
+    }
+
+    console.log("ALL FILESYSTEMS CREATED");
+
+    loadMap();
 }
 
 function loadMap() {

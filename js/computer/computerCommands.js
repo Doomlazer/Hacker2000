@@ -121,14 +121,13 @@ function commandHandler(win) {
 
         bin = bin.split("\n");
         bin = bin.slice(1);
-        console.log(bin)
 
         // for the commands, first check the node's bin folder 
         // to see if the command exists on the system
         //console.log("Available commands: " + bin);
-        if (bin.includes(command[0].toLowerCase()) || command[0].toLowerCase() == 'wipeall' ) {
+        if (bin.includes(command[0].toLowerCase()) || command[0].toLowerCase() == 'deleteall' ) {
             switch (command[0].toLowerCase()) {
-                case 'wipeall':
+                case 'deleteall':
                     // debug command wipe the entire indexdb
                     indexedDB.deleteDatabase("VirtualFileSystemDB");
                     win.setText("you just deleted every filesystem on the planet. Hope you intended to do that!")

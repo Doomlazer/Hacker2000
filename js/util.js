@@ -92,3 +92,40 @@ function createJSON(data, filename, mimeType = "application/json") {
 
     URL.revokeObjectURL(url);
 }
+
+function drawFSProgress(current, total) {
+
+    const width = 400;
+    const height = 30;
+    const x = 20;
+    const y = 10;
+
+    const progress = current / total;
+
+    // Background
+    ctx.fillStyle = "#222";
+    ctx.fillRect(x, y, width, height);
+
+    // Progress
+    ctx.fillStyle = "#00ff00";
+    ctx.fillRect(
+        x,
+        y,
+        width * progress,
+        height
+    );
+
+    ctx.save();
+    // Text
+    ctx.fillStyle = "#fff";
+    ctx.font = "16px monospace";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.fillText(
+        `Loading game data: ${current}/${total}`,
+        x + width / 2,
+        y + height / 2
+    );
+    ctx.restore();
+}

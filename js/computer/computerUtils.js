@@ -31,6 +31,20 @@ async function createFS(n) {
         return fs;
     }
 
+    if(!nodes[n]) {
+    console.error("MISSING NODE:",n);
+    throw new Error(`nodes[${n}] does not exist`);
+}
+
+if(!nodes[n].accounts) {
+    console.error("MISSING ACCOUNTS:",n,nodes[n]);
+    throw new Error(`nodes[${n}].accounts does not exist`);
+}
+
+if(!nodes[n].accounts[1]) {
+    console.error("MISSING ACCOUNT[1]:",n,nodes[n]);
+    throw new Error(`nodes[${n}].accounts[1] does not exist`);
+}
 
     const user =
         nodes[n].accounts[1].user;
@@ -325,82 +339,10 @@ async function createFS(n) {
         0
     );
 
-
     await fs.save();
 
     return fs;
 }
-
-
-
-/*function createFS(n) {
-    const fs = new FileSystem();
-
-    // Create folders
-    fs.createFolder("C:\\Users", 1);
-
-    fs.createFolder(`C:\\Users\\root`, 0);
-    fs.createFolder(`C:\\Users\\${nodes[n].accounts[1].user}`, 1);
-    fs.createFolder(`C:\\Users\\${nodes[n].accounts[1].user}\\Desktop`, 1);
-    fs.createFolder(`C:\\Users\\${nodes[n].accounts[1].user}\\Documents`, 1);
-    fs.createFolder(`C:\\Users\\${nodes[n].accounts[1].user}\\Music`, 1);
-
-
-    fs.createFolder("C:\\System", 0);
-    fs.createFolder("C:\\System\\logs", 0);
-    fs.createFolder("C:\\System\\bin", 0);
-
-    // Create files
-    fs.createFile("C:\\config.cfg", 0, generateGiberish(getRandInt(200)+200));
-    fs.createFile("C:\\System\\logs\\logs.txt", 0, nodes[n].ip_address + "\nLOG FILE:\n");
-
-
-    // standard commands
-    fs.createFile("C:\\System\\bin\\exit", 0, generateGiberish(32));
-    fs.createFile("C:\\System\\bin\\ls", 0, generateGiberish(63));
-    fs.createFile("C:\\System\\bin\\ulist", 0, generateGiberish(23));
-    fs.createFile("C:\\System\\bin\\read", 0, generateGiberish(113));
-    fs.createFile("C:\\System\\bin\\cd", 0, generateGiberish(12));
-    fs.createFile("C:\\System\\bin\\pwd", 0, generateGiberish(42));
-    fs.createFile("C:\\System\\bin\\ssh", 0, generateGiberish(32));
-    fs.createFile("C:\\System\\bin\\clear", 0, generateGiberish(32));
-    fs.createFile("C:\\System\\bin\\su", 0, generateGiberish(32));
-    fs.createFile("C:\\System\\bin\\reg", 0, generateGiberish(42));
-    fs.createFile("C:\\System\\bin\\date", 0, generateGiberish(102));
-
-    // specific to players computer and/or rare commands
-    if (n == 0) {
-        fs.createFile("C:\\System\\bin\\setparam", 0, generateGiberish(62));
-        fs.createFile("C:\\System\\bin\\fullscreen", 0, generateGiberish(142));
-        fs.createFile("C:\\System\\bin\\scan", 0, generateGiberish(172));
-        fs.createFile("C:\\System\\bin\\map", 0, generateGiberish(372));
-        fs.createFile("C:\\System\\bin\\speak", 0, generateGiberish(113));
-        fs.createFile("C:\\System\\bin\\hangup", 0, generateGiberish(32));
-        fs.createFile("C:\\System\\bin\\dial", 0, generateGiberish(32));
-        fs.createFile("C:\\System\\bin\\audio", 0, generateGiberish(234));
-        fs.createFile("C:\\System\\bin\\help", 0, generateGiberish(23));
-        fs.createFile(`C:\\Users\\${nodes[n].accounts[1].user}\\Documents\\phrack.txt`, 0, phrack);
-    }
-    
-    // Make System read-only
-    fs.setAttributes(
-        "C:\\System",
-        {
-            readOnly: true,
-            system: true
-        }
-    );
-
-    fs.setAttributes(
-        "C:\\Users\\root",
-        {
-            readOnly: true,
-            system: true
-        }
-    );
-
-    return fs;
-}*/
 
 function spawnReadWin(win, text) {
     // a text reader window
@@ -500,13 +442,7 @@ function createAccounts(n) {
         nodes[n].telephone = generatePhoneNumber(nodes[n].country);
 
         nodes[n].logFile = "C:\\System\\logs\\logs.txt";
-
-        ugh(n);
     }
-}
-
-async function ugh(n) {
-    nodes[n].fileSystem = await createFS(n);
 }
 
 function attachNode(window, node) {
