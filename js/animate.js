@@ -132,18 +132,117 @@ class aniRect {
         if (e.key == "Enter") {
             // execute entered string
             this.lastInput = this.inputStr;
-            console.log("Enter: " + this.inputStr);
+            //console.log("Enter: " + this.inputStr);
             commandHandler(this);
 
         } else if (e.key == "Tab") {
                 e.preventDefault();
 
                 let node = cast[0].node;
+                let command = this.inputStr.split(" ");
 
                 // ---------------------------------------------------------
                 // Command completion
                 // ---------------------------------------------------------
-                // If there is no space, we're completing the command.
+                if (command[0] == "brute") {
+                    // tab complete Scan, Stop and compromised ips
+                    let choices = [];
+                    if ("quit".startsWith(command[1].toLowerCase()) || command.length == 1) {
+                        choices.push("quit");
+                    }
+                    if ("scan".startsWith(command[1].toLowerCase()) || command.length == 1) {
+                        choices.push("scan");
+                    }
+                    for (let i of player.lastScanIP) {
+                        if (i.startsWith(command[1])) {
+                            choices.push(i);
+                        }
+                    }
+                    if (choices.length > 1) {
+                        let str = "";
+                        for (let c = 0; c < choices.length; c++) {
+                            if (c == choices.length -1) {
+                                str += choices[c];
+                            } else {
+                                str += choices[c] + "\n";
+                            }
+                        }
+                        this.setText(str);
+                        if (command[1] === undefined) {
+                            this.inputStr = command[0];
+                        } else {
+                            this.inputStr = command[0] + " " + command[1];
+                        }
+                        this.displayLines[this.displayLines.length - 1] =
+                        node.promptChar + this.inputStr;
+                    } else if (choices.length == 0) {
+                        // do nothing
+                    } else {
+                        this.inputStr = command[0] + " " + choices[0];
+                        this.displayLines[this.displayLines.length - 1] =
+                        node.promptChar + this.inputStr;
+                    }
+                    
+                    return;
+                }
+                if (command[0] == "ssh") {
+                    // tab complete for compromisedComputers ip
+                    let choices = [];
+                    if (command.length > 1) {
+                        // split off user
+                        let param = command[1].split("@");
+                        let ip;
+                        if (param.length > 1) {
+                            ip = param[1];
+                        } else {
+                            ip = param[0]
+                        }
+                        for (let i of player.compromisedComputers) {
+                            //console.log(`ip ${ip}, i ${i}`)
+                            if (i.startsWith(ip)) {
+                                choices.push(i);
+                            }
+                        }
+                    } else {
+                        for (let i of player.compromisedComputers) {
+                            choices.push(i);
+                        }
+                        console.log(choices);
+                    }
+                    
+                    if (choices.length > 1) {
+                        let str = "";
+                        for (let c = 0; c < choices.length; c++) {
+                            if (c == choices.length -1) {
+                                str += choices[c];
+                            } else {
+                                str += choices[c] + "\n";
+                            }
+                        }
+                        this.setText(str);
+                        if (command[1] === undefined) {
+                            this.inputStr = command[0];
+                        } else {
+                            this.inputStr = command[0] + " " + command[1];
+                        }
+                        this.displayLines[this.displayLines.length - 1] =
+                        node.promptChar + this.inputStr;
+                    } else if (choices.length == 0) {
+                        // do nothing
+                    } else {
+                        if (command[1] && command[1].split("@").length > 1) {
+                            this.inputStr = command[0] + " " + 
+                                command[1].split("@")[0] + "@" + choices[0];
+                        } else {
+                            this.inputStr = command[0] + " " + choices[0];
+                        }
+                        this.displayLines[this.displayLines.length - 1] =
+                        node.promptChar + this.inputStr;
+                    }
+                    
+                    return;
+                }
+                // If there is no space, we're completing a command.
                 if (!this.inputStr.includes(" ")) {
                     let commandPrefix = this.inputStr;
 
@@ -179,6 +278,7 @@ class aniRect {
 
                     return;
                 }
+        
 
                 // ---------------------------------------------------------
                 // Path argument completion
@@ -390,12 +490,18 @@ class aniRect {
         } else if (this.delete) {
             // flush it
             const index = cast.indexOf(this);
-            if (index > -1) cast.splice(index, 1);
-
+            
             if (this.type == "proxy") {
                 //console.log(`player.proxyWindow: ${player.proxyWindow}`);
                 if (this == player.proxyWindow[0]) {
                     player.proxyWindow.pop();
+                }
+            } else if (this.type = "brute") {
+                console.log(`player.bruteWindow ${player.bruteWindow}`);
+                if (player.bruteWindow.length > 0) {
+                    console.log(player.bruteWindow.length);
+                    player.bruteWindow.pop();
+                    console.log(player.bruteWindow.length);
                 }
             } else if (this.type = "audio") {
                 player.audioPlayer = 0;
@@ -405,6 +511,10 @@ class aniRect {
                     player.readerWindow.pop();
                 }
             }
+            if (index > -1) {
+                cast.splice(index, 1);
+            }
+            console.log(`cast ${cast}`);
         }
     }
 

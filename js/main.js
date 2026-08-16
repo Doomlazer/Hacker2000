@@ -73,6 +73,7 @@ function loadPasswords() {
         .then(response => response.json())
         .then(data => passwords = data)
         .then(result => {
+            shuffle[passwords]
             loadCities();
         })
         .catch(error => {
@@ -194,6 +195,8 @@ function loadMap() {
 
 function frame(timestamp) {
     //renderer.beginFrame();
+    doBrute();
+    doCleanLogs();
     draw();
     //renderer.flush(cameraMatrix);
 

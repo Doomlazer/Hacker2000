@@ -872,7 +872,7 @@ class FileSystem {
         ) {
 
             const part =
-                parts[i];
+                [i];
 
 
             if (
@@ -1633,10 +1633,10 @@ class FileSystem {
         let current =
             this.root;
 
-        console.log(`path ${path}`)
-        console.log(`parts ${parts}`)
-        console.log(`filename ${filename}`)
-        console.log(`current ${current}`)
+        //console.log(`path ${path}`)
+        //console.log(`parts ${parts}`)
+        //console.log(`filename ${filename}`)
+        //console.log(`current ${current}`)
 
         /*
          * Traversing directories requires execute.

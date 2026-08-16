@@ -57,7 +57,6 @@ function commandHandler(win) {
     } else if (player.askedForPwd) {
         // check user entered password
 
-        //let notFound = true;
         let stack = player.nodeStack;
         let node = nodes[stack[stack.length-1]];
         let account = node.accounts[player.authAccountIndex];
@@ -210,12 +209,20 @@ function commandHandler(win) {
                 case 'speak':
                     speakCommand(win, command);
                     break;
+                case 'brute':
+                    brutecCommand(win, command);
+                    break;
                 default:
                     win.text = `ERROR: ${command[0]} - Unknown Command`;
                     win.setText(win.text);  
             }
         } else {
-            win.text = `ERROR: ${command[0]} - Command does not exist on system`;
+            if (command[0].length < 1) {
+                win.text = 'SYNTAX ERROR: No command';
+            } else {
+                win.text = `ERROR: ${command[0]} - Command does not exist on system`;
+            }
+            
             win.setText(win.text);
         }
     }
@@ -417,6 +424,7 @@ function sshCommand(win, command) {
         // if the ip_address was found, 
         // then try to find the account
         if (notFound) {
+            //console.log("player.lastScanIP: ", player.lastScanIP);
             win.setText("Unable to open a connection or host does not exist.");
         } else {
             let stack = player.nodeStack;
@@ -510,7 +518,8 @@ function mapCommand(win, command) {
             mapNodeSteps = 0
             win.setText("Show nodes");
         }
-    } else if (command[1].toLowerCase() == "cities") {
+    } else if (command[1].toLowerCase() == "cities" ||
+                command[1].toLowerCase() == "city") {
         // toggle cities
         if (player.drawCities) {
             player.drawCities = false;
@@ -634,6 +643,7 @@ function scanCommand(win, command) {
                 nodes[r].discovered = true;
                 win.text += `Found...${nodes[r].ip_address}\n`;
                 win.setText(win.text);
+                player.lastScanIP.push(nodes[r].ip_address);
                 mapNodeSteps = 0;
                 updateMap = true;
             }
@@ -704,5 +714,91 @@ function speakCommand(win, command){
         let str = `speaking file [${command[1]}]...` + 
                     fs.readFile(command[1], player.authAccountIndex);
         win.setText(str);
+    }
+}
+
+function brutecCommand(win, command) {
+// ssh [ip_address] or ssh [user@ip_address]
+
+    // searches nodes until ip found and addis it to the connection chain
+    if (command.length < 2) {
+        // brute command HELP string
+        win.setText(
+            `brute \- Brute force cracker over ssh
+
+            \tbrute [user]@[ip address]
+            
+            ex. brute jdoe@198.51.100.5`
+        );
+    } else {
+        // auto crack all the last scanned ip addresses
+        if (command[1].toLowerCase() == "scan" && player.lastScanIP.length > 0) {
+            for (let j = player.lastScanIP.length-1; j > -1; j--) {           
+                //console.log("player.lastScanIP: ", player.lastScanIP.length);  
+                let notFound = true;
+                for (let i of nodes) {
+                    if (player.lastScanIP[j] == i.ip_address) {
+                        notFound = false;
+                        spawnBruteWin(win, command, player.lastScanIP[j], "root", nodes[i.id]);
+                    }
+                }
+                if (notFound) {
+                    console.log("player.lastScanIP: ", player.lastScanIP);
+                    win.setText(player.lastScanIP + " Unable to open a connection or host does not exist.");
+                } else {
+                    if (j == 0) {
+                        win.setText("Brutalizing...root@" + player.lastScanIP[j], true);
+                    } else {
+                        win.setText("Brutalizing...root@" + player.lastScanIP[j], false);
+                    }
+                    player.lastScanIP.pop();
+                }
+            }
+        } else if (command[1].toLowerCase() == "quit") {
+            //if (command.length == 2) {
+            //console.log(player.bruteWindow)
+            for (let i = 0; i < player.bruteWindow.length; i++) {
+                player.bruteWindow[i].delete = true;
+                player.bruteWindow[i].toOpen = false
+                if (i == player.bruteWindow.length-1) {
+                    win.setText("Stopping brute on " + player.bruteWindow[i].ip);
+                } else {
+                    win.setText("Stopping brute on " + player.bruteWindow[i].ip, false);
+                }
+            }
+            //}
+        } else {
+            let addr = command[1].split("@");
+
+            if (addr.length < 2) {
+                // no user provided
+                win.setText(
+                    `Error - you must supply a user and IP address\nex. brute jdoe@198.51.100.5`
+                );
+            } else {
+                // user@ip_address provided
+                win.tryAuthName = addr[0];
+                win.ip = addr[1];
+            }
+
+            // try to find the ip address
+            let notFound = true;
+            for (let i of nodes) {
+                if (win.ip == i.ip_address) {
+                    notFound = false;
+                    spawnBruteWin(win, command, win.ip, win.tryAuthName, nodes[i.id]);
+                }
+            }
+            if (notFound) {
+                console.log("player.lastScanIP: ", player.lastScanIP);
+                win.setText(player.lastScanIP + "Unable to open a connection or host does not exist.");
+            } else {
+                win.setText("Brutalizing..." + win.user + "@" + win.ip);
+                //let stack = player.nodeStack;
+                //let node = nodes[stack[stack.length-1]];
+                
+                // each frame the cracker will try a password
+            }
+        }
     }
 }

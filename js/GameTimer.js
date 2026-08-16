@@ -17,6 +17,22 @@ class GameTimer {
         const ms = Date.now() - this.startTime;
 
         return {
+            milliseconds: ms % 100,
+            seconds: Math.floor(ms / 1000),
+            minutes: Math.floor(ms / 60000),
+            hours: Math.floor(ms / 3600000),
+            days: Math.floor(ms / 86400000)
+        };
+    }
+
+    timerStart() {
+        return Date.now();
+    }
+    
+    timer(start) {
+        const ms = Date.now() - start;
+
+        return {
             milliseconds: ms,
             seconds: Math.floor(ms / 1000),
             minutes: Math.floor(ms / 60000),

@@ -27,24 +27,24 @@ async function createFS(n) {
 
 
     if (fs.existsOnDisk) {
-        //console.log(`${n} already exists`)
+        // already exists
         return fs;
     }
 
     if(!nodes[n]) {
-    console.error("MISSING NODE:",n);
-    throw new Error(`nodes[${n}] does not exist`);
-}
+        console.error("MISSING NODE:",n);
+        throw new Error(`nodes[${n}] does not exist`);
+    }
 
-if(!nodes[n].accounts) {
-    console.error("MISSING ACCOUNTS:",n,nodes[n]);
-    throw new Error(`nodes[${n}].accounts does not exist`);
-}
+    if(!nodes[n].accounts) {
+        console.error("MISSING ACCOUNTS:",n,nodes[n]);
+        throw new Error(`nodes[${n}].accounts does not exist`);
+    }
 
-if(!nodes[n].accounts[1]) {
-    console.error("MISSING ACCOUNT[1]:",n,nodes[n]);
-    throw new Error(`nodes[${n}].accounts[1] does not exist`);
-}
+    if(!nodes[n].accounts[1]) {
+        console.error("MISSING ACCOUNT[1]:",n,nodes[n]);
+        throw new Error(`nodes[${n}].accounts[1] does not exist`);
+    }
 
     const user =
         nodes[n].accounts[1].user;
@@ -227,7 +227,6 @@ if(!nodes[n].accounts[1]) {
         0
     );
 
-
     //==================================================
     // Player computer
     //==================================================
@@ -278,7 +277,7 @@ if(!nodes[n].accounts[1]) {
             "C:\\System\\bin\\hangup",
             0,
             0,
-            generateGiberish(32),
+            generateGiberish(42),
             0
         );
 
@@ -303,6 +302,14 @@ if(!nodes[n].accounts[1]) {
             0,
             0,
             generateGiberish(23),
+            0
+        );
+
+        fs.createFile(
+            "C:\\System\\bin\\brute",
+            0,
+            0,
+            generateGiberish(33),
             0
         );
 
@@ -346,7 +353,9 @@ if(!nodes[n].accounts[1]) {
 
 function spawnReadWin(win, text) {
     // a text reader window
-    let rw = new aniRect(win.rX1, win.rY1, win.rXW, win.rYH);
+    let rw = new aniRect(win.rX1 + (player.readerWindow.length * 20),
+                            win.rY1 + (player.readerWindow.length * 20), 
+                            win.rXW, win.rYH);
     rw.fontSize = win.readerFontSize;
     rw.acceptInput = false;
     rw.backgroundColor = win.readerBackgroundColor;
@@ -393,8 +402,64 @@ function spawnProxyWin(win) {
     win.setProxyText();
 }
 
+function spawnBruteWin(win, command, ip, user, node) {
+    // the ssh brute force cracker
+    let bw = new aniRect(player.bX1 + (player.bruteWindow.length*10), 
+                            player.bY1  + (player.bruteWindow.length*20), 
+                            player.bXW, player.bYH);
+    bw.fontSize = player.bruteFontSize;
+    bw.acceptInput = false;
+    bw.backgroundColor = player.bruteBackgroundColor;
+    bw.rectColor = player.bruteRectColor;
+    bw.textColor = player.bruteTextColor
+    bw.isRounded = player.bruteIsRounded;
+    bw.hasBoarder = player.bruteHasBoarder;
+    bw.type = "brute";
+    bw.ip = ip;
+    bw.user = user;
+    bw.bNode = node;
+    bw.loops = 0;
+    bw.time = gameTimer.timerStart()
+    bw.setText(user + "@" + ip);
+    bw.tryAuthPwd = 0;
+
+    let notFound = true;
+    // try to match an account username
+    for (let i = 0; i < node.accounts.length; i++) {
+        //console.log(`node.accounts[${i}].user  ` + node.accounts[i].user )
+        //console.log(`user ${user}`)
+        if (node.accounts[i].user == user) {
+            // the entered username was valid, 
+            // so ask for pwd next command
+            notFound = false;
+            bw.authAccountIndex = i;
+        }
+    }
+    if (notFound) {
+        win.setText(`User account ${user} not found on ${ip}`);
+        win.delete = true
+        return;
+    }
+    bw.cracked = false;
+    player.bruteWindow.push(bw);
+    cast.push(bw);
+}
+
 function createAccounts(n) {
-    let a = [{"user": "root", "pwd":"password1234", "admin": true, "userId":0}];
+    let common = ["god","love","money","secert","sex","joshua","tonyass","fuckmyboss"];
+
+    let pwd = "";
+    let r = getRandInt(100)
+    if (r > 25) {
+        pwd = passwords[getRandInt(passwords.length-1)] + getRandInt(999);
+    } else if (r < 10) {
+        // bad password
+        pwd = common[getRandInt(common.length-1)];
+    } else {
+        passwords[getRandInt(passwords.length-1)]
+    }
+
+    let a = [{"user": "root", "pwd":pwd, "admin": true, "userId":0}];
 
     if (n < locations.length) {
         let f;
@@ -507,6 +572,92 @@ function generateIPs(count = 10_000) {
   return [...ips];
 }
 
+function doBrute() {
+    for (let i = 0; i < cast.length; i++) {
+        const c = cast[i];
+        if (c.type == "brute" && c.cracked == false) {
+            //let stack = player.nodeStack;
+            let node = c.bNode;
+            let account = node.accounts[c.authAccountIndex];
+
+            c.displayLines = [];
+
+            // password was correct
+            let p;
+            if (c.loops > 0) {
+                p = passwords[c.tryAuthPwd] + c.loops;
+            } else {
+                p = passwords[c.tryAuthPwd];
+            }
+            if (account.pwd == p) {
+                c.cracked = true;
+                c.backgroundColor = '#05a805';
+                let t = gameTimer.timer(c.time);
+                c.text = `${c.user}@${c.ip}\nWelcome, ${account.user}\nPassword: ${account.pwd}
+                elapsed: ${t.days}:${t.hours}:${t.minutes}:${t.seconds}`;
+                c.setText(c.text, false);
+                let str = `${gameTimer.formatted()} - ${c.ip} authenitcated with account ${account.user}\n`
+                node.fileSystem.appendFile(node.logFile, str);
+                node.compromisedAccounts.push(c.authAccountIndex);
+                player.compromisedComputers.push(c.ip);
+                console.log(player.compromisedComputers);
+                node.fileSystem.save();
+            } else {
+                //console.log(`${c.user}@${c.ip}\nTrying ${player.tryAuthPwd}\n(${i} of ${passwords.length})`)
+                let t = gameTimer.timer(c.time);
+                c.text =`${c.user}@${c.ip}\nTrying ${p}
+                        (${c.tryAuthPwd} of ${passwords.length} * ${c.loops})
+                        elapsed: ${t.days}:${t.hours}:${t.minutes}:${t.seconds}`;
+                c.setText(c.text, false);
+                let str = `${gameTimer.formatted()} - ${c.ip} authenitcated failed for account ${c.user}\n`
+                node.fileSystem.appendFile(node.logFile, str);
+                if (passwords.includes(account.pwd)) {
+                    c.backgroundColor = '#920155';
+                } else {
+                    c.backgroundColor = '#c00000';
+                }
+                
+                c.tryAuthPwd ++;
+                if (c.tryAuthPwd >= passwords.length) {
+                    c.tryAuthPwd = 0;
+                    c.loops ++;
+                }   
+            }
+        }
+    }
+}
+
+function doCleanLogs() {
+    let chunk = 50;
+    const end = Math.min(
+        player.cleanSegment + chunk,
+        locations.length
+    );
+    for (let i = player.cleanSegment; i < end; i ++ ) {
+        let fs = nodes[i].fileSystem;
+        //console.log("fs " + fs + " node: " + nodes[i].id)
+        let changed = false;
+        let j = fs.readFile("C:\\System\\logs\\logs.txt", 0);
+        j = j.split("\n");
+        while (j.length > 100) {
+            j = j.slice(-100);
+            console.log("cleaned node: " + i)
+            changed = true;
+        }
+        if (changed) {
+            if (j.lenght > 1) {
+                j = j.join('\n');
+            }
+            fs.writeFile("C:\\System\\logs\\logs.txt", j, 0);
+            fs.save();
+        }
+    }
+    player.cleanSegment += chunk;
+    if (player.cleanSegment > nodes.length) {
+        player.cleanSegment = 0;
+        player
+    }
+}
 
 
 let phrack = `

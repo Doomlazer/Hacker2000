@@ -21,6 +21,9 @@ class User {
 class Player extends User{
     constructor(name) {
         super();
+        this.cleanSegment = 0;
+        this.lastScanIP = [];
+        this.compromisedComputers = ["1.1.1.1"];
         this.name = name;
         this.uName = this.name.split(" ")[0].substring(0,1).toLowerCase() + this.name.split(" ")[1].toLowerCase();
         this.selCountry = nodes[0].country; // selected country on map, start at player's location
@@ -39,7 +42,20 @@ class Player extends User{
         this.audioTrack = 0;
         this.audioPlaylist = [];
         this.phoneMessage = "";
-        this.sendToReaderThreshold = 9;
         this.t2s = false;
+        // brute cracker
+        this.bruteWindow = [];
+        this.brutePwdIndex = 0;
+        this.bruteFontSize = 16;
+        this.bruteText = ""
+        this.bruteBackgroundColor = '#980531'
+        this.bruteRectColor = '#f7399e'
+        this.bruteTextColor = '#f7faf8'
+        this.bruteIsRounded = false;
+        this.bruteHasBoarder = false;
+        this.bX1 = getWidth()/25 * 11;
+        this.bY1 = getHeight()/8;
+        this.bXW = getWidth()/5;
+        this.bYH = getHeight()/5;
     }
 }

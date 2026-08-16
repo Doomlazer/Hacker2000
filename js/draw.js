@@ -133,6 +133,7 @@ function drawMap() {
     drawCities(bSize);
     drawNodes(bSize);
     drawProxyConnections();
+    drawBruteConnections();
 
     // draw the mouse hover label
     player.windowHover = true;
@@ -241,7 +242,7 @@ function drawCities(bSize) {
                             mapNodeSteps = 0;
                             mapInc = 2;
                             player.selCountry = city.country;
-                            console.log(player.selCountry);
+                            //console.log(player.selCountry);
                             cast[0].text = `Selected ${city.name}, ${city.country}`;
                             cast[0].setText(cast[0].text);
                             player.selectedCity = city;
@@ -293,7 +294,7 @@ function drawNodes(bSize) {
                         mapNodeSteps = 0;
                         mapInc = 2;
                         player.selCountry = node.country;
-                        console.log(player.selcountry)
+                        //console.log(player.selcountry)
                         cast[0].text = `Selected node: ${node.city}, ${node.country} \n
                                         ${node.router.manufacturer} ${node.router.model} 
                                         IP: ${node.ip_address}`;
@@ -383,6 +384,57 @@ function drawProxyConnections() {
                     ctx.fillText(label, (node.longitude * mapScale) + mapXOff,
                                         -(node.latitude * mapScale) + mapYOff);
                 }
+            }
+        }
+    }
+}
+
+function drawBruteConnections() {
+    // draw lines between brute force and homme
+    if (mapSteps >= mapStepsMax) {
+        if (player.bruteWindow.length > 0) {
+            for (let i = 0; i < player.bruteWindow.length; i++) {
+                ctx.strokeStyle = `rgb(200, 200, 200)`;
+                let l1 = nodes[player.nodeStack[0]];
+                let l2 = player.bruteWindow[i].bNode;
+                ctx.lineWidth = Math.min(mapScale * 1, 4)
+                drawLine([(l1.longitude * mapScale) + mapXOff, -(l1.latitude * mapScale) + mapYOff, 
+                            (l2.longitude * mapScale) + mapXOff, -(l2.latitude * mapScale) + mapYOff]);
+            }
+        }
+    }
+
+    //label
+    if (mapSteps >= mapStepsMax) {
+        let g = 155;
+        ctx.lineWidth = Math.min(mapScale * 1, 4);
+        if (player.bruteWindow.length > -1) {
+            for (let i = 0; i < player.bruteWindow.length; i++) {
+                let node = player.bruteWindow[i].bNode;
+                //console.log("player.bruteWindow[i]" + player.bruteWindow[i])
+                if (node.compromisedAccounts.length > 0) {
+                    // node aquired
+                    ctx.strokeStyle = `rgb(19, 195, 39)`;
+                } else {
+                    // un hacked
+                    ctx.strokeStyle = `rgb(138, 6, 6)`;
+                }
+                //ctx.strokeStyle = `rgb(247, 247, 247)`;
+                // ring
+                ctx.beginPath();
+                ctx.arc((node.longitude * mapScale) + mapXOff,
+                        -(node.latitude * mapScale) + mapYOff,
+                        1 * mapScale,
+                        0,
+                        2 * Math.PI); // x, y, radius, startAngle, endAngle
+                ctx.stroke();
+
+                // country, city label
+                let label = node.country + ", " + node.city;
+                ctx.fillStyle = '#f4eded';
+                ctx.font = scaleFont(0.010, "arial");
+                ctx.fillText(label, (node.longitude * mapScale) + mapXOff,
+                                    -(node.latitude * mapScale) + mapYOff);
             }
         }
     }
