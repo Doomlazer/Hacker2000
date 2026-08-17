@@ -73,12 +73,15 @@ function commandHandler(win) {
         // password was correct
         if (account.pwd == player.tryAuthPwd) {
             win.setText(`Welcome, ${account.user}`);
-            let str = `${gameTimer.formatted()} - ${nodes[stack.length-2].ip_address} authenitcated with account ${account.user}\n`
+            let str = `${gameTimer.formatted()} - ${nodes[stack[stack.length-2]].ip_address} authenitcated with account ${account.user}\n`
             node.fileSystem.appendFile(node.logFile, str);
 
             // remember account for future auto authenitcation
             if (!node.compromisedAccounts.includes(player.authAccountIndex)) {
                 node.compromisedAccounts.push(player.authAccountIndex);
+            }
+            if (!player.compromisedComputers.includes(node.ip_address)) {
+                player.compromisedComputers.push(node.ip_address);
             }
 
             // remember who signed in
@@ -318,16 +321,18 @@ function audioCommand(win, command) {
 
 function readCommand(win, command) {
     let text;
+    let stack = player.nodeStack;
+    let node = nodes[stack[stack.length-1]];
     if (command.length > 1) {
         if (command[1].toLowerCase() == "log" ||
             command[1].toLowerCase() == "logs" ||
             command[1].toLowerCase() == "logfile") {
-            text = nodes[player.nodeStack.length-1].fileSystem.readFile(
-                nodes[player.nodeStack.length-1].logFile, player.authAccountIndex
+            text = node.fileSystem.readFile(
+                node.logFile, player.authAccountIndex
             );
         } else {
             // read [path]
-            text = nodes[player.nodeStack.length-1].fileSystem.readFile(
+            text = node.fileSystem.readFile(
                 command[1], player.authAccountIndex
             );
         }

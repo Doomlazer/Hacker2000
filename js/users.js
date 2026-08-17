@@ -23,7 +23,7 @@ class Player extends User{
         super();
         this.cleanSegment = 0;
         this.lastScanIP = [];
-        this.compromisedComputers = ["1.1.1.1"];
+        this.compromisedComputers = [];
         this.name = name;
         this.uName = this.name.split(" ")[0].substring(0,1).toLowerCase() + this.name.split(" ")[1].toLowerCase();
         this.selCountry = nodes[0].country; // selected country on map, start at player's location

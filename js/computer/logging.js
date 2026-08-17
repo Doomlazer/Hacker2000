@@ -1,35 +1,43 @@
 function logSSH(win) {
-    let destIP = nodes[player.nodeStack.length-1].ip_address;
-    let prevIP = nodes[player.nodeStack.length-2].ip_address;
     let stack = player.nodeStack;
+    let destNode = nodes[stack[stack.length-1]];
+    let prevNode = nodes[stack[stack.length-2]];
+    console.log(destNode)
+    console.log(prevNode)
+    let destIP = destNode.ip_address;
+    let prevIP = prevNode.ip_address;
 
     // log inbound connection
-    let str = `${gameTimer.formatted()} - ssh inbound from ${prevIP}\n`
-    nodes[stack.length-1].fileSystem.appendFile(
-        nodes[stack.length-1].logFile, str
+    let str = `${destNode.id} ${destIP} ${gameTimer.formatted()} - ssh inbound from ${prevIP}\n`
+    destNode.fileSystem.appendFile(
+        destNode.logFile, str
     );
 
     // log outbound connection
-    str = `${gameTimer.formatted()} - ssh oubound to ${destIP}\n`
-    nodes[stack.length-2].fileSystem.appendFile(
-        nodes[stack.length-2].logFile, str
+    str = `${prevNode.id} ${prevIP} ${gameTimer.formatted()} - ssh oubound to ${destIP}\n`
+    prevNode.fileSystem.appendFile(
+        prevNode.logFile, str
     );
+    destNode.fileSystem.save();
 }
 
 function logSSHDisconnect(win) {
-    let prevIP = nodes[player.nodeStack.length-1].ip_address;
-    let destIP = nodes[player.nodeStack.length-2].ip_address;
     let stack = player.nodeStack;
+    let prevNode = nodes[stack[stack.length-1]];
+    let destNode = nodes[stack[stack.length-2]];
+    let prevIP = prevNode.ip_address;
+    let destIP = destNode.ip_address;
 
     // remote computer
     let str = `${gameTimer.formatted()} - ${destIP} dropped connection\n`
-    nodes[stack.length-1].fileSystem.appendFile(
-        nodes[stack.length-1].logFile, str
+    prevNode.fileSystem.appendFile(
+        prevNode.logFile, str
     );
     
     // previous computer on stack
     str = `${gameTimer.formatted()} - disconnected from ${prevIP}\n`
-    nodes[stack.length-2].fileSystem.appendFile(
-        nodes[stack.length-2].logFile, str
+    destNode.fileSystem.appendFile(
+        destNode.logFile, str
     );
+    destNode.fileSystem.save();
 }

@@ -129,7 +129,7 @@ async function createFS(n) {
         "C:\\System\\logs\\logs.txt",
         0,
         0,
-        nodes[n].ip_address +
+        nodes[n].ip_address + "\nnode.id " + nodes[n].id +
         "\nLOG FILE:\n",
         0
     );
@@ -404,9 +404,14 @@ function spawnProxyWin(win) {
 
 function spawnBruteWin(win, command, ip, user, node) {
     // the ssh brute force cracker
-    let bw = new aniRect(player.bX1 + (player.bruteWindow.length*10), 
-                            player.bY1  + (player.bruteWindow.length*20), 
-                            player.bXW, player.bYH);
+    let i = player.bruteWindow.length;
+
+    let bw = new aniRect(
+        player.bX1 + (i * 10),
+        player.bY1 + ((i * 20) % (getHeight()/2)),
+        player.bXW,
+        player.bYH
+    );
     bw.fontSize = player.bruteFontSize;
     bw.acceptInput = false;
     bw.backgroundColor = player.bruteBackgroundColor;
@@ -417,7 +422,7 @@ function spawnBruteWin(win, command, ip, user, node) {
     bw.type = "brute";
     bw.ip = ip;
     bw.user = user;
-    bw.bNode = node;
+    bw.bNode = node.id;
     bw.loops = 0;
     bw.time = gameTimer.timerStart()
     bw.setText(user + "@" + ip);
@@ -441,6 +446,11 @@ function spawnBruteWin(win, command, ip, user, node) {
         return;
     }
     bw.cracked = false;
+    if (passwords.includes(node.accounts[bw.authAccountIndex].pwd)) {
+        bw.backgroundColor2 = '#920155';
+    } else {
+        bw.backgroundColor2 = '#c00000';
+    }
     player.bruteWindow.push(bw);
     cast.push(bw);
 }
@@ -573,16 +583,26 @@ function generateIPs(count = 10_000) {
 }
 
 function doBrute() {
-    for (let i = 0; i < cast.length; i++) {
-        const c = cast[i];
+    for (let i = 0; i < player.bruteWindow.length; i++) {
+        const c = player.bruteWindow[i];
         if (c.type == "brute" && c.cracked == false) {
             //let stack = player.nodeStack;
-            let node = c.bNode;
+            let node = nodes[c.bNode];
             let account = node.accounts[c.authAccountIndex];
+
+            /*console.log(
+                "CRACKED",
+                "window:",
+                i,
+                "bNode:",
+                c.bNode,
+                "color:",
+                c.backgroundColor
+            );*/
 
             c.displayLines = [];
 
-            // password was correct
+            // test password
             let p;
             if (c.loops > 0) {
                 p = passwords[c.tryAuthPwd] + c.loops;
@@ -591,7 +611,6 @@ function doBrute() {
             }
             if (account.pwd == p) {
                 c.cracked = true;
-                c.backgroundColor = '#05a805';
                 let t = gameTimer.timer(c.time);
                 c.text = `${c.user}@${c.ip}\nWelcome, ${account.user}\nPassword: ${account.pwd}
                 elapsed: ${t.days}:${t.hours}:${t.minutes}:${t.seconds}`;
@@ -600,8 +619,10 @@ function doBrute() {
                 node.fileSystem.appendFile(node.logFile, str);
                 node.compromisedAccounts.push(c.authAccountIndex);
                 player.compromisedComputers.push(c.ip);
-                console.log(player.compromisedComputers);
+                //console.log(player.compromisedComputers);
                 node.fileSystem.save();
+                //console.log(node.fileSystem.readFile(node.logFile))
+                c.backgroundColor = '#05a805';
             } else {
                 //console.log(`${c.user}@${c.ip}\nTrying ${player.tryAuthPwd}\n(${i} of ${passwords.length})`)
                 let t = gameTimer.timer(c.time);
@@ -609,13 +630,9 @@ function doBrute() {
                         (${c.tryAuthPwd} of ${passwords.length} * ${c.loops})
                         elapsed: ${t.days}:${t.hours}:${t.minutes}:${t.seconds}`;
                 c.setText(c.text, false);
-                let str = `${gameTimer.formatted()} - ${c.ip} authenitcated failed for account ${c.user}\n`
+                let pip = nodes[player.nodeStack[player.nodeStack.length-1]].ip_address;
+                let str = `${gameTimer.formatted()} - ${pip} authenitcation failed for account ${c.user}\n`
                 node.fileSystem.appendFile(node.logFile, str);
-                if (passwords.includes(account.pwd)) {
-                    c.backgroundColor = '#920155';
-                } else {
-                    c.backgroundColor = '#c00000';
-                }
                 
                 c.tryAuthPwd ++;
                 if (c.tryAuthPwd >= passwords.length) {

@@ -396,8 +396,8 @@ function drawBruteConnections() {
             for (let i = 0; i < player.bruteWindow.length; i++) {
                 ctx.strokeStyle = `rgb(200, 200, 200)`;
                 let l1 = nodes[player.nodeStack[0]];
-                let l2 = player.bruteWindow[i].bNode;
-                ctx.lineWidth = Math.min(mapScale * 1, 4)
+                let l2 = nodes[player.bruteWindow[i].bNode];
+                ctx.lineWidth = 1 //Math.min(mapScale * 1, 4)
                 drawLine([(l1.longitude * mapScale) + mapXOff, -(l1.latitude * mapScale) + mapYOff, 
                             (l2.longitude * mapScale) + mapXOff, -(l2.latitude * mapScale) + mapYOff]);
             }
@@ -408,18 +408,10 @@ function drawBruteConnections() {
     if (mapSteps >= mapStepsMax) {
         let g = 155;
         ctx.lineWidth = Math.min(mapScale * 1, 4);
-        if (player.bruteWindow.length > -1) {
+        if (player.bruteWindow.length > 0) {
             for (let i = 0; i < player.bruteWindow.length; i++) {
-                let node = player.bruteWindow[i].bNode;
-                //console.log("player.bruteWindow[i]" + player.bruteWindow[i])
-                if (node.compromisedAccounts.length > 0) {
-                    // node aquired
-                    ctx.strokeStyle = `rgb(19, 195, 39)`;
-                } else {
-                    // un hacked
-                    ctx.strokeStyle = `rgb(138, 6, 6)`;
-                }
-                //ctx.strokeStyle = `rgb(247, 247, 247)`;
+                let node = nodes[player.bruteWindow[i].bNode];
+                ctx.strokeStyle = player.bruteWindow[i].backgroundColor;
                 // ring
                 ctx.beginPath();
                 ctx.arc((node.longitude * mapScale) + mapXOff,
@@ -428,6 +420,16 @@ function drawBruteConnections() {
                         0,
                         2 * Math.PI); // x, y, radius, startAngle, endAngle
                 ctx.stroke();
+
+                console.log(
+                    i,
+                    "window:",
+                    player.bruteWindow[i],
+                    "bNode:",
+                    player.bruteWindow[i].bNode,
+                    "color:",
+                    player.bruteWindow[i].backgroundColor
+                );
 
                 // country, city label
                 let label = node.country + ", " + node.city;

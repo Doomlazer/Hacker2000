@@ -119,6 +119,10 @@ function loadNodes() {
 
                 node.id = i;
                 node.ip_address = ip_addresses[i];
+                locations[i].id = i;
+                locations[i].network.ipv4 = ip_addresses[i];
+                locations[i].address.city = city.name;
+                locations[i].address.country = city.country;
                 node.city = city.name;
                 node.country = city.country;
                 node.latitude = city.lat;
