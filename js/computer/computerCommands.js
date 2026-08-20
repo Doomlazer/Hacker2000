@@ -218,6 +218,9 @@ function commandHandler(win) {
                 case 'dnslookup':
                     lookupDNSCommand(win, command);
                     break;
+                case 'mal':
+                    malCommand(win, command);
+                    break;
                 default:
                     win.text = `ERROR: ${command[0]} - Unknown Command`;
                     win.setText(win.text);  
@@ -734,7 +737,9 @@ function brutecCommand(win, command) {
         win.setText(
             `brute \- Brute force cracker over ssh
 
-            \tbrute [user]@[ip address]
+            \tbrute [user]@[ip address] - try all 10k passwords in the default password list against root
+            \tbrute scan - brute force all results from the SCAN command queue
+            \tbrute quit - close all Brute windows
             
             ex. brute jdoe@198.51.100.5`
         );
@@ -829,5 +834,14 @@ function lookupDNSCommand(win, command) {
             win.text = `Domain ${command[1]} not found.`;
             win.setText(win.text);
         }
+    }
+}
+
+function malCommand(win, command) {
+    command.shift();
+    win.text = `Running command ${command} on mal90`; {
+        win.inputStr = command;
+        console.log(win.inputStr);
+        commandHandler(win);
     }
 }

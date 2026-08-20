@@ -77,7 +77,6 @@ async function setAudioSource(url, array = phoneAudio) {
 function playMusic(window, url="") {
     player.audioPlaylist.push("https://archive.org/download/raveforce1-jungle-breakcore/Dmachine%20-%20Condiments%20of%20the%20Darkside.%20Jungle%20%26%20Breakcore%20Mix%20Heavy%20Amen%20subwoofer%20excurison-yVLXI-m70lQ.mp3");
     player.audioPlaylist.push("https://archive.org/download/raveforce1-jungle-breakcore/%5B%20JUNGLE_BREAKCORE%20%5D%20_%20JAMIN%20NIMJAH%20_%20ERROR404%20VISUAL%20MIX%20_%20002-kyXx-nGxqpQ.mp3");
-    player.audioPlaylist.push("https://archive.org/download/raveforce1-jungle-breakcore/%5BMachineKool%5D%202%20Hour%20Dark%20DnB%20to%20Jungle%20%2C%20Breakcore%20Mix%20%5BMachinekool%5D%202014%202hr-Xj9Hvmspej8.mp3");
     player.audioPlaylist.push("https://archive.org/download/raveforce1-sextrancemix/%5B2022%5D%20Exodia%20-%20Valkyria-fd6ZF1UJ9oM.mp3");
     player.audioPlaylist.push("https://archive.org/download/selected-dnb-1/Inner-Vation%20-%20Movements%20%281999%29-DU3Rezgt-TE.mp3");
     player.audioPlaylist.push("https://archive.org/download/selected-dnb-1/Intelligent%20Drum%20%26%20Bass%20-%20Selected%20Works%20%281994-2000%29-1zGaTE2AmsU.mp3");

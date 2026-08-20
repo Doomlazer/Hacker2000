@@ -312,6 +312,13 @@ async function createFS(n) {
             generateGiberish(33),
             0
         );
+        fs.createFile(
+            "C:\\System\\bin\\mal",
+            0,
+            0,
+            generateGiberish(3),
+            0
+        );
 
         fs.createFile(
             "C:\\System\\bin\\dnslookup",
