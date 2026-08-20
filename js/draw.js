@@ -406,38 +406,37 @@ function drawBruteConnections() {
 
     //label
     if (mapSteps >= mapStepsMax) {
-        let g = 155;
         ctx.lineWidth = Math.min(mapScale * 1, 4);
-        if (player.bruteWindow.length > 0) {
-            for (let i = 0; i < player.bruteWindow.length; i++) {
-                let node = nodes[player.bruteWindow[i].bNode];
-                ctx.strokeStyle = player.bruteWindow[i].backgroundColor;
-                // ring
-                ctx.beginPath();
-                ctx.arc((node.longitude * mapScale) + mapXOff,
-                        -(node.latitude * mapScale) + mapYOff,
-                        1 * mapScale,
-                        0,
-                        2 * Math.PI); // x, y, radius, startAngle, endAngle
-                ctx.stroke();
+        for (let i = 0; i < player.bruteWindow.length; i++) {
+            let w = player.bruteWindow[i];
+            let node = nodes[w.bNode];
+            ctx.strokeStyle = w.backgroundColor;
+            
+            // ring
+            ctx.beginPath();
+            ctx.arc((node.longitude * mapScale) + mapXOff,
+                    -(node.latitude * mapScale) + mapYOff,
+                    1 * mapScale,
+                    0,
+                    2 * Math.PI); // x, y, radius, startAngle, endAngle
+            ctx.stroke();
 
-                console.log(
-                    i,
-                    "window:",
-                    player.bruteWindow[i],
-                    "bNode:",
-                    player.bruteWindow[i].bNode,
-                    "color:",
-                    player.bruteWindow[i].backgroundColor
-                );
+            /*console.log(
+                i,
+                "window:",
+                player.bruteWindow[i],
+                "bNode:",
+                player.bruteWindow[i].bNode,
+                "color:",
+                player.bruteWindow[i].backgroundColor
+            );*/
 
-                // country, city label
-                let label = node.country + ", " + node.city;
-                ctx.fillStyle = '#f4eded';
-                ctx.font = scaleFont(0.010, "arial");
-                ctx.fillText(label, (node.longitude * mapScale) + mapXOff,
-                                    -(node.latitude * mapScale) + mapYOff);
-            }
+            // cit, country label
+            let label = `${node.city}, ${node.country}`;
+            ctx.fillStyle = '#f4eded';
+            ctx.font = scaleFont(0.010, "arial");
+            ctx.fillText(label, (node.longitude * mapScale) + mapXOff,
+                                -(node.latitude * mapScale) + mapYOff);
         }
     }
 }

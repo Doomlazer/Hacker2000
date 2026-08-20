@@ -215,6 +215,9 @@ function commandHandler(win) {
                 case 'brute':
                     brutecCommand(win, command);
                     break;
+                case 'dnslookup':
+                    lookupDNSCommand(win, command);
+                    break;
                 default:
                     win.text = `ERROR: ${command[0]} - Unknown Command`;
                     win.setText(win.text);  
@@ -804,6 +807,27 @@ function brutecCommand(win, command) {
                 
                 // each frame the cracker will try a password
             }
+        }
+    }
+}
+
+function lookupDNSCommand(win, command) {
+    // work in progess
+    if (command.length != 2) {
+        win.text = `DNSLookUp - Returns the IP address of a specified domain
+
+                    \tDNSLookUp [domain]
+
+                    example - DNSLookUp ${emailProviders[getRandInt(emailProviders.length)]}`
+        win.setText(win.text);
+    } else {
+        let domain = command[1].toLowerCase(); 
+        if (Object.hasOwn(DNSKeys, domain) && DNSKeys[domain] !== undefined) {
+            win.text = DNSKeys[domain];
+            win.setText(win.text);
+        } else {
+            win.text = `Domain ${command[1]} not found.`;
+            win.setText(win.text);
         }
     }
 }

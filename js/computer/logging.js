@@ -41,3 +41,9 @@ function logSSHDisconnect(win) {
     );
     destNode.fileSystem.save();
 }
+
+function logFailedAuth(win, node, user) {
+    let ip = nodes[player.nodeStack[player.nodeStack.length-1]].ip_address;
+    let str = `${gameTimer.formatted()} - Failed authenitcation from ${ip} for account ${user}\n`
+    node.fileSystem.appendFile(node.logFile, str);
+}

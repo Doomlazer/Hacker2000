@@ -27,6 +27,12 @@ let movingMap = false;
 let passwords = [];
 let ip_addresses = [];
 const gameTimer = new GameTimer("2000-7-5");
+let emailProviders = ["MailSphere.com", "ZipPost.net", "InboxZone.com", "WebLetter.com", 
+    "MailClix.net", "CyberSnail.com", "PostPilot.net", "MessageMan.com", "MailSlug.com", 
+    "NetInbox.com", "Tomale.com", "ClickMail.com", "Abazabado.com", "MailWave.net", 
+    "WebPost.com", "MailWorks.net", "RabbitMail.com","EZMail.com", "KillerMail.net"];
+let DNSServers = ["1.1.1.1", "8.8.8.8"];
+let DNSKeys = {};
 
 function init() {
     window.addEventListener('click', doClick);
@@ -57,6 +63,7 @@ function init() {
     ctx.font = scaleFont(0.01, "arial");
     //ctx.fillText("Loading game. Please wait...", 20,20);
     //indexedDB.deleteDatabase("VirtualFileSystemDB");
+    shuffle(emailProviders);
 
     fetch('data/locations.json')
         .then(response => response.json())
@@ -129,7 +136,7 @@ function loadNodes() {
                 node.longitude = city.lon;
                 node.dicovered = false;
                 node.fileSystem = [];
-                node.type = "mal-90.";
+                node.type = "mal-90";
                 node.text = `Welcome to the mal-90.${i} OS\nDate: ${gameTimer.formatted()}\nMight I suggest some AUDIO or asking for HELP if you need it.`;
                 node.promptChar = ">";
                 createAccounts(i);

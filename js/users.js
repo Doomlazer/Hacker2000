@@ -49,13 +49,13 @@ class Player extends User{
         this.bruteFontSize = 16;
         this.bruteText = ""
         this.bruteBackgroundColor = '#980531'
-        this.bruteRectColor = '#f7399e'
+        this.bruteRectColor = '#ffffff'
         this.bruteTextColor = '#f7faf8'
         this.bruteIsRounded = false;
         this.bruteHasBoarder = false;
         this.bX1 = getWidth()/25 * 11;
         this.bY1 = getHeight()/8;
-        this.bXW = getWidth()/5;
-        this.bYH = getHeight()/5;
+        this.bXW = 300;
+        this.bYH = 130;
     }
 }

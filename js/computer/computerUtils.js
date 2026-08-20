@@ -314,6 +314,14 @@ async function createFS(n) {
         );
 
         fs.createFile(
+            "C:\\System\\bin\\dnslookup",
+            0,
+            0,
+            generateGiberish(33),
+            0
+        );
+
+        fs.createFile(
             `C:\\Users\\${user}\\Documents\\phrack.txt`,
             0,
             0,
@@ -446,27 +454,24 @@ function spawnBruteWin(win, command, ip, user, node) {
         return;
     }
     bw.cracked = false;
-    if (passwords.includes(node.accounts[bw.authAccountIndex].pwd)) {
-        bw.backgroundColor2 = '#920155';
-    } else {
-        bw.backgroundColor2 = '#c00000';
-    }
     player.bruteWindow.push(bw);
     cast.push(bw);
 }
 
 function createAccounts(n) {
-    let common = ["god","love","money","secert","sex","joshua","tonyass","fuckmyboss"];
+    let movie = ["god","love","money","secert","sex","joshua", "swordfish"];
 
     let pwd = "";
     let r = getRandInt(100)
-    if (r > 25) {
+    if (r > 35) {
+        // sort of strong
         pwd = passwords[getRandInt(passwords.length-1)] + getRandInt(999);
-    } else if (r < 10) {
-        // bad password
-        pwd = common[getRandInt(common.length-1)];
+    } else if (r < 5) {
+        // movie
+        pwd = movie[getRandInt(movie.length-1)];
     } else {
-        passwords[getRandInt(passwords.length-1)]
+        // bad
+        pwd = passwords[getRandInt(passwords.length-1)]
     }
 
     let a = [{"user": "root", "pwd":pwd, "admin": true, "userId":0}];
@@ -497,6 +502,22 @@ function createAccounts(n) {
             uname = locations[n].homeowner.split(" ")[0].toLowerCase();
         }
 
+        // make every 256 nodes an email host, but not node
+        if (n % 256 == 0 && n != 0) {
+            let e = n / 256 - 1;
+            if (e < emailProviders.length) {
+                DNSKeys[emailProviders[e].toLocaleLowerCase()] = nodes[n].ip_address;
+                //console.log(`e: ${e}, DNSKeys ${DNSKeys}`);
+                nodes[n].type = "eMail Server"
+                nodes[n].text = `${emailProviders[e]} eMail Host Sever v2.58`
+            }
+        }
+
+        // assign email account to random email service
+        let host = emailProviders[getRandInt(emailProviders.length)]
+        let eAddress = uname + "@" + host;
+        locations[n].email = eAddress;
+
         // some passwords will match if run against the password table 
         // others have random numbers on the end, which are harder to crack
         if (getRandInt(100) > 75) {
@@ -513,6 +534,11 @@ function createAccounts(n) {
         nodes[n].compromisedAccounts = [];
         nodes[n].accounts = a;
         nodes[n].lastAuthAccount = -1;
+        
+        // assign primary and secondary DNS
+        nodes[n].dns = [];
+        nodes[n].dns.push(getRandInt(DNSServers.length));
+        //nodes[n].dns.push(getRandInt(DNSServers.length));
 
         nodes[n].telephone = generatePhoneNumber(nodes[n].country);
 
@@ -590,16 +616,6 @@ function doBrute() {
             let node = nodes[c.bNode];
             let account = node.accounts[c.authAccountIndex];
 
-            /*console.log(
-                "CRACKED",
-                "window:",
-                i,
-                "bNode:",
-                c.bNode,
-                "color:",
-                c.backgroundColor
-            );*/
-
             c.displayLines = [];
 
             // test password
@@ -612,8 +628,11 @@ function doBrute() {
             if (account.pwd == p) {
                 c.cracked = true;
                 let t = gameTimer.timer(c.time);
-                c.text = `${c.user}@${c.ip}\nWelcome, ${account.user}\nPassword: ${account.pwd}
-                elapsed: ${t.days}:${t.hours}:${t.minutes}:${t.seconds}`;
+                c.text = `${c.user}@${c.ip}
+                            ${node.city}, ${node.country}
+                            Welcome, ${account.user}
+                            Password: ${account.pwd}
+                            elapsed: ${t.days}:${t.hours}:${t.minutes}:${t.seconds}`;
                 c.setText(c.text, false);
                 let str = `${gameTimer.formatted()} - ${c.ip} authenitcated with account ${account.user}\n`
                 node.fileSystem.appendFile(node.logFile, str);
@@ -626,13 +645,13 @@ function doBrute() {
             } else {
                 //console.log(`${c.user}@${c.ip}\nTrying ${player.tryAuthPwd}\n(${i} of ${passwords.length})`)
                 let t = gameTimer.timer(c.time);
-                c.text =`${c.user}@${c.ip}\nTrying ${p}
+                c.text =`${c.user}@${c.ip}
+                        ${node.city}, ${node.country}
+                        Trying - ${p}
                         (${c.tryAuthPwd} of ${passwords.length} * ${c.loops})
                         elapsed: ${t.days}:${t.hours}:${t.minutes}:${t.seconds}`;
                 c.setText(c.text, false);
-                let pip = nodes[player.nodeStack[player.nodeStack.length-1]].ip_address;
-                let str = `${gameTimer.formatted()} - ${pip} authenitcation failed for account ${c.user}\n`
-                node.fileSystem.appendFile(node.logFile, str);
+                logFailedAuth(c, node, c.user);
                 
                 c.tryAuthPwd ++;
                 if (c.tryAuthPwd >= passwords.length) {

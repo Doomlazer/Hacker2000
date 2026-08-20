@@ -185,6 +185,41 @@ class aniRect {
                     
                     return;
                 }
+                if (command[0] == "dnslookup") {
+                    // tab complete eMailProviders for now
+                    let choices = [];
+                    for (let i of emailProviders) {
+                        if (i.toLocaleLowerCase().startsWith(command[1].toLocaleLowerCase())) {
+                            choices.push(i);
+                        }
+                    }
+                    if (choices.length > 1) {
+                        let str = "";
+                        for (let c = 0; c < choices.length; c++) {
+                            if (c == choices.length -1) {
+                                str += choices[c];
+                            } else {
+                                str += choices[c] + "\n";
+                            }
+                        }
+                        this.setText(str);
+                        if (command[1] === undefined) {
+                            this.inputStr = command[0];
+                        } else {
+                            this.inputStr = command[0] + " " + command[1];
+                        }
+                        this.displayLines[this.displayLines.length - 1] =
+                        node.promptChar + this.inputStr;
+                    } else if (choices.length == 0) {
+                        // do nothing
+                    } else {
+                        this.inputStr = command[0] + " " + choices[0];
+                        this.displayLines[this.displayLines.length - 1] =
+                        node.promptChar + this.inputStr;
+                    }
+                    
+                    return;
+                }
                 if (command[0] == "ssh") {
                     // tab complete for compromisedComputers ip
                     let choices = [];

@@ -38,6 +38,7 @@ function getHeight() {
 }
 
 function getRandInt(i) {
+    // non-inclusive i = 100 is 0-99
     return Math.floor(Math.random() * i);
 }
 
