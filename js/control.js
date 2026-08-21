@@ -24,7 +24,7 @@ function doWheel(e) {
 
             adjustedWindow = true;
 
-            if (c.type == "proxy" || c.type == "reader" || c.type == "browser") {
+            /*if (c.type == "proxy" || c.type == "reader" || c.type == "browser") {
                 c.wheelOff += e.deltaY;
                 //console.log(`wheelOff ; ${c.wheelOff} ${c.type}`)
             } else {
@@ -33,7 +33,11 @@ function doWheel(e) {
                 c.yH -= e.deltaY;
                 c.xP -= e.deltaY;
                 c.yP -= e.deltaY;
-            }
+            }*/
+
+            // to do: I've disabled window resizing with 
+            // the mouse wheel, need do corner drag resizing
+            c.wheelOff += e.deltaY;
 
             // set max
             c.textMaxLines = Math.floor(c.yH / (c.fontSize * 1.25));
@@ -231,13 +235,13 @@ function doMouseUp(e) {
 
 function doKeyDown(e) {
     for (let i = 0; i < cast.length; i++) {
-        //console.log(`cast[${i}].acceptInput: ${cast[i].acceptInput}`)
+        // dont add v when pasting data
+        if ((e.metaKey || e.ctrlKey) && e.code === "KeyV") {
+            return;
+        }
         if (cast[i].acceptInput) {
             cast[i].keyHandler(e);
         }
-    }
-    if (e.key === " ") {
-
     }
 }
 

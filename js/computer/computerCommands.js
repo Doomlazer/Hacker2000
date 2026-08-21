@@ -1,4 +1,4 @@
-function commandHandler(win) {
+function commandHandler(win, mal = false) {
     const command = win.inputStr.split(" ").filter(Boolean);
     win.inputStr = "";
 
@@ -110,6 +110,14 @@ function commandHandler(win) {
             }
         }
     } else {
+        let bin;
+        if (mal) {
+            // run on player's computer as root
+            bin = nodes[0].fileSystem.list("C:\\System\\bin\\", 0, false);
+        } else {
+            bin = win.node.fileSystem.list("C:\\System\\bin\\", player.authAccountIndex, false);
+        }
+
         /*let fs = win.node.fileSystem;
         console.log("fs:", fs)
         console.log("fs.root.folders:", fs.root.folders);
@@ -119,15 +127,14 @@ function commandHandler(win) {
             Object.keys(fs.root.folders)
         );*/
 
-        let bin = win.node.fileSystem.list("C:\\System\\bin\\", player.authAccountIndex, false);
-
         bin = bin.split("\n");
         bin = bin.slice(1);
+        console.log("bin: " + bin)
 
         // for the commands, first check the node's bin folder 
         // to see if the command exists on the system
         //console.log("Available commands: " + bin);
-        if (bin.includes(command[0].toLowerCase()) || command[0].toLowerCase() == 'deleteall' ) {
+        if (bin.includes(command[0].toLowerCase()) || command[0].toLowerCase() == 'deleteall' || command[0].toLowerCase() == 'mal') {
             switch (command[0].toLowerCase()) {
                 case 'deleteall':
                     // debug command wipe the entire indexdb
@@ -238,7 +245,128 @@ function commandHandler(win) {
 }
 
 function helpCommand(win) {
-    spawnReadWin(win, "eventually this will be a help file!");
+    spawnReadWin(win, `███╗   ███╗ █████╗ ██╗      █████╗  ██████╗
+████╗ ████║██╔══██╗██║     ██╔══██╗██╔═████╗
+██╔████╔██║███████║██║     ███████║██║██╔██║
+██║╚██╔╝██║██╔══██║██║     ╚════██║████╔╝██║
+██║ ╚═╝ ██║██║  ██║███████╗     ██║╚██████╔╝
+╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝     ╚═╝ ╚═════╝
+Mal90 Operations Manual
+        
+        --==ALL CREWS WELCOME==--
+        **%%N0JNGl3N0L1f3%%**     
+
+        Mal90 Br0wzerOperating System by Vid30Dr0mEE, l337 HAx0r p.o.s.OS .,'"You get what you pay 4"',. Forked from TonyOS v2.309.1 R.I.P PheakySmurph J0nnyK4t, Rulz.
+        
+        In addition to dumb terminal functionality, the Mal90 includes several tools to facilitate network scanning and account cracking. The TonySoft registration lock has been disabled since v0.1134.777 when the servers went offline and promising your f1rst b0rn to a corporation was no longer required just to run an OS. Use mousewheel to scroll document text  
+
+        Interpreter Version 1.001.064
+        December 1992
+        
+        \tCapitalization is now generally ignored
+        \tTab Completion is nearly adequate
+
+        Known Bugs:
+
+        \tWindow click priority is still broken
+        \tC4p1t4l1zm 1z 3v1l
+        \t2 m4ny m0r3 2 l1st
+        
+        Remember that, like a hammer, this OS is just a tool; The morality of its use is determined by the individu4l. - CMOTDibblerDistantCousin
+        
+        IMPORTANT DISCLAIMER: While this is a browser-based game, the simulated computers are created locally on your device only. The pretend tools, like SSH, are NOT connecting over the internet to real computers. The DTMF tones from DIAL are NOT makeing real world phone calls. That said, this game does make real network connections for the command AUDIO, which streams music from real urls over the real world (outside this game) internet.
+        
+        
+        COMMANDS
+
+        The commands installed on this computer can be found in the C:\\System\\bin folder. Type BIN to list its contents. Commands must be installed in this folder to be run. Valid programs outside this folder will not be executed.
+
+        
+        NAVIGATING THE FILESYSTEM AND BASIC FEATURES
+        
+        Like most OSes, there are several commands available for traversing the file system.
+        
+        PWD - Print working directory. lists the current directory.
+
+        LS [path] - list folder contents. Use LS -a to show file and folder attributes. LS defaults to the PWD, but LS [path] can be used as well.
+        
+        CD [path or folder] - Change Directory. Paths in MalOS do not need to include C:\\ and default to the PWD. Use CD .. to move up one level.
+        
+        EXIT - Close the last network connection on proxy node stack. Note that Mal90 itself should be closed by closing your browser. If EXIT is run with no network connections, Mal90 will automatically reopen it's terminal window.
+
+        READ [path/to/file] - Opens the file in a scrollable reader window such as this one. Double-click to close.
+        
+        HELP - Opens this file in a READ window.
+
+        DATE - Prints the current date and time.
+
+        SPEAK - Toggle Text2Speach reading of command output. Use SPEAK [path/to/file] to speak text files.
+
+        ULIST - List computer user accounts.
+
+        REG - Show computer registation info.
+
+        AUDIO - Start the audio player with a random track from the default playlist. The default playist includes links to Archive.org the games ability to stream audio is dependant on the hope that their servers aren't overloaded. Consider donating to Archive.org they are amazing IMO.
+
+        AUDIO [URL] - Paste in a real world link to stream your own audio into the game. URLs are added to the playlist.
+
+        FULLSCREEN - Toggle fullscreen.
+
+        CLEAR - Clear all text from the terminal window.
+
+
+        THE MAP
+
+        One of the many unique features of the Mal90 is the world MAP which can graphically represent several different data sets. Click to drag. Zoom with mousewheel. The selected country is highlighted in color. M4p now shows active SSH and BRUTE c0nn3cti0ns.
+
+        MAP - displays MAP help info.
+        
+        MAP CITY - Toggles the display of global cities. Cities are filtered by a city population threshold. Set the threshold with MAP POP [threshold].
+
+        MAP NODE - Toggles the display of discovered network nodes.
+
+        MAP POP - Sets city population filter to zero. Use MAP POP [threshold] to set the desired value.
+
+        MAP ZOOM - Set the map zoom level with MAP ZOOM [level].
+
+        MAP RESET - Restore default map settings.
+
+
+        REMOTE CONNECTIONS
+
+        DNSLOOKUP [domain] - Translate domain to IP address using the configurted DNS server.
+        
+        SSH - Secure Shell tunnel. SSH [IP] or SSH [USERNAME@IP]. Mal90 caches remote authintications and SSH [IP] will autouthenitcate with the first account cached for the device, eleminating the need to enter a password after the first authentication. Press Tab to auto complete the IP addresses of all cached authenitcations.
+
+        MAL [COMMAND] - Mal90's terminal shell provides MAL to execute commands locally while connected over SSH. Example: MAL FULLSCREEN
+
+        DIAL[PHONENUMBER] - Call a phone number in the simulation.
+
+        HANGUP - Dissconnet phone call
+        
+
+        *** DL's bumb4cl0th T0S REMIX ***
+
+        SCAN - Pingz@100 random_IP addresses per. If country == m4p selected country add ip to SCAN QUEUE.
+
+        BRUTE - BRUTE [USERNAME@IP] will do all the cr4z0ring. Built-in 10k word password table TNKS2 D4taL0v3r. Cracked accounts are automatically added 2 the cached SSH authentications so that SSH [IP] will now auto authenicate with the cracked account I just cracked for you. TNKz to JB4gZ If a match isn't found after trying all 10k passwords it cycles them again + the cycle count number. Some passwords are about as likely as finding a book in B0rg3s l1br4ry 0f B4b3l.
+        
+        BRUTE SCAN - Run BRUTE root@IP on every IP address in the SCAN QUEUE.
+
+        BRUTE QUIT - K1ll 4ll
+
+        
+        THE END
+
+        Remember that a computer has no morals, it only inherits its user's. -Nameless1 on HarbNetBBS ${nodes[locpnum].telephone}
+
+        SHOUTS TO FZ (l337) AND SPR3
+
+        “There is no spoon.”
+        \t\t\t\t\t\t\t\t—- The Matrix
+
+        V1d30 your documentation was shit and I had to rewrite h4lf of it becuse it didnt work at all how you described - X3r0x v1.001.065 Aug 1994
+        `);
 }
 
 function dateCommand() {
@@ -515,7 +643,11 @@ function mapCommand(win, command) {
         \tmap nodes
         \tmap cities
         reset to defaults:
-        \tmap reset`;
+        \tmap center
+        \tmap reset
+        \tmap zoom
+        change cities display population threshold:
+        \tmap pop [threshold]`;
 
     if (command.length < 2) {
         // not enough args, show map command help
@@ -585,7 +717,12 @@ function mapCommand(win, command) {
         }
         mapSteps = 0;
         mapCitiesSteps = 10000;
-        win.setText(`Set population threshold to ${player.cityPopulationThreshold}`);
+        let str = player.cityPopulationThreshold.toLocaleString(
+        undefined, // leave undefined to use the visitor's browser 
+                    // locale or a string like 'en-US' to override it.
+        { minimumFractionDigits: 0 }
+        );
+        win.setText(`Population threshold set to ${str}`);
     } else {
         // the supplied argument doesn't exist, 
         // show map command help string
@@ -840,9 +977,9 @@ function lookupDNSCommand(win, command) {
 
 function malCommand(win, command) {
     command.shift();
-    win.text = `Running command ${command} on mal90`; {
-        win.inputStr = command;
-        console.log(win.inputStr);
-        commandHandler(win);
-    }
+    command = command.join(" ");
+    win.text = `Running command \"${command}\" on mal90`;
+    win.setText(win.text, false);
+    win.inputStr = command;
+    commandHandler(win, true);
 }

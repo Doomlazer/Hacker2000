@@ -337,6 +337,69 @@ async function createFS(n) {
         );
     }
 
+    //
+    // Mal90 Author
+    //
+    if (n == locpnum) {
+        nodes[n].accounts.push({"user": "Vid30Dr0mEE", "pwd":"password", "admin": true, "userId":n})
+        fs.createFolder(
+            `C:\\Users\\Vid30Dr0mEE`,
+            1,
+            0
+        );
+
+        fs.createFolder(
+            `C:\\Users\\Vid30Dr0mEE\\Desktop`,
+            1,
+            0
+        );
+
+        fs.createFolder(
+            `C:\\Users\\Vid30Dr0mEE\\Documents`,
+            1,
+            0
+        );
+
+        fs.createFolder(
+            `C:\\Users\\Vid30Dr0mEE\\Music`,
+            1,
+            0
+        );
+
+        fs.createFolder(
+            `C:\\Users\\Vid30Dr0mEE\\Documents\\mal90`,
+            1,
+            0
+        );
+        fs.createFolder(
+            `C:\\Users\\Vid30Dr0mEE\\Documents\\mal90\\SourceCode`,
+            1,
+            0
+        );
+        fs.createFolder(
+            `C:\\Users\\Vid30Dr0mEE\\Documents\\mal90\\SourceCode\\TonySoft`,
+            1,
+            0
+        );
+        fs.createFile(
+            `C:\\Users\\Vid30Dr0mEE\\Documents\\mal\\mal90.txt`,
+            0,
+            0,
+            `ToDo:
+            \tRemove spyware
+            \tCalculatar App
+            \tWindow click order`,
+            0
+        );
+        fs.createFile(
+            `C:\\Users\\Vid30Dr0mEE\\Documents\\mal90\\SourceCode\\TonySoft\\main.src`,
+            0,
+            0,
+            generateGiberish(857),
+            0
+        );
+    }
+
 
     //==================================================
     // Attributes

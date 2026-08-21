@@ -69,9 +69,9 @@ class aniRect {
         // reader defaults
         this.readerFontSize = 16;
         this.readerText = "Proxy List:\n"
-        this.readerBackgroundColor = '#180377'
-        this.readerRectColor = '#152272'
-        this.readerTextColor = '#bad606'
+        this.readerBackgroundColor = '#141414'
+        this.readerRectColor = '#f59b13'
+        this.readerTextColor = '#d68306'
         this.readerIsRounded = false;
         this.readerHasBoarder = true;
         this.rX1 = getWidth()/25 * 10.5;
@@ -419,7 +419,7 @@ class aniRect {
                 e.key != "CapsLock" &&
                 e.key != "ArrowLeft" &&
                 e.key != "ArrowRight") {
-                // add character to input    
+                // add character to input
                 this.inputStr += e.key;
                 this.displayLines[this.displayLines.length-1] += e.key;
                 // wrap if needed
@@ -518,14 +518,14 @@ class aniRect {
             // always reopen player's computer win
              this.toOpen = true;
              this.delete = false;
-             this.xW = getWidth()/2;
-             this.yH = getHeight()/2;
+             this.xW = getWidth()/3;
+             this.yH = getHeight()/1.5;
              this.xP = 1;
              this.yP = 1;
         } else if (this.delete) {
             // flush it
             const index = cast.indexOf(this);
-            console.log("this.type " + this.type)
+            
             if (this.type == "proxy") {
                 //console.log(`player.proxyWindow: ${player.proxyWindow}`);
                 if (this == player.proxyWindow[0]) {

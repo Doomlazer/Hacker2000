@@ -33,6 +33,7 @@ let emailProviders = ["MailSphere.com", "ZipPost.net", "InboxZone.com", "WebLett
     "WebPost.com", "MailWorks.net", "RabbitMail.com","EZMail.com", "KillerMail.net"];
 let DNSServers = ["1.1.1.1", "8.8.8.8"];
 let DNSKeys = {};
+let locpnum;
 
 function init() {
     window.addEventListener('click', doClick);
@@ -46,10 +47,14 @@ function init() {
     window.addEventListener("paste", (event) => {
         let text = event.clipboardData.getData("text");
         for (let i = 0; i < text.length; i++) {
-            let e = {"key": text[i]}
+            let e = {
+                "key": text[i],
+                isPaste: true
+            }
             cast[0].keyHandler(e);
         }
     });
+    locpnum = getRandInt(999) + 1;
 
     // add touch support for mobile at some point... maybe
     //document.addEventListener("gesturestart", e => e.preventDefault(), { passive: false });
