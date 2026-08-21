@@ -309,6 +309,7 @@ function audioCommand(win, command) {
         backgroundMusic[0].audio.pause();
     } else {
         player.musicOn = true;
+        console.log(player.audioPlayer)
         if (player.audioPlayer == 0) {
             spawnAudioWin(win, command);
         }

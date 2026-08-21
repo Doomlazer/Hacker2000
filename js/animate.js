@@ -84,7 +84,7 @@ class aniRect {
         this.audioBackgroundColor = '#390ed2'
         this.audioRectColor = '#3952f7'
         this.audioTextColor = '#f7faf8'
-        this.audioIsRounded = false;
+        this.audioIsRounded = true;
         this.audioHasBoarder = false;
         this.aX1 = getWidth()/25 * 11;
         this.aY1 = getHeight()/8;
@@ -525,22 +525,19 @@ class aniRect {
         } else if (this.delete) {
             // flush it
             const index = cast.indexOf(this);
-            
+            console.log("this.type " + this.type)
             if (this.type == "proxy") {
                 //console.log(`player.proxyWindow: ${player.proxyWindow}`);
                 if (this == player.proxyWindow[0]) {
                     player.proxyWindow.pop();
                 }
-            } else if (this.type = "brute") {
-                console.log(`player.bruteWindow ${player.bruteWindow}`);
+            } else if (this.type == "brute") {
                 if (player.bruteWindow.length > 0) {
-                    console.log(player.bruteWindow.length);
                     player.bruteWindow.pop();
-                    console.log(player.bruteWindow.length);
                 }
-            } else if (this.type = "audio") {
+            } else if (this.type == "audio") {
                 player.audioPlayer = 0;
-            } else if (this.type = "reader") {
+            } else if (this.type == "reader") {
                 //console.log(`player.readerWindow: ${player.readerWindow}`);
                 if (this == player.readerWindow[0]) {
                     player.readerWindow.pop();
@@ -549,7 +546,6 @@ class aniRect {
             if (index > -1) {
                 cast.splice(index, 1);
             }
-            console.log(`cast ${cast}`);
         }
     }
 

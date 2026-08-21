@@ -624,9 +624,13 @@ function drawWin(win) { // draw a window
 
                 ctx.globalAlpha = 0.25;
                 ctx.fillStyle = "#111";
-                ctx.beginPath();
-                ctx.roundRect(px, py, pw, ph, radius);
-                ctx.fill();
+                if (win.isRounded) {
+                    ctx.beginPath();
+                    ctx.roundRect(px, py, pw, ph, radius);
+                    ctx.stroke();
+                } else {
+                    ctx.strokeRect(px, py, pw, ph);
+                }
                 ctx.globalAlpha = 1;
 
                 ctx.strokeStyle = accent;
@@ -859,6 +863,52 @@ function drawWin(win) { // draw a window
                 );
                 ctx.fill();
 
+                // ----------------------
+                // Time display
+                // ----------------------
+
+                function formatTime(seconds) {
+                    if (!isFinite(seconds) || seconds < 0) {
+                        return "0:00";
+                    }
+
+                    const mins = Math.floor(seconds / 60);
+                    const secs = Math.floor(seconds % 60);
+
+                    return `${mins}:${secs.toString().padStart(2, "0")}`;
+                }
+
+                const currentTime = audio ? audio.currentTime : 0;
+                const duration =
+                    audio && isFinite(audio.duration)
+                        ? audio.duration
+                        : 0;
+
+                // Center vertically with the buttons
+                const timeY = buttonAreaY + buttonSize / 2;
+
+                // Place times just outside the first/last button
+                const timeGap = pw * 0.025;
+
+                ctx.fillStyle = "#ddd";
+                ctx.font = `${Math.max(10, buttonSize * 0.22)}px sans-serif`;
+                ctx.textBaseline = "middle";
+
+                // Left timer
+                ctx.textAlign = "right";
+                ctx.fillText(
+                    formatTime(currentTime),
+                    startX - timeGap,
+                    timeY
+                );
+
+                // Right timer
+                ctx.textAlign = "left";
+                ctx.fillText(
+                    formatTime(duration),
+                    startX + totalButtonsW + timeGap,
+                    timeY
+                );
 
                 ctx.restore();
             }
