@@ -67,7 +67,7 @@ function speak(text, queue = 0, voice = 0) {
     const voices = window.speechSynthesis.getVoices();
     utterance.onend = function(event) {
         if (debug) {
-            console.log('Speech has finished after ' + event.elapsedTime + ' seconds.');
+            //console.log('Speech has finished after ' + event.elapsedTime + ' seconds.');
         }
     };
     

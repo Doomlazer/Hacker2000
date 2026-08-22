@@ -607,6 +607,18 @@ function drawWin(win) { // draw a window
                 }
             }
 
+            // box to resize window
+            if (mouseX > win.x1 + win.xW - 20 &&
+                        mouseX < win.x1 + win.xW &&
+                        mouseY > win.y1 + win.yH - 20 &&
+                        mouseY < win.y1 + win.yH) {
+                            ctx.strokeRect(win.x1 + win.xW - 20,
+                                    win.y1 + win.yH - 20,
+                                    20,
+                                    20);
+
+            }
+
             if (win.type == "audio") {
                 ctx.save();
 

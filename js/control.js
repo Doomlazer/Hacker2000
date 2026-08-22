@@ -87,20 +87,50 @@ function doMouseMove(e) {
             for (let w = 0; w < cast.length; w ++) {
                 let c = cast[w];
                 if (c.mouseDrag) { // moving this window
-
                     adjustedWindow = true;
-                    c.x1 = mouseX + oldOffX ;
-                    c.y1 = mouseY + oldOffY ;
+                    if (c.resizing) {
+                            c.xW = c.resizeStartW + (mouseX - c.resizeStartX);
+                            c.yH = c.resizeStartH + (mouseY - c.resizeStartY);
+                            c.xP = c.xW;
+                            c.yP = c.yH;
 
-                    // save the updated proxy and reader windows loc so
-                    // they respawn where the user closed them
-                    if (c.type == "proxy") {
-                        cast[0].pX1 = c.x1;
-                        cast[0].pY1 = c.y1;
-                    }
-                    if (c.type == "reader") {
-                        cast[0].rX1 = c.x1;
-                        cast[0].rY1 = c.y1;
+                            c.xW = Math.max(c.xW, 100);
+                            c.yH = Math.max(c.yH, 100);
+
+                            if (c.type == "proxy") {
+                                cast[0].pXW = c.xW;
+                                cast[0].pYH = c.yH;
+                            }
+                            if (c.type == "reader") {
+                                cast[0].rXW = c.xW;
+                                cast[0].rYH = c.yH;
+                            }
+
+                            //re wrap text
+                            // Set font and text color
+                            ctx.fillStyle = c.textColor;
+                            ctx.font = c.fontSize + "px " + c.textFont;
+                            c.text = c.displayLines.join("\n");
+                            c.displayLines = [];
+                            if (c.type == "reader") {
+                                c.setText(c.originalText, false);
+                            } else {
+                                c.setText(c.text, false);
+                            }
+                    } else {
+                        c.x1 = mouseX + oldOffX;
+                        c.y1 = mouseY + oldOffY;
+
+                        // save the updated proxy and reader windows loc so
+                        // they respawn where the user closed them
+                        if (c.type == "proxy") {
+                            cast[0].pX1 = c.x1;
+                            cast[0].pY1 = c.y1;
+                        }
+                        if (c.type == "reader") {
+                            cast[0].rX1 = c.x1;
+                            cast[0].rY1 = c.y1;
+                        }
                     }
 
                     // clear
@@ -172,6 +202,20 @@ function doMouseDown(e) {
                 }
             }
 
+            // check if resizing instead of dragging
+            if (mouseX > c.x1 + c.xW - 20 &&
+                    mouseX < c.x1 + c.xW &&
+                    mouseY > c.y1 + c.yH - 20 &&
+                    mouseY < c.y1 + c.yH) { 
+                        c.resizing = true;
+                        c.resizeStartX = mouseX;
+                        c.resizeStartY = mouseY;
+                        c.resizeStartW = c.xW;
+                        c.resizeStartH = c.yH;
+            } else {
+                c.resizing = false;
+            }
+
             // audio player buttons
             if (c.type == "audio") {
                 const bar = c.progressBar;
@@ -228,7 +272,9 @@ function doMouseUp(e) {
     mouseDownX = 0;
     mouseDownY = 0;
     for (let w = 0; w < cast.length; w++) {
-        cast[w].mouseDrag = false;
+        let s = cast[w];
+        s.mouseDrag = false;
+        s.resizing = false;
     }
     drawMap();
 }

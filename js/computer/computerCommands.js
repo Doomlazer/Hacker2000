@@ -129,7 +129,7 @@ function commandHandler(win, mal = false) {
 
         bin = bin.split("\n");
         bin = bin.slice(1);
-        console.log("bin: " + bin)
+        //console.log("bin: " + bin)
 
         // for the commands, first check the node's bin folder 
         // to see if the command exists on the system
@@ -258,7 +258,7 @@ Mal90 Operations Manual
 
         Mal90 Br0wzerOperating System by Vid30Dr0mEE, l337 HAx0r p.o.s.OS .,'"You get what you pay 4"',. Forked from TonyOS v2.309.1 R.I.P PheakySmurph J0nnyK4t, Rulz.
         
-        In addition to dumb terminal functionality, the Mal90 includes several tools to facilitate network scanning and account cracking. The TonySoft registration lock has been disabled since v0.1134.777 when the servers went offline and promising your f1rst b0rn to a corporation was no longer required just to run an OS. Use mousewheel to scroll document text  
+        In addition to dumb terminal functionality, the Mal90 includes several t00lz to facilitate network scanning and account cracking. The TonySoft registration lock has been disabled since v0.1134.777 when the servers went offline and promising your f1rst b0rn to a corporation was no longer required just to run an OS. Use mousewheel to scroll document text  
 
         Interpreter Version 1.001.064
         December 1992
@@ -269,10 +269,9 @@ Mal90 Operations Manual
         Known Bugs:
 
         \tWindow click priority is still broken
-        \tC4p1t4l1zm 1z 3v1l
-        \t2 m4ny m0r3 2 l1st
+        \tCorporations are evil
         
-        Remember that, like a hammer, this OS is just a tool; The morality of its use is determined by the individu4l. - CMOTDibblerDistantCousin
+        Remember that, like a hammer, a computer is just a tool; The morality of its use is determined by the individu4l. - CMOTDibblersDistant2ndCousin
         
         IMPORTANT DISCLAIMER: While this is a browser-based game, the simulated computers are created locally on your device only. The pretend tools, like SSH, are NOT connecting over the internet to real computers. The DTMF tones from DIAL are NOT makeing real world phone calls. That said, this game does make real network connections for the command AUDIO, which streams music from real urls over the real world (outside this game) internet.
         
@@ -306,9 +305,9 @@ Mal90 Operations Manual
 
         REG - Show computer registation info.
 
-        AUDIO - Start the audio player with a random track from the default playlist. The default playist includes links to Archive.org the games ability to stream audio is dependant on the hope that their servers aren't overloaded. Consider donating to Archive.org they are amazing IMO.
+        AUDIO - Start the audio player with a random track from the default playlist. The default playist includes real links to Archive.org and the games ability to stream audio is dependant on the hope that their servers aren't overloaded. Consider donating to Archive.org
 
-        AUDIO [URL] - Paste in a real world link to stream your own audio into the game. URLs are added to the playlist.
+        AUDIO [URL] - Paste in a real world link to stream your own audio into the game. URLs are added to the playlist if not already.
 
         FULLSCREEN - Toggle fullscreen.
 
@@ -967,12 +966,12 @@ function lookupDNSCommand(win, command) {
         let domain = command[1].toLowerCase(); 
         let DNSIP = win.node.dns[0];
         let notFound = true;
-        console.log(DNSIP + " DNSIP")
+        //console.log(DNSIP + " DNSIP")
         for (let i = 0; i < locations.length; i++) {
             if (DNSIP == nodes[i].ip_address) {
                 let DNSKeys = nodes[i].fileSystem.readFile('C:\\System\\DNS\\entries.txt', player.authAccountIndex)
                 DNSKeys = JSON.parse(DNSKeys);
-                console.log("JSON.parse(DNSKeys)[domain] " + DNSKeys[domain]);
+                //console.log("JSON.parse(DNSKeys)[domain] " + DNSKeys[domain]);
                 if (Object.hasOwn(DNSKeys, domain) && DNSKeys[domain] !== undefined) {
                     win.text = DNSKeys[domain];
                     win.setText(win.text);
@@ -984,8 +983,6 @@ function lookupDNSCommand(win, command) {
             }
         }
         if (notFound) {
-            console.log("nodes[1].ip_address" + nodes[1].ip_address)
-            console.log("nodes[2].ip_address" + nodes[2].ip_address)
             win.text = `DNS Server ${DNSIP} did not respond`;
             win.setText(win.text);
         }

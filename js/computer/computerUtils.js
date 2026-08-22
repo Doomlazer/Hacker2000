@@ -383,7 +383,7 @@ function fsDNS(fs, ip, n) {
         JSON.stringify(DNSKeys),
         0
     );
-    console.log("sssss" + fs.readFile(`C:\\System\\DNS\\entries.txt`, 0))
+    //console.log("sssss" + fs.readFile(`C:\\System\\DNS\\entries.txt`, 0))
     fs.createFile(
         `C:\\System\\bin\\dns`,
         0,
@@ -497,6 +497,7 @@ function spawnReadWin(win, text) {
     rw.isRounded = win.readerIsRounded;
     rw.hasBoarder = win.readerHasBoarder;
     rw.type = "reader";
+    rw.originalText = text;
     cast.push(rw);
     player.readerWindow.push(rw);
     rw.setText(text, false);
@@ -627,7 +628,7 @@ function createAccounts(n) {
             uname = locations[n].homeowner.split(" ")[0].toLowerCase();
         }
 
-        // make every 256 nodes an email host, but not node
+        // make every 256 nodes an email host, but not node 0
         if (n % 256 == 0 && n != 0) {
             let e = n / 256 - 1;
             if (e < emailProviders.length) {
@@ -635,7 +636,6 @@ function createAccounts(n) {
                 //console.log(`e: ${e}, DNSKeys ${DNSKeys}`);
                 nodes[n].type = "eMail Server"
                 nodes[n].text = `${emailProviders[e]} eMail Host Sever v2.58`
-                console.log(e, DNSKeys)
             }
         }
 

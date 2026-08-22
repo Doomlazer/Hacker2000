@@ -46,6 +46,7 @@ class aniRect {
         this.text = "";
         this.authTries = 0;
         this.pri = cast.length; // draw priority
+        this.resizing = false;
         // map defaults
         this.drawMap = true
         this.mapHasBoarder = true;
@@ -116,6 +117,10 @@ class aniRect {
         // add the input prompt
         if (prompt) {
             this.displayLines.push(this.promptChar);
+        }
+        if (this.type == "none") {
+            // force the mal90 scroll to bottom
+            this.wheelOff += 10000
         }
     }
 
@@ -481,7 +486,8 @@ class aniRect {
 
         // remove overflow lines, but don't crop scrolling windows
         if (this.type != "proxy" && this.type != "reader") {
-            while (this.displayLines.length > this.textMaxLines) {
+            let keepHistory = 100;
+            while (this.displayLines.length > this.textMaxLines + keepHistory) {
                 this.displayLines.shift();
             }
         }
