@@ -141,6 +141,9 @@ function loadNodes() {
                 node.longitude = city.lon;
                 node.dicovered = false;
                 node.fileSystem = [];
+                node.dns = [];
+                node.dns.push(DNSServers[getRandInt(DNSServers.length-1)]);
+                node.dns.push(DNSServers[getRandInt(DNSServers.length-1)]);
                 node.type = "mal-90";
                 node.text = `Welcome to the mal-90.${i} OS\nDate: ${gameTimer.formatted()}\nMight I suggest some AUDIO or asking for HELP if you need it.`;
                 node.promptChar = ">";
@@ -193,6 +196,10 @@ function loadMap() {
             attachNode(playersWindow, nodes[0]);
             playersWindow.admins.push(0); // add player as admin to own computer
             cast.push(playersWindow);
+
+            // dns
+            fsDNS(nodes[1].fileSystem, DNSServers[0], 1);
+            fsDNS(nodes[2].fileSystem, DNSServers[1], 2);
 
             /*/ broswer test
             let browser = new CanvasBrowser(

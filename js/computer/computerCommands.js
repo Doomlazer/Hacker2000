@@ -358,7 +358,7 @@ Mal90 Operations Manual
         
         THE END
 
-        Remember that a computer has no morals, it only inherits its user's. -Nameless1 on HarbNetBBS ${nodes[locpnum].telephone}
+        Remember that a computer has no morals, it only inherits its user's. -Nameless1 on HarbNetBBS ${nodes[locpnum].ip_address}
 
         SHOUTS TO FZ (l337) AND SPR3
 
@@ -965,11 +965,28 @@ function lookupDNSCommand(win, command) {
         win.setText(win.text);
     } else {
         let domain = command[1].toLowerCase(); 
-        if (Object.hasOwn(DNSKeys, domain) && DNSKeys[domain] !== undefined) {
-            win.text = DNSKeys[domain];
-            win.setText(win.text);
-        } else {
-            win.text = `Domain ${command[1]} not found.`;
+        let DNSIP = win.node.dns[0];
+        let notFound = true;
+        console.log(DNSIP + " DNSIP")
+        for (let i = 0; i < locations.length; i++) {
+            if (DNSIP == nodes[i].ip_address) {
+                let DNSKeys = nodes[i].fileSystem.readFile('C:\\System\\DNS\\entries.txt', player.authAccountIndex)
+                DNSKeys = JSON.parse(DNSKeys);
+                console.log("JSON.parse(DNSKeys)[domain] " + DNSKeys[domain]);
+                if (Object.hasOwn(DNSKeys, domain) && DNSKeys[domain] !== undefined) {
+                    win.text = DNSKeys[domain];
+                    win.setText(win.text);
+                } else {
+                    win.text = `Domain ${command[1]} not found.`;
+                    win.setText(win.text);
+                }
+                notFound = false;
+            }
+        }
+        if (notFound) {
+            console.log("nodes[1].ip_address" + nodes[1].ip_address)
+            console.log("nodes[2].ip_address" + nodes[2].ip_address)
+            win.text = `DNS Server ${DNSIP} did not respond`;
             win.setText(win.text);
         }
     }

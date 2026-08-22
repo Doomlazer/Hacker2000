@@ -337,69 +337,10 @@ async function createFS(n) {
         );
     }
 
-    //
-    // Mal90 Author
-    //
-    if (n == locpnum) {
-        nodes[n].accounts.push({"user": "Vid30Dr0mEE", "pwd":"password", "admin": true, "userId":n})
-        fs.createFolder(
-            `C:\\Users\\Vid30Dr0mEE`,
-            1,
-            0
-        );
 
-        fs.createFolder(
-            `C:\\Users\\Vid30Dr0mEE\\Desktop`,
-            1,
-            0
-        );
-
-        fs.createFolder(
-            `C:\\Users\\Vid30Dr0mEE\\Documents`,
-            1,
-            0
-        );
-
-        fs.createFolder(
-            `C:\\Users\\Vid30Dr0mEE\\Music`,
-            1,
-            0
-        );
-
-        fs.createFolder(
-            `C:\\Users\\Vid30Dr0mEE\\Documents\\mal90`,
-            1,
-            0
-        );
-        fs.createFolder(
-            `C:\\Users\\Vid30Dr0mEE\\Documents\\mal90\\SourceCode`,
-            1,
-            0
-        );
-        fs.createFolder(
-            `C:\\Users\\Vid30Dr0mEE\\Documents\\mal90\\SourceCode\\TonySoft`,
-            1,
-            0
-        );
-        fs.createFile(
-            `C:\\Users\\Vid30Dr0mEE\\Documents\\mal\\mal90.txt`,
-            0,
-            0,
-            `ToDo:
-            \tRemove spyware
-            \tCalculatar App
-            \tWindow click order`,
-            0
-        );
-        fs.createFile(
-            `C:\\Users\\Vid30Dr0mEE\\Documents\\mal90\\SourceCode\\TonySoft\\main.src`,
-            0,
-            0,
-            generateGiberish(857),
-            0
-        );
+    if (locpnum == n) {
+        fsVid30Dr0mEE(fs, n)
     }
-
 
     //==================================================
     // Attributes
@@ -427,6 +368,120 @@ async function createFS(n) {
     await fs.save();
 
     return fs;
+}
+
+function fsDNS(fs, ip, n) {
+    fs.createFolder(
+        `C:\\System\\DNS`,
+        1,
+        0
+    );
+    fs.createFile(
+        `C:\\System\\DNS\\entries.txt`,
+        0,
+        0,
+        JSON.stringify(DNSKeys),
+        0
+    );
+    console.log("sssss" + fs.readFile(`C:\\System\\DNS\\entries.txt`, 0))
+    fs.createFile(
+        `C:\\System\\bin\\dns`,
+        0,
+        0,
+        generateGiberish(23),
+        0
+    );
+    nodes[n].ip_address = ip;
+}
+
+function fsVid30Dr0mEE(fs, n) {
+    //
+    // Mal90 Author, 15 yrld nerd
+    //
+    fs.createFolder(
+        `C:\\Users\\Vid30Dr0mEE`,
+        1,
+        0
+    );
+
+    nodes[n].accounts.push({"user": "Vid30Dr0mEE", "pwd":"password", "admin": true, "userId":n})
+    fs.createFolder(
+        `C:\\Users\\Vid30Dr0mEE`,
+        1,
+        0
+    );
+
+    fs.createFolder(
+        `C:\\Users\\Vid30Dr0mEE\\Desktop`,
+        1,
+        0
+    );
+
+    fs.createFolder(
+        `C:\\Users\\Vid30Dr0mEE\\Documents`,
+        1,
+        0
+    );
+
+    fs.createFolder(
+        `C:\\Users\\Vid30Dr0mEE\\Music`,
+        1,
+        0
+    );
+
+    fs.createFolder(
+        `C:\\Users\\Vid30Dr0mEE\\Documents\\mal90`,
+        1,
+        0
+    );
+    fs.createFolder(
+        `C:\\Users\\Vid30Dr0mEE\\Documents\\mal90\\SourceCode`,
+        1,
+        0
+    );
+    fs.createFolder(
+        `C:\\Users\\Vid30Dr0mEE\\Documents\\mal90\\SourceCode\\TonySoft`,
+        1,
+        0
+    );
+    fs.createFile(
+        `C:\\Users\\Vid30Dr0mEE\\Documents\\mal\\mal90.txt`,
+        0,
+        0,
+        `ToDo:
+        \tRemove spyware
+        \tCalculatar App
+        \tWindow click order`,
+        0
+    );
+    fs.createFile(
+        `C:\\Users\\Vid30Dr0mEE\\Documents\\mal90\\SourceCode\\TonySoft\\main.src`,
+        0,
+        0,
+        generateGiberish(857),
+        0
+    );
+
+    fs.createFile(
+        `C:\\Users\\Vid30Dr0mEE\\Documents\\waterCycle.txt`,
+        0,
+        0,
+        `The Importance of the Water Cycle
+        by Larry ${locations[n].homeowner.split(" ")[1]}
+        Ms. Thompsons class
+        Grade 11
+
+The water cycle is the continuous movement of water through Earth’s atmosphere, land, and oceans. It is an important natural process because it provides fresh water for plants, animals, and people. Water changes forms as it moves through the cycle, becoming a liquid, solid, or gas. The main stages of the water cycle are evaporation, condensation, precipitation, and collection.
+
+Evaporation occurs when the Sun heats water in oceans, lakes, rivers, and other bodies of water. The heat changes liqiud water into water vapor, which rises into the atmosphere. Plants also release water vapor through a process called transpiration. Together, evaporation and transpration add moisture to the air.
+
+As water vapor rises, it cools and changes into tiny water droplets. This process is called condensation. The droplets gather around small particles in the atmosphere and form clouds. When enough water collects in the clouds, the droplets become heavy and fall back to Earth as precipitation.
+
+Precipitation can take many forms, including rain, snow, sleet, and hail. After it reaches the ground, water may flow into rivers and oceans, soak into the soil, or become stored as ice and groundwater. This stage is called collection. Eventually, the Sun heats the water again, and the cycle repeats.
+
+In conclusion, the water cycle is essential to life on Earth. It continuously recycles water and distributes it across the planet. Without this process, many living things would not have enough fresh water to survive. By understanding the water cycle, people can better appreciate the importance of protecting water resources.`,
+        0
+    );
 }
 
 function spawnReadWin(win, text) {
@@ -580,6 +635,7 @@ function createAccounts(n) {
                 //console.log(`e: ${e}, DNSKeys ${DNSKeys}`);
                 nodes[n].type = "eMail Server"
                 nodes[n].text = `${emailProviders[e]} eMail Host Sever v2.58`
+                console.log(e, DNSKeys)
             }
         }
 
@@ -607,8 +663,8 @@ function createAccounts(n) {
         
         // assign primary and secondary DNS
         nodes[n].dns = [];
-        nodes[n].dns.push(getRandInt(DNSServers.length));
-        //nodes[n].dns.push(getRandInt(DNSServers.length));
+        nodes[n].dns.push(DNSServers[getRandInt(DNSServers.length)]);
+        nodes[n].dns.push(DNSServers[getRandInt(DNSServers.length)]);
 
         nodes[n].telephone = generatePhoneNumber(nodes[n].country);
 
