@@ -46,11 +46,13 @@ function doWheel(e) {
             // clear
             ctxMarkers.fillStyle = '#000000';
             ctxMarkers.fillRect(0, 0, c.width, c.height);
-        } else if (mouseX > c.x1 &&
+        } else if (
+            mouseX > c.x1 &&
             mouseX < c.x1 + c.xW &&
             mouseY > c.y1 &&
             mouseY < c.y1 + c.yH &&
-            !adjustedWindow) {
+            !adjustedWindow
+        ) {
                 // do nothing when scrolling on mail above message area
                 adjustedWindow = true;
         }
@@ -89,7 +91,9 @@ function doMouseMove(e) {
     mouseLastY = mouseY;
 
 
-    if (player.ignoreMouseDrag) {
+    //console.log("player !== undefined", player !== "undefined")
+    //console.log("player.ignoreMouseDrag ",player.ignoreMouseDrag)
+    if (player !== "undefined" && player.ignoreMouseDrag) {
         // clicking on not shown cards needs to have no effect
         // without ingnoreMouseDrag we'd be moving the map
         adjustedWindow = true;
@@ -331,6 +335,11 @@ function doClick(e) {
 
 function doMouseDown(e) {
     e.preventDefault();
+
+    if (e.button === 2) {
+        doClick(e);
+        return;
+    }
     // update mouse first
     mouseX = e.x;
     mouseY = e.y;
@@ -765,6 +774,30 @@ function handleMailButton(win, button) {
             break;
 
         case 2: // Delete
+            if (win.mailSelected != null) {
+                let id = win.mailSelected.messageId;
+                win.fs.deleteFile(`C:\\Email\\${win.user}\\Inbox\\${id}`, 0);
+
+                win.inbox = [];
+                let arr1 = win.fs.list(`C:\\Email\\${win.user}\\Inbox`, 0, false)
+                console.log("arr1: ",arr1)
+                let arr = arr1.split("\n");
+                arr.shift();
+                if (arr[0] !== "(empty)") {
+                    for (let i of arr) {
+                        win.inbox.push(win.fs.readFile(`C:\\Email\\${win.user}\\Inbox\\${i}`));
+                    }
+                } else {
+                win.inbox = [];
+                }
+                if (win.inbox.length > 0) {
+                    win.mailSelected = JSON.parse(win.inbox[0]);
+                } else {
+                    win.mailSelected = null;
+                }
+                //console.log("win.inbox ", win.inbox)
+                win.fs.save();
+            }
             break;
 
         case 3: // Quit

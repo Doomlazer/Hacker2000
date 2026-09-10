@@ -150,6 +150,9 @@ function commandHandler(win, mal = false) {
                         win.setText("Deletion blocked — close all connections/tabs using the database.");
                     };
                     break;
+                case 'ms':
+                    minesweeperCommand(win);
+                    break;
                 case 'mail':
                     mailCommand(win);
                     break;
@@ -981,7 +984,7 @@ function brutecCommand(win, command) {
     }
 }
 
-function lookupDNSCommand(win, command) {
+function lookupDNSCommand(win, command, internal = false) {
     // work in progess
     if (command.length != 2) {
         win.text = `DNSLookUp - Returns the IP address of a specified domain
@@ -992,25 +995,37 @@ function lookupDNSCommand(win, command) {
         win.setText(win.text);
     } else {
         let domain = command[1].toLowerCase(); 
-        let DNSIP = win.node.dns[0];
+        let DNSIP;
+        if (win.dns) {
+            DNSIP = win.dns;   
+        } else {
+            DNSIP = win.node.dns[0];
+        }
         let notFound = true;
-        //console.log(DNSIP + " DNSIP")
         for (let i = 0; i < locations.length; i++) {
             if (DNSIP == nodes[i].ip_address) {
                 let DNSKeys = nodes[i].fileSystem.readFile('C:\\System\\DNS\\entries.txt', player.authAccountIndex)
                 DNSKeys = JSON.parse(DNSKeys);
                 //console.log("JSON.parse(DNSKeys)[domain] " + DNSKeys[domain]);
                 if (Object.hasOwn(DNSKeys, domain) && DNSKeys[domain] !== undefined) {
-                    win.text = DNSKeys[domain];
-                    win.setText(win.text);
+                    if (internal) {
+                        notFound = false;
+                        return DNSKeys[domain];
+                    } else {
+                        win.text = DNSKeys[domain];
+                        win.setText(win.text);
+                    }
                 } else {
-                    win.text = `Domain ${command[1]} not found.`;
-                    win.setText(win.text);
+                    if (!internal) {
+                        win.text = `Domain ${command[1]} not found.`;
+                        win.setText(win.text);
+                    }
                 }
                 notFound = false;
             }
         }
         if (notFound) {
+            console.log("Not found")
             win.text = `DNS Server ${DNSIP} did not respond`;
             win.setText(win.text);
         }
@@ -1051,9 +1066,18 @@ function deckCommand(win, command) {
 
 function mailCommand(win) {
     if (player.mailWindow === 0) {
-        player.mailWindow = spawnMailWin();
+        player.mailWindow = spawnMailWin(win.node.dns[0]);
         win.setText("Loading eMail client...");
     } else {
         win.setText("eMail client already open...");
+    }
+}
+
+function minesweeperCommand(win) {
+    if (player.minesweeperWindow === 0) {
+        player.minesweeperWindow = spawnMineSweeperWin();
+        win.setText("Runnig MineSweeper app...");
+    } else {
+        win.setText("MineSweeper app already open...");
     }
 }

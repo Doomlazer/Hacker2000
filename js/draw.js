@@ -516,7 +516,7 @@ function drawIcon() {
 }
 
 function drawWin(win) { // draw a window
-        if (win.type == "card") {
+        if (win.type == "card" || win.type == "mine") {
             // skip open/close if playing card
             blitWinRect(win);
             win.xP = win.xW;
@@ -581,7 +581,11 @@ function drawWin(win) { // draw a window
 
         if (win.xP > 0 || win.yP > 0) {
             // background
-            if (win.opaqueBackground && win.type != "card") {
+            if (
+                win.opaqueBackground &&
+                win.type != "card" //&&
+                //win.type != "mine"
+            ) {
                 if (win.type != "reader") {
                     ctx.globalAlpha = win.alpha;
                 }
@@ -606,7 +610,11 @@ function drawWin(win) { // draw a window
 
 
             // main rect
-            if (win.type != "audio" && win.type != "card" ) {
+            if (
+                win.type != "audio" &&
+                win.type != "card" &&
+                win.type != "mine"
+            ) {
                 if (win.isRounded) {
                     ctx.beginPath();
                     ctx.roundRect(win.x1, win.y1, win.xP, win.yP, win.cornerRad);
@@ -637,6 +645,12 @@ function drawWin(win) { // draw a window
                         win.yP + ((win.boarderHeight * (win.yP / win.yH)) * 2)
                     );
                 }
+            }
+
+            // minesweeper
+            if (win.type == "mine") {
+                drawMSGrid(win);
+                return;
             }
 
             // card
@@ -1173,6 +1187,51 @@ function drawWin(win) { // draw a window
                         win.xW - (gap/10*2),
                         win.yH - (gap/10) - (gap*2.6)
                     )
+
+                    // draw inbox subject lines
+                    ctx.fillStyle = "#b5b2b2";
+                    ctx.font = `${buttonSize * 0.6}px sans-serif`;
+                    ctx.textAlign = "left";
+                    ctx.textBaseline = "middle";
+                    for (let i = 0; i < win.inbox.length; i++) {
+                        let m = JSON.parse(win.inbox[i]);
+                        let str = m.from + " - " + m.subject;
+                        ctx.fillText(
+                            str,
+                            win.x1 + (gap/6), 
+                            win.y1 + gap/4 + (gap/3 * i)
+                        );
+                    }
+                    if (win.inbox.length < 1) {
+                        ctx.fillText(
+                            "(Inbox Empty)",
+                            win.x1 + (gap/6), 
+                            win.y1 + gap/4
+                        );
+                    }
+
+                    ctx.fillStyle = "#b5b2b2";
+                    //ctx.font = `${buttonSize * 0.6}px sans-serif`;
+                    ctx.textAlign = "left";
+                    ctx.textBaseline = "middle";
+                    let str;
+                    if (win.mailSelected != null) {
+                        console.log("here ", win.mailSelected)
+                        let m = win.mailSelected;
+                        str = m.from + "\n" +
+                            m.to + "\n" +
+                            m.timestamp + "\n" +
+                            m.subject + "\n" +
+                            m.message;
+                    } else {
+                        str = ""
+                    }
+
+                    if (win.text != str) {
+                        win.displayLines = [];
+                        win.text = str;
+                        win.setText(win.text);
+                    }
                 }
 
                 ctx.restore();
@@ -1837,6 +1896,16 @@ function drawMailAuth(win) {
                 win.y1 + (win.yP/3) - (fH/4) + (win.yP/5 * i) + win.xP/22
             );
         }
+    }
+
+    if (win.xP == win.xW) {
+        ctx.fillStyle = '#f71111';
+        ctx.font = scaleFont(0.02, "Courier new");
+        ctx.fillText(
+            win.text,
+            win.x1 + (win.xW/8),
+            win.y1 + ((win.yP/8)*7.5)
+        );
     }
 
     // focus

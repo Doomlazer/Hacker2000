@@ -168,6 +168,60 @@ function formatBytes(bytes, decimals = 2) {
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
 
+function generateIPs(count = 10_000) {
+  const ips = new Set();
+
+  // Ranges that should not be generated for fake WAN addresses.
+  const reserved = [
+    [0, 0, 0, 255],       // 0.0.0.0/8
+    [10, 0, 0, 255],      // 10.0.0.0/8
+    [100, 64, 0, 255],    // 100.64.0.0/10
+    [127, 0, 0, 255],     // 127.0.0.0/8
+    [169, 254, 0, 255],   // 169.254.0.0/16
+    [172, 16, 31, 255],   // 172.16.0.0/12
+    [192, 0, 0, 255],     // 192.0.0.0/24
+    [192, 0, 2, 255],     // TEST-NET-1
+    [192, 168, 0, 255],   // 192.168.0.0/16
+    [198, 18, 19, 255],   // benchmark networks
+    [198, 51, 100, 255],  // TEST-NET-2
+    [203, 0, 113, 255],   // TEST-NET-3
+    [224, 0, 0, 255],     // multicast+
+  ];
+
+  function isReserved(a, b, c) {
+    return (
+      a === 0 ||
+      a === 10 ||
+      a === 127 ||
+      a === 224 ||
+      a >= 240 ||
+      (a === 100 && b >= 64 && b <= 127) ||
+      (a === 169 && b === 254) ||
+      (a === 172 && b >= 16 && b <= 31) ||
+      (a === 192 && b === 168) ||
+      (a === 192 && b === 0) ||
+      (a === 198 && (b === 18 || b === 19 || b === 51)) ||
+      (a === 203 && b === 0)
+    );
+  }
+
+  while (ips.size < count) {
+    const a = 1 + Math.floor(Math.random() * 223);
+    const b = Math.floor(Math.random() * 256);
+    const c = Math.floor(Math.random() * 256);
+    const d = Math.floor(Math.random() * 256);
+
+    if (!isReserved(a, b, c)) {
+      ips.add(`${a}.${b}.${c}.${d}`);
+    }
+    if (ips.size % 100 == 0) {
+        //console.log(ips.size)
+    }
+  }
+
+  return [...ips];
+}
+
 function bounce(n) {
   const speed = Number(player.cWonSpeed) || 1;
   const width = getWidth();

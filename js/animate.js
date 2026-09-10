@@ -52,9 +52,9 @@ class aniRect {
         this.mapHasBoarder = true;
         this.mapLineWidth = 1;
         this.mapBoarderLineWidth = 2;
-        this.mapBoarderColor = '#00ba00';
+        this.mapBoarderColor = '#fefefe';
         this.mapdefaultColor = '#FFFFFF';
-        this.mapSelCountryColor = '#a06000'
+        this.mapSelCountryColor = '`#b66e02'
         // proxy defaults
         this.proxyFontSize = 12;
         this.proxyText = "Proxy List:\n"
@@ -130,11 +130,18 @@ class aniRect {
     }
 
     clickHandler(e) {
+        if (this.type == "mine") {
+            console.log("fuck button " + e.button);
+            mineSweeperClick(mouseX, mouseY, e.button, this);
+            return;
+        }
         if (e.detail > 1) {
 
             // solitaire 
             if (this.type == "card") {
                 handleCardClick(this);
+            } else if (this.type == "mail") {
+                // do nothing on double click
             } else {
                 this.toOpen = false;
                 this.delete = true;
@@ -147,7 +154,54 @@ class aniRect {
         if (e.key == "Enter") {
             // execute entered string
             if (this.focusNum == 2) {
-                this.authMode = false;
+                // connect to email host
+                let ip = lookupDNSCommand(this, ["",this.host], true) // last arg return ip
+                // try to find the ip address
+                let notFound = true;
+                for (let i of nodes) {
+                    if (ip == i.ip_address) {
+                        //player.nodeStack.push(i.id);
+                        //logSSH(win);
+                        //attachNode(this, nodes[i.id]);
+                        notFound = false;
+
+                        this.fs = i.fileSystem;
+                        if (this.fs.getFolder(`C:\\Email\\${this.user}`)) {
+                            const p = this.fs.readFile(`C:\\Email\\${this.user}\\Acct\\pswd.txt`,0);
+                            this.text = p;
+                            if (p == this.password) {
+                                this.authMode = false;
+                                this.inbox = [];
+                                let arr1 = this.fs.list(`C:\\Email\\${this.user}\\Inbox`, 0, false)
+                                let arr = arr1.split("\n");
+                                arr.shift();
+                                if (arr[0] !== "(empty)") {
+                                    for (let i of arr) {
+                                        this.inbox.push(this.fs.readFile(`C:\\Email\\${this.user}\\Inbox\\${i}`));
+                                    }
+                                    this.mailSelected = JSON.parse(this.inbox[0]);
+                                } else {
+                                    this.inbox = [];
+                                    this.mailSelected = null;
+                                }
+                            } else {
+                                if (this.password != "bobalu") {
+                                    this.text = "Password is incorrect";
+                                }
+                            }
+                        } else {
+                            this.text = "User does not exist";
+                            console.log(this.fs.list(`C:\\Email`))
+                        }
+                    }
+                }
+
+                // if the ip_address was found, 
+                // then try to find the account
+                if (notFound) {
+                    //console.log("player.lastScanIP: ", player.lastScanIP);
+                    this.text = "Err: No connection to Domain";
+                }
             } else {
                 this.focusNum ++;
             }

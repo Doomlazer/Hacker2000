@@ -50,6 +50,7 @@ function init() {
     window.addEventListener('wheel', doWheel);
     //window.addEventListener("keyup", kUp);
     window.addEventListener('resize', doResize);
+    window.addEventListener('contextmenu', (e) => e.preventDefault());
     window.addEventListener("paste", (event) => {
         let text = event.clipboardData.getData("text");
         for (let i = 0; i < text.length; i++) {
@@ -212,7 +213,6 @@ function frame(timestamp) {
 }
 
 async function createAllFS() {
-
     const concurrency = 50;
 
     for (let i = 0; i < locations.length; i += concurrency) {
@@ -244,6 +244,7 @@ async function createAllFS() {
 async function createAllEmails() {
     // email population
     const concurrency = 50;
+    console.log("Running createAllEmails()")
     for (let i = 0; i < locations.length; i += concurrency) {
         const end = Math.min(
             i + concurrency,

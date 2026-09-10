@@ -322,6 +322,14 @@ async function createFS(n) {
         );
 
         fs.createFile(
+            "C:\\System\\bin\\ms",
+            0,
+            0,
+            generateGiberish(116),
+            0
+        );
+
+        fs.createFile(
             "C:\\System\\bin\\brute",
             0,
             0,
@@ -585,7 +593,7 @@ function spawnProxyWin(win) {
     win.setProxyText();
 }
 
-function spawnMailWin() {
+function spawnMailWin(dns) {
     // the email client window
     let mw = new aniRect(player.mX1, player.mY1, player.mXW, player.mYH);
     mw.fontSize = player.mailFontSize;
@@ -598,9 +606,13 @@ function spawnMailWin() {
     mw.promptChar = "";
     mw.authMode = true;
     mw.focusNum = 0;
+    mw.dns = dns;
     mw.host = locations[0].email.split("@")[1];
     mw.user = locations[0].email.split("@")[0];
     mw.password = ""
+    mw.mailSelected = null;
+    mw.Inbox = [];
+    mw.Sent = [];
     mw.type = "mail";
     cast.push(mw);
     mw.text = ""; //generateGiberish(600);
@@ -692,11 +704,11 @@ function createAccounts(n) {
             last = locations[n].homeowner.split(" ")[1].toLowerCase();
             uname = f + last;
         } else if (r < 85) {
-            // just last name
-            uname = locations[n].homeowner.split(" ")[1].substring(0,1).toLowerCase();
-        } else {
             // just first name
-            uname = locations[n].homeowner.split(" ")[0].toLowerCase();
+            uname = locations[n].homeowner.split(" ")[0].toLowerCase() + getRandInt(999);
+        } else {
+            // just last name + rand
+            uname = locations[n].homeowner.split(" ")[1].substring(0,1).toLowerCase() + getRandInt(99);
         }
 
         // make every 256 nodes an email host, but not node 0
@@ -714,6 +726,7 @@ function createAccounts(n) {
         let host = emailProviders[getRandInt(emailProviders.length)]
         let eAddress = uname + "@" + host;
         locations[n].email = eAddress;
+
 
         // some passwords will match if run against the password table 
         // others have random numbers on the end, which are harder to crack
@@ -748,61 +761,6 @@ function attachNode(window, node) {
     window.promptChar = node.promptChar;
     window.text = node.text;
     window.fileSystem = FileSystem[node.id];
-}
-
-
-function generateIPs(count = 10_000) {
-  const ips = new Set();
-
-  // Ranges that should not be generated for fake WAN addresses.
-  const reserved = [
-    [0, 0, 0, 255],       // 0.0.0.0/8
-    [10, 0, 0, 255],      // 10.0.0.0/8
-    [100, 64, 0, 255],    // 100.64.0.0/10
-    [127, 0, 0, 255],     // 127.0.0.0/8
-    [169, 254, 0, 255],   // 169.254.0.0/16
-    [172, 16, 31, 255],   // 172.16.0.0/12
-    [192, 0, 0, 255],     // 192.0.0.0/24
-    [192, 0, 2, 255],     // TEST-NET-1
-    [192, 168, 0, 255],   // 192.168.0.0/16
-    [198, 18, 19, 255],   // benchmark networks
-    [198, 51, 100, 255],  // TEST-NET-2
-    [203, 0, 113, 255],   // TEST-NET-3
-    [224, 0, 0, 255],     // multicast+
-  ];
-
-  function isReserved(a, b, c) {
-    return (
-      a === 0 ||
-      a === 10 ||
-      a === 127 ||
-      a === 224 ||
-      a >= 240 ||
-      (a === 100 && b >= 64 && b <= 127) ||
-      (a === 169 && b === 254) ||
-      (a === 172 && b >= 16 && b <= 31) ||
-      (a === 192 && b === 168) ||
-      (a === 192 && b === 0) ||
-      (a === 198 && (b === 18 || b === 19 || b === 51)) ||
-      (a === 203 && b === 0)
-    );
-  }
-
-  while (ips.size < count) {
-    const a = 1 + Math.floor(Math.random() * 223);
-    const b = Math.floor(Math.random() * 256);
-    const c = Math.floor(Math.random() * 256);
-    const d = Math.floor(Math.random() * 256);
-
-    if (!isReserved(a, b, c)) {
-      ips.add(`${a}.${b}.${c}.${d}`);
-    }
-    if (ips.size % 100 == 0) {
-        //console.log(ips.size)
-    }
-  }
-
-  return [...ips];
 }
 
 function doBrute() {
@@ -914,7 +872,10 @@ async function populateEmailServers(i) {
     if (!fs.getFolder(`C:\\Email`)) {
         fs.createFolder(`C:\\Email`, 0, 0);
     }
-    fs.createFolder(`C:\\Email\\${e[0]}`, 0, 0);
+    //console.log(`C:\\Email\\${e[0]}`);
+    //console.log(fs.createFolder(`C:\\Email\\${e[0]}`, 0, 0));
+    fs.createFolder(`C:\\Email\\${e[0]}\\Acct`, 0, 0);
+    fs.createFile(`C:\\Email\\${e[0]}\\Acct\\pswd.txt`, 0, 0, nodes[i].accounts[1].pwd, 0);
     fs.createFolder(`C:\\Email\\${e[0]}\\Inbox`, 0, 0);
     fs.createFolder(`C:\\Email\\${e[0]}\\Sent`, 0, 0);
 
@@ -940,10 +901,36 @@ async function populateEmailServers(i) {
         // gameTimer.formatted(-60 * 60 * 1000)
         timestamp: gameTimer.formatted(-getRandInt(4000) * 60 * 32 * 1000)
     });
+    //console.log(nodes[i].accounts[1].pwd);
     fs.createFile(`C:\\Email\\${e[0]}\\Inbox\\${email.messageId}`, 0, 0, JSON.stringify(email), 0);
 
     await fs.save();
     //console.log(fs.getFolder('C:\\Email'))
+}
+
+function spawnMineSweeperWin() {
+    let msw = new aniRect(player.msX1, player.msY1, player.msXW, player.msYH);
+    msw.fontSize = player.msFontSize;
+    msw.acceptInput = false;
+    msw.backgroundColor = player.msBackgroundColor;
+    msw.rectColor = player.msRectColor;
+    msw.textColor = player.msTextColor
+    msw.isRounded = player.msIsRounded;
+    msw.hasBoarder = player.msHasBoarder;
+    msw.type = "mine";
+    msw.msScale = player.msScale;
+    msw.x1 = player.msX1;
+    msw.y1 = player.msY1;
+    msw.msW = player.msXW;
+    msw.msH = player.msyH;
+    msw.msBArray = []; // mine locations
+    msw.msRArray = []; // revealed or not
+    msw.msFArray = []; // player set flags
+    msw.msTotalMines = 0;
+    msw.msGameOver = false;
+    msw.msFlagged = 0;
+    cast.push(msw);
+    mineInit(msw);
 }
 
 
