@@ -231,7 +231,15 @@ async function createFS(n) {
         "C:\\System\\bin\\date",
         0,
         0,
-        generateGiberish(102),
+        generateGiberish(12),
+        0
+    );
+
+    fs.createFile(
+        "C:\\System\\bin\\clock",
+        0,
+        0,
+        generateGiberish(36),
         0
     );
 
@@ -906,6 +914,24 @@ async function populateEmailServers(i) {
 
     await fs.save();
     //console.log(fs.getFolder('C:\\Email'))
+}
+
+function spawnClock() {
+    let cw = new aniRect(
+        5,
+        5,
+        199,
+        40
+    );
+    cw.fontSize = player.msFontSize;
+    cw.acceptInput = false;
+    cw.backgroundColor = "#0202e3";
+    cw.rectColor = "#ececec";
+    cw.textColor = "#ffffff";
+    cw.isRounded = false;
+    cw.hasBoarder = false;
+    cw.type = "clock";
+    cast.push(cw);
 }
 
 function spawnMineSweeperWin(s = 20) {

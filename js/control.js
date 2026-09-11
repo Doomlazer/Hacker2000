@@ -424,7 +424,8 @@ function doMouseDown(e) {
                     mouseY > c.y1 + c.yH - 20 &&
                     mouseY < c.y1 + c.yH &&
                     c.type != "card" &&
-                    c.type != "mine"
+                    c.type != "mine" &&
+                    c.type != "clock"
                 ) { 
                     c.resizing = true;
                     c.resizeStartX = mouseX;

@@ -647,6 +647,13 @@ function drawWin(win) { // draw a window
                 }
             }
 
+            // clock
+            if (win.type == "clock") {
+                win.displayLines = [];
+                win.text = gameTimer.formatted();
+                win.setText(win.text, false);
+            }
+
             // minesweeper
             if (win.type == "mine") {
                 drawMSGrid(win);
@@ -1244,7 +1251,8 @@ function drawWin(win) { // draw a window
                 mouseY > win.y1 + win.yH - 20 &&
                 mouseY < win.y1 + win.yH &&
                 win.type != "card" &&
-                win.type != "mine"
+                win.type != "mine" &&
+                win.type != "clock"
             ) {
                 ctx.strokeRect(
                     win.x1 + win.xW - 20,

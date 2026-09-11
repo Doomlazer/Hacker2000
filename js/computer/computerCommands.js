@@ -168,6 +168,10 @@ function commandHandler(win, mal = false) {
                     // print current date/time
                     dateCommand();
                     break;
+                case 'clock':
+                    // print current date/time
+                    clockCommand();
+                    break;
                 case 'fullscreen':
                     // toggle fullscreen
                     fullscreenCommand(win);
@@ -319,6 +323,8 @@ Mal90 Operations Manual
 
         DATE - Prints the current date and time.
 
+        CLOCK - Opens the digital clock window.
+
         SPEAK - Toggle Text2Speach reading of command output. Use SPEAK [path/to/file] to speak text files.
 
         ULIST - List computer user accounts.
@@ -406,6 +412,11 @@ Mal90 Operations Manual
 
 function dateCommand() {
     cast[0].setText(gameTimer.formatted());
+}
+
+function clockCommand() {
+    spawnClock();
+    cast[0].setText("Launching Clock app...");
 }
 
 function fullscreenCommand(win) {

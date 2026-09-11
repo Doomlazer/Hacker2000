@@ -618,7 +618,6 @@ class aniRect {
         // draw the text
         if (this.type == "audio") {
             // special handling 
-
         } else {
             // non-audio window text
             if (this.wheelOff > this.displayLines.length - this.textMaxLines) {
@@ -636,6 +635,9 @@ class aniRect {
             let o = 0;
             if (this.type == "mail") {
                 o = this.xW/10 * 2.6;
+            }
+            if (this.type == "clock") {
+                o = 10;
             }
             for (let i = this.wheelOff; i <  this.displayLines.length; i++) {
                 if (i - this.wheelOff < this.textMaxLines) {
