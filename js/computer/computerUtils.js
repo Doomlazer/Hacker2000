@@ -908,8 +908,13 @@ async function populateEmailServers(i) {
     //console.log(fs.getFolder('C:\\Email'))
 }
 
-function spawnMineSweeperWin() {
-    let msw = new aniRect(player.msX1, player.msY1, player.msXW, player.msYH);
+function spawnMineSweeperWin(s = 20) {
+    let msw = new aniRect(
+        player.msX1,
+        player.msY1,
+        s * player.msScale,
+        s * player.msScale
+    );
     msw.fontSize = player.msFontSize;
     msw.acceptInput = false;
     msw.backgroundColor = player.msBackgroundColor;
@@ -921,8 +926,11 @@ function spawnMineSweeperWin() {
     msw.msScale = player.msScale;
     msw.x1 = player.msX1;
     msw.y1 = player.msY1;
-    msw.msW = player.msXW;
-    msw.msH = player.msyH;
+    msw.msW = s;
+    msw.msH = s;
+    msw.wasDragged = false;
+    msw.xDist = 0;
+    msw.yDist = 0;
     msw.msBArray = []; // mine locations
     msw.msRArray = []; // revealed or not
     msw.msFArray = []; // player set flags
@@ -930,7 +938,8 @@ function spawnMineSweeperWin() {
     msw.msGameOver = false;
     msw.msFlagged = 0;
     cast.push(msw);
-    mineInit(msw);
+    mineInit(msw, s);
+    return msw;
 }
 
 

@@ -131,7 +131,7 @@ class aniRect {
 
     clickHandler(e) {
         if (this.type == "mine") {
-            console.log("fuck button " + e.button);
+            //console.log("the button " + e.button);
             mineSweeperClick(mouseX, mouseY, e.button, this);
             return;
         }

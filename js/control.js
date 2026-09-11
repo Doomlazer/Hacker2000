@@ -211,6 +211,14 @@ function doMouseMove(e) {
                         } else {
                             c.x1 = mouseX + oldOffX;
                             c.y1 = mouseY + oldOffY;
+                            if (c.type == "mine") {
+                                // make this a bit less sensitive
+                                //console.log(mouseX, oldOffX, mouseY, oldOffY)
+                                c.wasDragged = Math.max(
+                                    Math.abs(mouseX - c.xDist), 
+                                    Math.abs(mouseY - c.yDist)
+                                );
+                            }
                         }
                         
 
@@ -377,11 +385,18 @@ function doMouseDown(e) {
                 // draw this window on top now
                 setWindowPri(c);
 
+                if (c.type == "mine") {
+                    c.xDist = mouseX;
+                    c.yDist = mouseY;
+                }
                 // more CARD stuff
                 if (c.type == "card") {
                     touchedCard = true;
                     if (!player.cStored) {
                         c.mouseDrag = true;
+                        if (c.type == "mine") {
+                            c.wasDragged = true;
+                        }
 
                         // break the parent bond
                         if (c.parentCard) {
@@ -408,7 +423,8 @@ function doMouseDown(e) {
                     mouseX < c.x1 + c.xW &&
                     mouseY > c.y1 + c.yH - 20 &&
                     mouseY < c.y1 + c.yH &&
-                    c.type != "card"
+                    c.type != "card" &&
+                    c.type != "mine"
                 ) { 
                     c.resizing = true;
                     c.resizeStartX = mouseX;

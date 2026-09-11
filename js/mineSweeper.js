@@ -28,9 +28,11 @@ var totalMines = 0;
 var gOver = 0;
 var flagged = 0*/
 
-function mineInit(win) {
-    win.msW = 20;
-    win.msH = 20;
+function mineInit(win, s = 20) {
+    win.msW = s;
+    win.msH = s;
+    win.xW = s * player.msScale;
+    win.yH = s * player.msScale;
     win.msBArray = [];
     win.msRArray = [];
     win.msFArray = [];
@@ -52,78 +54,90 @@ function mineInit(win) {
 
 function mineSweeperGameOver(win) {
     win.msGameOver = true;
-    let x = y = cel = 0;
-    ctx.font = "16px serif";
-    ctx.fillStyle = 'rgb(200, 0, 0)'
-    while (y < win.msH) {
-        if (win.msBArray[cel] > 0) {
-            ctx.fillText(
-                "X",
-                (x * win.msScale) + (win.msScale / 3),
-                (y * win.msScale) + (win.msScale / 1.25)
-            );
-        }
-        x ++;
-        cel ++
-        if (x >= win.msW) {
-            x = win.x1;
-            y ++;
+    let covered = 0
+    for (let r in win.msRArray) {
+        if (win.msRArray[r] == 0) {
+            covered ++
         }
     }
+    if (covered != win.msTotalMines) {
+        let x = y = cel = 0;
+        ctx.font = "16px serif";
+        ctx.fillStyle = 'rgb(200, 0, 0)'
+        while (y < win.msH) {
+            if (win.msBArray[cel] > 0) {
+                ctx.fillText(
+                    "X",
+                    win.x1 + (x * win.msScale) + (win.msScale / 4),
+                    win.y1 + (y * win.msScale) + (win.msScale / 1.25)
+                );
+            }
+            x ++;
+            cel ++
+            if (x >= win.msW) {
+                x = 0;
+                y ++;
+            }
+        }
 
-    ctx.fillStyle = 'rgb(100, 100, 100)'
-    ctx.fillRect(
-        win.msW * win.msScale / 2 - 100,
-        win.msH * win.msScale / 2 - 40,
-        220,
-        60
-    );
-    // TODO: get text width, font size dynamically
-    ctx.font = "30px serif";
-    ctx.fillStyle = 'rgb(255, 0, 0)'
-    ctx.fillText(
-        "GAME OVER",
-        (win.msW * win.msScale / 2) - 80,
-        win.msH * win.msScale/2);
+        ctx.fillStyle = 'rgb(100, 100, 100)'
+        ctx.fillRect(
+            win.x1 + (win.msW * win.msScale / 2) - 100,
+            win.y1 + (win.msH * win.msScale / 2) - 40,
+            220,
+            60
+        );
+        // TODO: get text width, font size dynamically
+        ctx.font = "30px serif";
+        ctx.fillStyle = 'rgb(255, 0, 0)'
+        ctx.fillText(
+            "GAME OVER",
+            win.x1 +(win.msW * win.msScale / 2) - 80,
+            win.y1 + (win.msH * win.msScale/2)
+        );
+    }
 }
 
 function mineSweeperClick(xr, yr, button, win) {
-    let x = Math.floor((xr - win.x1) / win.msScale);
-    let y = Math.floor((yr - win.y1) / win.msScale);
-    console.log("click x: " + x + ", y: " + y)
-    let cel = (y * win.msW) + x;
-    //console.log(cel, " cel")
-    if (win.msGameOver) {
-        // restart
-        ctx.clearRect(win.x1, win.y1, win.msW * win.msScale, win.msH * win.msScale);
-        mineInit(win);
+    if (win.wasDragged > 1) {
+        win.wasDragged = 0;
     } else {
-        console.log("button " + button);
-        if (button == 0) {
-            // left click
-            if (win.msBArray[cel] == 1) {
-                mineSweeperGameOver(win);
-            } else {
-                if (win.msRArray[cel] != 1) {
-                    win.msRArray[cel] = 1;
-                    floodFill(x,y, win);
+        let x = Math.floor((xr - win.x1) / win.msScale);
+        let y = Math.floor((yr - win.y1) / win.msScale);
+        //console.log("click x: " + x + ", y: " + y)
+        let cel = (y * win.msW) + x;
+        //console.log(cel, " cel")
+        if (win.msGameOver) {
+            // restart
+            ctx.clearRect(win.x1, win.y1, win.msW * win.msScale, win.msH * win.msScale);
+            mineInit(win, win.msW);
+        } else {
+            if (button == 0) {
+                // left click
+                if (win.msBArray[cel] == 1) {
+                    mineSweeperGameOver(win);
+                } else {
+                    if (win.msRArray[cel] != 1) {
+                        win.msRArray[cel] = 1;
+                        floodFill(x,y, win);
+                        //drawMSGrid(win);
+                    }
+                }
+            } else if (button == 2) {
+                // right click
+                // check if not uncovered
+                //console.log(cel , " cel")
+                if (win.msRArray[cel] < 1) {
+                    // toggle flag
+                    if (win.msFArray[cel] > 0) {
+                        win.msFArray[cel] = 0;
+                        win.msFlagged --;
+                    } else {
+                        win.msFArray[cel] = 1;
+                        win.msFlagged ++;
+                    }
                     //drawMSGrid(win);
                 }
-            }
-        } else if (button == 2) {
-            // right click
-            // check if not uncovered
-            console.log(cel , " cel")
-            if (win.msRArray[cel] < 1) {
-                // toggle flag
-                if (win.msFArray[cel] > 0) {
-                    win.msFArray[cel] = 0;
-                    win.msFlagged --;
-                } else {
-                    win.msFArray[cel] = 1;
-                    win.msFlagged ++;
-                }
-                //drawMSGrid(win);
             }
         }
     }
@@ -205,10 +219,10 @@ function msCheckAdjacent(x, y, win) {
 
 function drawMSGrid(win) {
     let scale = win.msScale
-    //ctx.clearRect(win.x1, win.y1, win.msW * scale, win.msH * scale);
+    ctx.clearRect(win.x1, win.y1, win.msW * scale, win.msH * scale);
     let x = 0, y = 0, cel = 0;
     ctx.font = "16px serif";
-    while (cel < win.msRArray.length+1) {
+    while (cel < win.msRArray.length) {
         // square color
         if (win.msRArray[cel] > 0) {
             if (win.msFArray[cel] > 0) {
@@ -233,7 +247,7 @@ function drawMSGrid(win) {
                         ctx.fillStyle = 'rgb(0, 150, 0)'
                         break;
                     case 3:
-                        ctx.fillStyle = 'rgb(150, 150, 0)'
+                        ctx.fillStyle = 'rgb(193, 48, 4)'
                         break;
                     case 4:
                         ctx.fillStyle = 'rgb(150, 0, 150)'
@@ -247,7 +261,7 @@ function drawMSGrid(win) {
             }
         } else {
             ctx.fillStyle = 'rgb(150, 150, 150)'
-            //ctx.fillRect(x*scale, y*scale, scale, scale);
+            ctx.fillRect(win.x1 + (x*scale), win.y1 + (y*scale), scale, scale);
             if (win.msFArray[cel] > 0) {
                 // flag
                 ctx.font = "16px serif";
@@ -273,6 +287,7 @@ function drawMSGrid(win) {
     x = 0;
     y = 0;
     i = 0;
+    ctx.lineWidth = 1;
     ctx.strokeStyle = 'rgb(0, 0, 0)'
     //console.log(x*scale, y*scale, x , y ,scale)
     while (y < win.msH) {
@@ -288,16 +303,39 @@ function drawMSGrid(win) {
             y ++;
         }
     }
+
+    /*/ delete me show bombs
+    x = y = cel = 0;
+    ctx.font = "16px serif";
+    ctx.fillStyle = 'rgb(200, 0, 0)'
+    while (y < win.msH) {
+        if (win.msBArray[cel] > 0) {
+            ctx.fillText(
+                "X",
+                win.x1 + (x * win.msScale) + (win.msScale / 4),
+                win.y1 + (y * win.msScale) + (win.msScale / 1.25)
+            );
+        }
+        x ++;
+        cel ++
+        if (x >= win.msW) {
+            x = 0;
+            y ++;
+        }
+    }*/
+
+
+
+
     // update text
-    let str = "Mines: " + (win.msTotalMines) + "___Flagged: " + win.msFlagged;
-    win.text = str;
-    win.setText(win.text);
+    //let str = "Mines: " + (win.msTotalMines) + "___Flagged: " + win.msFlagged;
+    //win.text = str;
+    //win.setText(win.text);
     
     // check if game won
     let covered = 0
     for (let r in win.msRArray) {
         if (win.msRArray[r] == 0) {
-        //if (r == 0) {
             covered ++
         }
     }
@@ -305,11 +343,22 @@ function drawMSGrid(win) {
         // console.log("covered: " + covered + ", totalMines: " + totalMines);
         win.msGameOver = true;
         ctx.fillStyle = 'rgb(100, 100, 100)'
-        ctx.fillRect(w*scale/2-100, h*scale/2-40, 220, 60);
+        ctx.fillRect(
+            win.x1 + (win.msW * scale/2) - 100,
+            win.y1 + (win.msH * scale/2) - 40,
+            220,
+            60);
         // TODO: get text width, font size dynamically
         ctx.font = "30px serif";
         ctx.fillStyle = 'rgb(0, 150, 0)'
-        ctx.fillText("YOU WIN", (w*scale/2)-55, h*scale/2); 
+        ctx.fillText(
+            "YOU WIN",
+            win.x1 + (win.msW * scale/2)-55,
+            win.y1 + (win.msH * scale/2)); 
+    }
+
+    if (win.msGameOver) {
+        mineSweeperGameOver(win); 
     }
 }
 

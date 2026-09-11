@@ -583,8 +583,8 @@ function drawWin(win) { // draw a window
             // background
             if (
                 win.opaqueBackground &&
-                win.type != "card" //&&
-                //win.type != "mine"
+                win.type != "card" &&
+                win.type != "mine"
             ) {
                 if (win.type != "reader") {
                     ctx.globalAlpha = win.alpha;
@@ -612,8 +612,8 @@ function drawWin(win) { // draw a window
             // main rect
             if (
                 win.type != "audio" &&
-                win.type != "card" &&
-                win.type != "mine"
+                win.type != "card" //&&
+                //win.type != "mine"
             ) {
                 if (win.isRounded) {
                     ctx.beginPath();
@@ -1242,7 +1242,9 @@ function drawWin(win) { // draw a window
                 mouseX > win.x1 + win.xW - 20 &&
                 mouseX < win.x1 + win.xW &&
                 mouseY > win.y1 + win.yH - 20 &&
-                mouseY < win.y1 + win.yH
+                mouseY < win.y1 + win.yH &&
+                win.type != "card" &&
+                win.type != "mine"
             ) {
                 ctx.strokeRect(
                     win.x1 + win.xW - 20,

@@ -151,7 +151,7 @@ function commandHandler(win, mal = false) {
                     };
                     break;
                 case 'ms':
-                    minesweeperCommand(win);
+                    minesweeperCommand(win, command);
                     break;
                 case 'mail':
                     mailCommand(win);
@@ -340,11 +340,11 @@ Mal90 Operations Manual
 
         MAP - displays MAP help info.
         
-        MAP CITY - Toggles the display of global cities. Cities are filtered by a city population threshold. Set the threshold with MAP POP [threshold].
+        MAP CITY - Toggles the display of global cities. Cities are filtered by a city population threshold. Default threshold is 100k.
 
         MAP NODE - Toggles the display of discovered network nodes.
 
-        MAP POP - Sets city population filter to zero. Use MAP POP [threshold] to set the desired value.
+        MAP POP - Resets the city population filter to zero. Use MAP POP [threshold] to set the desired value.
 
         MAP ZOOM - Set the map zoom level with MAP ZOOM [level].
 
@@ -361,16 +361,16 @@ Mal90 Operations Manual
 
         DIAL[PHONENUMBER] - Call a phone number in the simulation.
 
-        HANGUP - Dissconnet phone call
+        HANGUP - Disconnect active phone call
         
 
-        *** DL's bumb4cl0th T0S REMIX ***
+        HACKING & CRACKING
 
-        SCAN - Pingz@100 random_IP addresses per. If country == m4p selected country add ip to SCAN QUEUE.
+        SCAN - Connects to 100 random IP address. If the IP address is valid and is assigned to the Map selected country, add the ip to SCAN QUEUE.
 
-        BRUTE - BRUTE [USERNAME@IP] will do all the cr4z0ring. Built-in 10k word password table TNKS2 D4taL0v3r. Cracked accounts are automatically added 2 the cached SSH authentications so that SSH [IP] will now auto authenicate with the cracked account I just cracked for you. TNKz to JB4gZ If a match isn't found after trying all 10k passwords it cycles them again + the cycle count number. Some passwords are about as likely as finding a book in B0rg3s l1br4ry 0f B4b3l.
+        BRUTE [USERNAME]@[IP] - Attempt to brute force crack the user account by cycling through the built-in 10k word password table (TNKS2 D4taL00v3r). Cracked accounts are automatically added 2 the cached SSH authentications so that SSH [IP] will now auto authenicate with the previously cracked credentials. If a match isn't found after trying all 10k passwords it cycles them again, but adding the cycle count number to the end of the password.
         
-        BRUTE SCAN - Run BRUTE root@IP on every IP address in the SCAN QUEUE.
+        BRUTE SCAN - Autorun BRUTE root@[IP] on every IP address in the SCAN QUEUE.
 
         BRUTE QUIT - K1ll 4ll
 
@@ -383,6 +383,11 @@ Mal90 Operations Manual
 
         DECK QUIT - Quits the DECK application. Warning: Progress will not be saved!
 
+        MS - Play Mine Sweeper.  Left-click to uncover, right-click to place flag.
+
+        MS [number] - Start Mine Sweeper with a custom grid size. E.g. MS 10 for a 10 x 10 grid. Must be greater than 0.
+
+        MS QUIT - Kill Mine Sweeper.
 
         
         THE END
@@ -1073,11 +1078,33 @@ function mailCommand(win) {
     }
 }
 
-function minesweeperCommand(win) {
+function minesweeperCommand(win, command) {
+    let s = 20;
+    if (command.length > 1) {
+        if (command[1].toLowerCase() == "quit") {
+            const indexC = cast.indexOf(player.minesweeperWindow);
+            if (indexC > -1) {
+                cast.splice(indexC, 1);
+            }
+            player.minesweeperWindow = 0;
+            win.setText("Closing MineSweeper app...");
+            return;
+        }
+
+        if (
+            typeof parseInt(command[1]) == "number" &&
+            !isNaN(parseInt(command[1])) &&
+            parseInt(command[1]) > 0
+        ) {
+            s = parseInt(command[1]);
+        }
+    }
     if (player.minesweeperWindow === 0) {
-        player.minesweeperWindow = spawnMineSweeperWin();
+        player.minesweeperWindow = spawnMineSweeperWin(s);
         win.setText("Runnig MineSweeper app...");
     } else {
-        win.setText("MineSweeper app already open...");
+
+        mineInit(player.minesweeperWindow, s);
+        win.setText("MineSweeper restarting...");
     }
 }

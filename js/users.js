@@ -95,14 +95,14 @@ class Player extends User{
         this.msRectColor = '#ffffff'
         this.msTextColor = '#f1f1f1'
         this.msIsRounded = false;
-        this.msHasBoarder = false;
+        this.msHasBoarder = true;
         this.msX1 = getWidth()/25 * 11;
         this.msY1 = getHeight()/8;
         this.msScale = 20;
         this.msXW = 20 * this.msScale;
         this.msYH = 20 * this.msScale;
-        this.msW;
-        this.msH;
+        //this.msW;
+        //this.msH;
         this.msBArray = []; // mine locations
         this.msRArray = []; // revealed or not
         this.msFArray = []; // player set flags
