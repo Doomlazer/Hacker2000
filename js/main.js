@@ -25,6 +25,7 @@ let mapNodeSteps = 0;
 let mapNodeStackSteps = 0;
 let movingMap = false;
 let passwords = [];
+let nukes = [];
 let ip_addresses = [];
 const gameTimer = new GameTimer("2000-7-5");
 let emailProviders = ["MailSphere.com", "ZipPost.net", "InboxZone.com", "WebLetter.com", 
@@ -238,6 +239,8 @@ async function createAllFS() {
     const quota = await navigator.storage.estimate();
     console.log('Approx total allocated space:', formatBytes(quota.quota));
     console.log('Approx used space:', formatBytes(quota.usage));
+    const retaliation = getRetaliationOptions("United States");
+    console.log(retaliation);
     loadMap();
 }
 

@@ -7,6 +7,19 @@ function draw() {
     ctx.fillRect(0, 0, c.width, c.height);
 
     drawMap();
+    //console.log(-player.archDashOffset*2%180)
+    player.archDashOffset -= 0.2;
+    for (let n of nukes) {
+        //console.log(n, " nukeporgress: ", nukeProgress(n.city0, n.city1, n.launchTime))
+        drawArch(
+            n.city0,
+            n.city1,
+            color = "#FF0000",
+            80,
+            nukeProgress(n.city0, n.city1, n.launchTime).progress,
+            n.launchTime
+        );
+    }
 
     // Release player.cNotStoring if complete.
     // this is a terrible name to mean if the game is in 
@@ -176,9 +189,11 @@ function drawMap() {
         ctxMap.lineWidth = 1;
         ctxMap.strokeStyle = mapColor;
 
+        //const mySet = new Set()
         // do each country's line data
         for (let i = 0; i < map.length; i++) {
             const f = map[i];
+            //mySet.add(f.properties.name)
             if (true) {
                 const cords = f.geometry.coordinates;
                 // the player's selected contry needed to be drawn on top to 
@@ -189,6 +204,7 @@ function drawMap() {
                 drawCoords(cords);
             }
         }
+        //console.log(mySet)
 
         // Draw the player selected country
         ctxMap.strokeStyle = win.mapSelCountryColor;
@@ -1223,7 +1239,7 @@ function drawWin(win) { // draw a window
                     ctx.textBaseline = "middle";
                     let str;
                     if (win.mailSelected != null) {
-                        console.log("here ", win.mailSelected)
+                        //console.log("here ", win.mailSelected)
                         let m = win.mailSelected;
                         str = m.from + "\n" +
                             m.to + "\n" +
@@ -1927,4 +1943,166 @@ function drawMailAuth(win) {
         win.xP/1.8,
         win.xP/15
     );
+}
+
+function drawArch(
+    city0,
+    city1,
+    color = "#0000FF",
+    height = 0.18,
+    point = 100,
+    launchTime
+) {
+    //console.log(city0)
+    const x0 = (city0.lon * mapScale) + mapXOff, 
+    y0 = (-city0.lat * mapScale) + mapYOff,
+    x1 = (city1.lon * mapScale) + mapXOff,
+    y1 = (-city1.lat * mapScale) + mapYOff;
+    //console.log(x0,y0,x1,y1)
+  const dx = x1 - x0;
+  const dy = y1 - y0;
+  const distance = Math.hypot(dx, dy);
+//console.log("distance " , distance)
+  if (distance < 1) return;
+
+  // --------------------------------------------------
+  // Consistent visual settings (screen pixels)
+  // --------------------------------------------------
+  const lineWidth = Math.max(4, (1 * (mapScale/8)));
+  const dashLength = 10 * (mapScale/8);
+  const gapLength = 5 * (mapScale/8);
+  let ballRadius = 2;
+
+  // Scale arch with distance, but clamp it.
+  const archHeight = 80 /*Math.min(
+    Math.max(distance * height, 15),
+    120
+  );*/
+
+  // --------------------------------------------------
+  // Perpendicular vector
+  // --------------------------------------------------
+  const perpX = -dy / distance;
+  const perpY = dx / distance;
+
+  // Always point north/up
+  const direction = perpY > 0 ? -1 : 1;
+
+  const nx = perpX * direction;
+  const ny = perpY * direction;
+
+  // --------------------------------------------------
+  // Quadratic Bézier control point
+  // --------------------------------------------------
+  const cx = (x0 + x1) / 2;
+  const cy = (y0 + y1) / 2;
+
+  const cpx = cx + nx * archHeight;
+  const cpy = cy + ny * archHeight;
+
+  // --------------------------------------------------
+  // Clamp progress
+  // --------------------------------------------------
+  const t = Math.max(0, Math.min(100, point)) / 100;
+  //console.log("point ", point, ", player.archDashOffset % 120 " + (player.archDashOffset % 120))
+  if (point == 100) {
+    //city1.population = 0;
+    city1.nukeCounter++;
+    city1.nukeCounter = Math.min(city1.nukeCounter, 20);
+    ballRadius = (city1.nukeCounter/10) * mapScale;
+  } else {
+    ballRadius = 4;
+    city1.nukeCounter = 2;
+  }
+
+  // --------------------------------------------------
+  // Position of ball on curve
+  // --------------------------------------------------
+  const u = 1 - t;
+
+  const px =
+    u * u * x0 +
+    2 * u * t * cpx +
+    t * t * x1;
+
+  const py =
+    u * u * y0 +
+    2 * u * t * cpy +
+    t * t * y1;
+
+  // Control point for partial curve
+  const partialCpx = x0 + t * (cpx - x0);
+  const partialCpy = y0 + t * (cpy - y0);
+
+  ctx.save();
+
+  // --------------------------------------------------
+  // Dashed arch
+  // --------------------------------------------------
+    if (point == 100) {
+        ctx.strokeStyle = "#4b4a4a"
+    } else {
+        ctx.strokeStyle = color;
+    }
+
+  ctx.lineWidth = lineWidth;
+  ctx.lineCap = "butt";
+
+  ctx.setLineDash([dashLength, gapLength]);
+
+  if (point == 100) {
+    ctx.lineDashOffset = 0;
+  } else {
+    ctx.lineDashOffset = player.archDashOffset;
+  }
+
+  ctx.beginPath();
+  ctx.moveTo(x0, y0);
+  ctx.quadraticCurveTo(
+    partialCpx,
+    partialCpy,
+    px,
+    py
+  );
+  ctx.stroke();
+
+  // --------------------------------------------------
+  // Blue ball
+  // --------------------------------------------------
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = '#FFFFFF'//color;
+  if (point == 100) {
+    ctx.globalAlpha = 0.5;
+  } else {
+    ctx.globalAlpha = 1;
+  }
+  ctx.beginPath();
+  ctx.arc(
+    px,
+    py,
+    ballRadius,
+    0,
+    Math.PI * 2
+  );
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = '#0f0e0e';
+    ctx.font = `${1 * mapScale}px arial`;
+    ctx.fillText(`TARGET: ${city1.name},${city1.country}`, px + 8, py + 3);
+    ctx.fillText(`ETA: ${nukeProgress(city0, city1, launchTime).eta}`, px + 8, py + Math.floor(1.65 * mapScale) + 2);
+    ctx.fillText(`TARGET: ${city1.name},${city1.country}`, px + 12, py +7);
+    ctx.fillText(`ETA: ${nukeProgress(city0, city1, launchTime).eta}`, px + 12, py + Math.floor(1.65 * mapScale) - 2);
+    if (point == 100) {
+        ctx.fillText(`Est. DEAD: ${city1.population}`, px + 8, py + (3 * mapScale) + 2);
+        ctx.fillText(`Est. DEAD: ${city1.population}`, px + 12, py + (3 * mapScale) - 2);
+  }
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(`TARGET: ${city1.name},${city1.country}`, px + 10, py + 5);
+    ctx.fillText(`ETA: ${nukeProgress(city0, city1, launchTime).eta}`, px + 10, py + Math.floor(1.65 * mapScale));
+  if (point == 100) {
+    ctx.fillText(`Est. DEAD: ${city1.population}`, px + 10, py + (3 * mapScale));
+  }
+
+  ctx.restore();
 }

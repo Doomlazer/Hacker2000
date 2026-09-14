@@ -28,7 +28,7 @@ var totalMines = 0;
 var gOver = 0;
 var flagged = 0*/
 
-function mineInit(win, s = 20) {
+function mineInit(win, s = 20, diff) {
     win.msW = s;
     win.msH = s;
     win.xW = s * player.msScale;
@@ -36,7 +36,22 @@ function mineInit(win, s = 20) {
     win.msBArray = [];
     win.msRArray = [];
     win.msFArray = [];
-    win.msTotalMines = Math.floor(win.msW * win.msH *.25);
+    if (getRandInt(100) == 1) {
+        win.coverStyle = `rgb(${getRandInt(255)}, ${getRandInt(255)}, ${getRandInt(255)})`;
+    } else {
+        win.coverStyle = `rgb(160, 160, 160)`;
+    }
+    
+    let r = getRandInt(30)+2;
+    //console.log("diff ", diff)
+    win.lastDiff = diff;
+    if (diff == 0) {
+        win.msTotalMines = Math.floor(win.msW * win.msH * (r/100));
+        //console.log("win.msTotalMines ", win.msTotalMines, " r ", r)
+    } else {
+        win.msTotalMines = Math.floor(win.msW * win.msH * (diff/100));
+        //console.log("win.msTotalMines ", win.msTotalMines, " r ", r)
+    }
     win.msGameOver = false;
     
     // fill array with mines
@@ -80,16 +95,28 @@ function mineSweeperGameOver(win) {
             }
         }
 
+        /*ctx.globalAlpha = win.alpha - 0.2;
+        console.log(win.alpha)
         ctx.fillStyle = 'rgb(100, 100, 100)'
         ctx.fillRect(
-            win.x1 + (win.msW * win.msScale / 2) - 100,
-            win.y1 + (win.msH * win.msScale / 2) - 40,
-            220,
-            60
-        );
+            win.x1 + (win.msW * win.msScale / 2) - 85,
+            win.y1 + (win.msH * win.msScale / 2) - 20,
+            190,
+            20
+        );*/
+
         // TODO: get text width, font size dynamically
-        ctx.font = "30px serif";
-        ctx.fillStyle = 'rgb(255, 0, 0)'
+        ctx.globalAlpha = 0.5;
+        ctx.font = "28px serif";
+        ctx.fillStyle = 'rgb(47, 0, 255)'
+        ctx.fillText(
+            "GAME OVER",
+            win.x1 +(win.msW * win.msScale / 2) - 85,
+            win.y1 + (win.msH * win.msScale / 2) + 5
+        );
+        ctx.globalAlpha = 1;
+        ctx.font = "28px serif";
+        ctx.fillStyle = 'rgb(238, 255, 0)'
         ctx.fillText(
             "GAME OVER",
             win.x1 +(win.msW * win.msScale / 2) - 80,
@@ -110,12 +137,18 @@ function mineSweeperClick(xr, yr, button, win) {
         if (win.msGameOver) {
             // restart
             ctx.clearRect(win.x1, win.y1, win.msW * win.msScale, win.msH * win.msScale);
-            mineInit(win, win.msW);
+            mineInit(win, win.msW, win.lastDiff);
         } else {
             if (button == 0) {
                 // left click
                 if (win.msBArray[cel] == 1) {
-                    mineSweeperGameOver(win);
+                    if (win.msFArray[cel] != 1) {
+                        mineSweeperGameOver(win);
+                        if (player.t2s) {
+                            speak("BOOM! You step on a landmine, blowing your entire leg into a fine mist.");
+                        }
+                    }
+                    
                 } else {
                     if (win.msRArray[cel] != 1) {
                         win.msRArray[cel] = 1;
@@ -260,7 +293,7 @@ function drawMSGrid(win) {
                 ctx.fillText(adjCount, (win.x1 + (x*scale))+(scale/3), win.y1+(y*scale)+(scale/1.25));
             }
         } else {
-            ctx.fillStyle = 'rgb(150, 150, 150)'
+            ctx.fillStyle = win.coverStyle;
             ctx.fillRect(win.x1 + (x*scale), win.y1 + (y*scale), scale, scale);
             if (win.msFArray[cel] > 0) {
                 // flag
@@ -341,20 +374,34 @@ function drawMSGrid(win) {
     }
     if (covered == win.msTotalMines) {
         // console.log("covered: " + covered + ", totalMines: " + totalMines);
+        if (!win.msGameOver) {
+            if (player.t2s) {
+                speak("You somehow managed to survive the minefield without dying. Next time you might not be so lucky");
+            }
+        }
         win.msGameOver = true;
-        ctx.fillStyle = 'rgb(100, 100, 100)'
+        /*ctx.fillStyle = 'rgb(100, 100, 100)'
         ctx.fillRect(
             win.x1 + (win.msW * scale/2) - 100,
             win.y1 + (win.msH * scale/2) - 40,
             220,
-            60);
+            60
+        );*/
+
         // TODO: get text width, font size dynamically
-        ctx.font = "30px serif";
-        ctx.fillStyle = 'rgb(0, 150, 0)'
+        ctx.font = "28px serif";
+        ctx.fillStyle = 'rgb(0, 0, 0)'
         ctx.fillText(
             "YOU WIN",
-            win.x1 + (win.msW * scale/2)-55,
-            win.y1 + (win.msH * scale/2)); 
+            win.x1 +(win.msW * win.msScale / 2) - 82,
+            win.y1 + (win.msH * win.msScale / 2) + 2
+        );
+        ctx.fillStyle = 'rgb(0, 255, 0)'
+        ctx.fillText(
+            "YOU WIN",
+            win.x1 +(win.msW * win.msScale / 2) - 80,
+            win.y1 + (win.msH * win.msScale/2)
+        );
     }
 
     if (win.msGameOver) {
@@ -398,7 +445,7 @@ function floodFill(x,y, win) {
         }
 
         // console.log("right");
-        if (cX<win.msW) {
+        if (cX < win.msW - 1) {
             if (win.msBArray[(cY*win.msW)+cX+1] == 0) {
                 if (win.msRArray[(cY*win.msW)+cX+1] == 0) {
                     win.msRArray[(cY*win.msW)+cX+1] = 1;
@@ -411,7 +458,7 @@ function floodFill(x,y, win) {
         }
 
         // console.log("bottom");
-        if (cY<win.msH) {
+        if (cY < win.msH - 1) {
             if (win.msBArray[((cY+1)*win.msW)+cX] == 0) {
                 if (win.msRArray[((cY+1)*win.msW)+cX] == 0) {
                     win.msRArray[((cY+1)*win.msW)+cX] = 1;

@@ -150,6 +150,9 @@ function commandHandler(win, mal = false) {
                         win.setText("Deletion blocked — close all connections/tabs using the database.");
                     };
                     break;
+                case 'nuke':
+                    nukeCommand(win, command);
+                    break;
                 case 'ms':
                     minesweeperCommand(win, command);
                     break;
@@ -1091,6 +1094,40 @@ function mailCommand(win) {
 
 function minesweeperCommand(win, command) {
     let s = 20;
+    if (
+        typeof parseInt(command[1]) == "number" &&
+        !isNaN(parseInt(command[1])) &&
+        parseInt(command[1]) > 0
+    ) {
+        s = parseInt(command[1]);
+    }
+    let diff;
+    if (player.minesweeperWindow === 0) {
+
+        let p = player.minesweeperWindow
+        if (p.lastDiff === undefined){
+            p.lastDiff = 0;
+        }
+        diff = p.lastDiff;
+        
+    }
+    if (
+        typeof parseInt(command[2]) == "number" &&
+        !isNaN(parseInt(command[2])) &&
+        parseInt(command[2]) > -1
+    ) {
+        diff = parseInt(command[2]);
+        if (player.minesweeperWindow === 0) {
+            player.minesweeperWindow.lastDiff = diff;
+        }
+    } else {
+        if (player.minesweeperWindow !== 0) {
+            diff = player.minesweeperWindow.lastDiff
+        } else {
+            diff = 0;
+        }
+    }
+    
     if (command.length > 1) {
         if (command[1].toLowerCase() == "quit") {
             const indexC = cast.indexOf(player.minesweeperWindow);
@@ -1101,21 +1138,46 @@ function minesweeperCommand(win, command) {
             win.setText("Closing MineSweeper app...");
             return;
         }
-
-        if (
-            typeof parseInt(command[1]) == "number" &&
-            !isNaN(parseInt(command[1])) &&
-            parseInt(command[1]) > 0
-        ) {
-            s = parseInt(command[1]);
+        if (player.minesweeperWindow === 0) {
+            player.minesweeperWindow = spawnMineSweeperWin(s, diff);
+        } else {
+            mineInit(player.minesweeperWindow, s, diff);
+        }
+    } else {
+        if (player.minesweeperWindow === 0) {
+            player.minesweeperWindow = spawnMineSweeperWin(s, diff);
+        } else {
+            mineInit(player.minesweeperWindow, s, diff);
         }
     }
-    if (player.minesweeperWindow === 0) {
-        player.minesweeperWindow = spawnMineSweeperWin(s);
-        win.setText("Runnig MineSweeper app...");
-    } else {
 
-        mineInit(player.minesweeperWindow, s);
-        win.setText("MineSweeper restarting...");
+    if  (player.minesweeperWindow.lastDiff == 0) {
+        win.setText(`MineSweeper size ${s} and randomn number of mines`);
+    } else {
+        win.setText(`MineSweeper size ${s} and W*H*(${diff}/100) mines`);
+    }
+    //console.log("diff ", diff, ", lastDiff ", player.minesweeperWindow.lastDiff)
+}
+
+function nukeCommand(win, command) {
+    console.log(typeof player.selectedCity)
+    if (typeof player.selectedCity === "undefined") {
+        let r = getRandInt(20);
+        win.text = `No location selected, Nuking ${r} random countries...`
+        win.setText(win.text, false);
+        for (let i = 0; i < r; i++) {
+            let r1 = getRandInt(9800);
+            new Nuke(cities[0], cities[r1], gameTimer.elapsed() + getRandInt(1000))
+            if (i == r - 1) {
+                win.setText(`Nuking ${cities[r1].name}, ${cities[r1].country}`)
+            } else {
+                win.setText(`Nuking ${cities[r1].name}, ${cities[r1].country}`, false)
+            }
+        }
+    } else {
+        // just nuke one city
+        const n = new Nuke(cities[0], player.selectedCity, gameTimer.elapsed())
+        win.text = `Nuke launched at ${player.selectedCity.name},${player.selectedCity.country}`
+        win.setText(win.text);
     }
 }

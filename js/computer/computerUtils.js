@@ -361,6 +361,14 @@ async function createFS(n) {
         );
 
         fs.createFile(
+            "C:\\System\\bin\\nuke",
+            0,
+            0,
+            generateGiberish(33),
+            0
+        );
+
+        fs.createFile(
             `C:\\Users\\${user}\\Documents\\phrack.txt`,
             0,
             0,
@@ -934,7 +942,7 @@ function spawnClock() {
     cast.push(cw);
 }
 
-function spawnMineSweeperWin(s = 20) {
+function spawnMineSweeperWin(s = 20, diff = 19.77) {
     let msw = new aniRect(
         player.msX1,
         player.msY1,
@@ -952,6 +960,7 @@ function spawnMineSweeperWin(s = 20) {
     msw.msScale = player.msScale;
     msw.x1 = player.msX1;
     msw.y1 = player.msY1;
+    msw.lastDiff = diff;
     msw.msW = s;
     msw.msH = s;
     msw.wasDragged = false;
@@ -964,7 +973,7 @@ function spawnMineSweeperWin(s = 20) {
     msw.msGameOver = false;
     msw.msFlagged = 0;
     cast.push(msw);
-    mineInit(msw, s);
+    mineInit(msw, s, msw.lastDiff);
     return msw;
 }
 

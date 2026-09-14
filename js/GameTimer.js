@@ -16,14 +16,6 @@ class GameTimer {
     elapsed() {
        //const ms = Date.now() - this.realStartTime;
        return Date.now() - this.realStartTime;
-
-        /*return {
-            milliseconds: ms % 1000,
-            seconds: Math.floor(ms / 1000),
-            minutes: Math.floor(ms / 60000),
-            hours: Math.floor(ms / 3600000),
-            days: Math.floor(ms / 86400000)
-        };*/
     }
 
     timerStart() {

@@ -21,6 +21,7 @@ class User {
 class Player extends User{
     constructor(name) {
         super();
+        this.archDashOffset = 0;
         this.ignoreMouseDrag = false;
         this.cardWindow = [];
         this.cleanSegment = 0;

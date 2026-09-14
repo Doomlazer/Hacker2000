@@ -1,4 +1,11 @@
 const EmailGenerator = (() => {
+  const tips = [
+    "You can set the minesweeper difficulty with MS [size] [%ofMines]. I can only beat it using MS 50 1 :) Once you set the % of mines it stays like that forever. You read that right, PERCENT of mines. The game calculates it as Width * Height * (r/100). Starting the game with MS 40 20 would be bombs = 40 * 40 *(20/100). Setting a % will make every subsequent game use that value, even if you just type MS. You can make it random again using MS 20 0",
+    "There's a way to cheat in MineSweeper. You place a flag on any field and then left click it. if it's a mine then nothing happens, otherwise it clears the square.",
+    "Try playing minesweeper with SPEAK lol",
+    "Early bird"
+  ]
+
   const names = [
     "Alex", "Mike", "Sarah", "James", "Daniel",
     "Chris", "Jennifer", "David", "Robert", "Lisa",
