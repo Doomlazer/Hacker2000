@@ -9,17 +9,7 @@ function draw() {
     drawMap();
     //console.log(-player.archDashOffset*2%180)
     player.archDashOffset -= 0.2;
-    for (let n of nukes) {
-        //console.log(n, " nukeporgress: ", nukeProgress(n.city0, n.city1, n.launchTime))
-        drawArch(
-            n.city0,
-            n.city1,
-            color = "#FF0000",
-            80,
-            nukeProgress(n.city0, n.city1, n.launchTime).progress,
-            n.launchTime
-        );
-    }
+    processNukes();
 
     // Release player.cNotStoring if complete.
     // this is a terrible name to mean if the game is in 
@@ -1959,150 +1949,158 @@ function drawArch(
     x1 = (city1.lon * mapScale) + mapXOff,
     y1 = (-city1.lat * mapScale) + mapYOff;
     //console.log(x0,y0,x1,y1)
-  const dx = x1 - x0;
-  const dy = y1 - y0;
-  const distance = Math.hypot(dx, dy);
-//console.log("distance " , distance)
-  if (distance < 1) return;
+    const dx = x1 - x0;
+    const dy = y1 - y0;
+    const distance = Math.hypot(dx, dy);
+    //console.log("distance " , distance)
+    if (distance < 1) return;
 
-  // --------------------------------------------------
-  // Consistent visual settings (screen pixels)
-  // --------------------------------------------------
-  const lineWidth = Math.max(4, (1 * (mapScale/8)));
-  const dashLength = 10 * (mapScale/8);
-  const gapLength = 5 * (mapScale/8);
-  let ballRadius = 2;
+    // --------------------------------------------------
+    // Consistent visual settings (screen pixels)
+    // --------------------------------------------------
+    const lineWidth = Math.max(1, (2 * (mapScale/8)));
+    const dashLength = 10 * (mapScale/8);
+    const gapLength = 5 * (mapScale/8);
+    let ballRadius = 2;
 
-  // Scale arch with distance, but clamp it.
-  const archHeight = 80 /*Math.min(
-    Math.max(distance * height, 15),
-    120
-  );*/
+    // Scale arch with distance, but clamp it.
+    const archHeight = Math.min(
+        Math.max(distance * height, 15),
+        120
+    );
 
-  // --------------------------------------------------
-  // Perpendicular vector
-  // --------------------------------------------------
-  const perpX = -dy / distance;
-  const perpY = dx / distance;
+    // --------------------------------------------------
+    // Perpendicular vector
+    // --------------------------------------------------
+    const perpX = -dy / distance;
+    const perpY = dx / distance;
 
-  // Always point north/up
-  const direction = perpY > 0 ? -1 : 1;
+    // Always point north/up
+    const direction = perpY > 0 ? -1 : 1;
 
-  const nx = perpX * direction;
-  const ny = perpY * direction;
+    const nx = perpX * direction;
+    const ny = perpY * direction;
 
-  // --------------------------------------------------
-  // Quadratic Bézier control point
-  // --------------------------------------------------
-  const cx = (x0 + x1) / 2;
-  const cy = (y0 + y1) / 2;
+    // --------------------------------------------------
+    // Quadratic Bézier control point
+    // --------------------------------------------------
+    const cx = (x0 + x1) / 2;
+    const cy = (y0 + y1) / 2;
 
-  const cpx = cx + nx * archHeight;
-  const cpy = cy + ny * archHeight;
+    const cpx = cx + nx * archHeight;
+    const cpy = cy + ny * archHeight;
 
-  // --------------------------------------------------
-  // Clamp progress
-  // --------------------------------------------------
-  const t = Math.max(0, Math.min(100, point)) / 100;
-  //console.log("point ", point, ", player.archDashOffset % 120 " + (player.archDashOffset % 120))
-  if (point == 100) {
-    //city1.population = 0;
-    city1.nukeCounter++;
-    city1.nukeCounter = Math.min(city1.nukeCounter, 20);
-    ballRadius = (city1.nukeCounter/10) * mapScale;
-  } else {
-    ballRadius = 4;
-    city1.nukeCounter = 2;
-  }
-
-  // --------------------------------------------------
-  // Position of ball on curve
-  // --------------------------------------------------
-  const u = 1 - t;
-
-  const px =
-    u * u * x0 +
-    2 * u * t * cpx +
-    t * t * x1;
-
-  const py =
-    u * u * y0 +
-    2 * u * t * cpy +
-    t * t * y1;
-
-  // Control point for partial curve
-  const partialCpx = x0 + t * (cpx - x0);
-  const partialCpy = y0 + t * (cpy - y0);
-
-  ctx.save();
-
-  // --------------------------------------------------
-  // Dashed arch
-  // --------------------------------------------------
+    // --------------------------------------------------
+    // Clamp progress
+    // --------------------------------------------------
+    const t = Math.max(0, Math.min(100, point)) / 100;
+    //console.log("point ", point, ", player.archDashOffset % 120 " + (player.archDashOffset % 120))
     if (point == 100) {
-        ctx.strokeStyle = "#4b4a4a"
+        //city1.population = 0;
+        city1.nukeCounter++;
+        city1.nukeCounter = Math.min(city1.nukeCounter, 20);
+        ballRadius = (city1.nukeCounter/10) * mapScale;
     } else {
-        ctx.strokeStyle = color;
+        ballRadius = 4;
+        city1.nukeCounter = 2;
     }
 
-  ctx.lineWidth = lineWidth;
-  ctx.lineCap = "butt";
+    // --------------------------------------------------
+    // Position of ball on curve
+    // --------------------------------------------------
+    const u = 1 - t;
 
-  ctx.setLineDash([dashLength, gapLength]);
+    const px =
+        u * u * x0 +
+        2 * u * t * cpx +
+        t * t * x1;
 
-  if (point == 100) {
-    ctx.lineDashOffset = 0;
-  } else {
-    ctx.lineDashOffset = player.archDashOffset;
-  }
+    const py =
+        u * u * y0 +
+        2 * u * t * cpy +
+        t * t * y1;
 
-  ctx.beginPath();
-  ctx.moveTo(x0, y0);
-  ctx.quadraticCurveTo(
-    partialCpx,
-    partialCpy,
-    px,
-    py
-  );
-  ctx.stroke();
+    // Control point for partial curve
+    const partialCpx = x0 + t * (cpx - x0);
+    const partialCpy = y0 + t * (cpy - y0);
 
-  // --------------------------------------------------
-  // Blue ball
-  // --------------------------------------------------
-  ctx.setLineDash([]);
+    ctx.save();
 
-  ctx.fillStyle = '#FFFFFF'//color;
-  if (point == 100) {
-    ctx.globalAlpha = 0.5;
-  } else {
-    ctx.globalAlpha = 1;
-  }
-  ctx.beginPath();
-  ctx.arc(
-    px,
-    py,
-    ballRadius,
-    0,
-    Math.PI * 2
-  );
-  ctx.fill();
-  ctx.globalAlpha = 1;
-  ctx.fillStyle = '#0f0e0e';
-    ctx.font = `${1 * mapScale}px arial`;
-    ctx.fillText(`TARGET: ${city1.name},${city1.country}`, px + 8, py + 3);
-    ctx.fillText(`ETA: ${nukeProgress(city0, city1, launchTime).eta}`, px + 8, py + Math.floor(1.65 * mapScale) + 2);
-    ctx.fillText(`TARGET: ${city1.name},${city1.country}`, px + 12, py +7);
-    ctx.fillText(`ETA: ${nukeProgress(city0, city1, launchTime).eta}`, px + 12, py + Math.floor(1.65 * mapScale) - 2);
+    // --------------------------------------------------
+    // Dashed arch
+    // --------------------------------------------------
+        if (point == 100) {
+            ctx.strokeStyle = "#4b4a4a"
+        } else {
+            ctx.strokeStyle = color;
+        }
+
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = "butt";
+
+    ctx.setLineDash([dashLength, gapLength]);
+
     if (point == 100) {
-        ctx.fillText(`Est. DEAD: ${city1.population}`, px + 8, py + (3 * mapScale) + 2);
-        ctx.fillText(`Est. DEAD: ${city1.population}`, px + 12, py + (3 * mapScale) - 2);
-  }
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(`TARGET: ${city1.name},${city1.country}`, px + 10, py + 5);
-    ctx.fillText(`ETA: ${nukeProgress(city0, city1, launchTime).eta}`, px + 10, py + Math.floor(1.65 * mapScale));
-  if (point == 100) {
-    ctx.fillText(`Est. DEAD: ${city1.population}`, px + 10, py + (3 * mapScale));
-  }
+        ctx.lineDashOffset = 0;
+    } else {
+        ctx.lineDashOffset = player.archDashOffset;
+        ctx.beginPath();
+        ctx.moveTo(x0, y0);
+        ctx.quadraticCurveTo(
+            partialCpx,
+            partialCpy,
+            px,
+            py
+        );
+        ctx.stroke();
+    }
 
-  ctx.restore();
+    // --------------------------------------------------
+    // Blue ball
+    // --------------------------------------------------
+    ctx.setLineDash([]);
+
+    if (point == 100) {
+        ctx.fillStyle = '#82f81c'//color;
+        ctx.globalAlpha = 0.35;
+    } else {
+        ctx.fillStyle = '#FFFFFF'//color;
+        ctx.globalAlpha = 1;
+    }
+    ctx.beginPath();
+    ctx.arc(
+        px,
+        py,
+        ballRadius,
+        0,
+        Math.PI * 2
+    );
+    ctx.fill();
+
+    ctx.globalAlpha = 1;
+    //ctx.font = Math.max(6, Math.min(20, 12 * mapScale)) + "px courier";
+    ctx.font = `${1 * mapScale}px arial`;
+    ctx.fillStyle = '#0f0e0e';
+    if (point == 100) {
+        ctx.fillText(`Target: ${city1.name},${city1.country}`, px + 8, py + 3);
+        ctx.fillText(`Target: ${city1.name},${city1.country}`, px + 12, py +7);
+        ctx.fillText(`Est. casualties: ${city1.population}`, px + 8, py + (1.65 * mapScale) + 2);
+        ctx.fillText(`Est. casualties: ${city1.population}`, px + 12, py + (1.65 * mapScale) - 2);
+    } else {
+        ctx.fillText(`Target: ${city1.name},${city1.country}`, px + 8, py + 3);
+        ctx.fillText(`ETA: ${nukeProgress(city0, city1, launchTime).eta}`, px + 8, py + Math.floor(1.65 * mapScale) + 2);
+        ctx.fillText(`Target: ${city1.name},${city1.country}`, px + 12, py +7);
+        ctx.fillText(`ETA: ${nukeProgress(city0, city1, launchTime).eta}`, px + 12, py + Math.floor(1.65 * mapScale) - 2);
+    }
+
+    ctx.fillStyle = '#ffffff';
+    if (point == 100) {
+        ctx.fillText(`Target: ${city1.name},${city1.country}`, px + 10, py + 5);
+        ctx.fillText(`Est. casualties: ${city1.population}`, px + 10, py + (1.65 * mapScale));
+    } else {
+        ctx.fillText(`Target: ${city1.name},${city1.country}`, px + 10, py + 5);
+        ctx.fillText(`ETA: ${nukeProgress(city0, city1, launchTime).eta}`, px + 10, py + Math.floor(1.65 * mapScale));
+    }
+
+    ctx.restore();
 }

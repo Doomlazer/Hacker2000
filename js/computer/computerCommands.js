@@ -1162,22 +1162,24 @@ function minesweeperCommand(win, command) {
 function nukeCommand(win, command) {
     console.log(typeof player.selectedCity)
     if (typeof player.selectedCity === "undefined") {
-        let r = getRandInt(20);
+        let r = getRandInt(5)+1;
         win.text = `No location selected, Nuking ${r} random countries...`
         win.setText(win.text, false);
         for (let i = 0; i < r; i++) {
-            let r1 = getRandInt(9800);
-            new Nuke(cities[0], cities[r1], gameTimer.elapsed() + getRandInt(1000))
-            if (i == r - 1) {
-                win.setText(`Nuking ${cities[r1].name}, ${cities[r1].country}`)
-            } else {
-                win.setText(`Nuking ${cities[r1].name}, ${cities[r1].country}`, false)
+            let r1 = getRandInt(9980);
+            if (cities[0].country !== cities[r1].country) {
+                barrage(cities[0], cities[r1])
+                if (i == r - 1) {
+                    win.setText(`Nuking ${cities[r1].name}, ${cities[r1].country}`)
+                } else {
+                    win.setText(`Nuking ${cities[r1].name}, ${cities[r1].country}`, false)
+                }
             }
         }
     } else {
         // just nuke one city
         const n = new Nuke(cities[0], player.selectedCity, gameTimer.elapsed())
-        win.text = `Nuke launched at ${player.selectedCity.name},${player.selectedCity.country}`
+        win.text = `ICBM launched at ${player.selectedCity.name},${player.selectedCity.country}`
         win.setText(win.text);
     }
 }

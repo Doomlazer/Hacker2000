@@ -3,6 +3,8 @@ class Nuke {
         this.launchTime = launchtime
         this.city0 = city0;
         this.city1 = city1;
+        this.gotResponse = false;
+        this.responseThreshold = getRandInt(50)+ 20;
         nukes.push(this)
     }
 }
@@ -713,7 +715,7 @@ function nukeProgress(city0, city1, launchTime) {
         );
 
     // Game speed
-    const speedKmPerSecond = 100;
+    const speedKmPerSecond = 15;
 
     // Total simulated flight time
     const flightTimeMs =
@@ -773,4 +775,85 @@ function nukeProgress(city0, city1, launchTime) {
         progress,
         eta
     };
+}
+
+function getCities(country) {
+    let list = [];
+    for (let i = 0; i < cities.length; i++) {
+        if (cities[i].country === country) {
+            list.push(i)
+        }
+    }
+    return list;
+}
+
+function processNukes() {
+    for (let n of nukes) {
+        //console.log(n, " nukeporgress: ", nukeProgress(n.city0, n.city1, n.launchTime))
+        let p = nukeProgress(n.city0, n.city1, n.launchTime).progress
+        let iso3 = getCountryData(n.city0.country).iso3;
+        drawArch(
+            n.city0,
+            n.city1,
+            iso3ToColor(iso3),
+            80,
+            p,
+            n.launchTime
+        );
+        if (n.responseThreshold < p && !n.gotResponse) {
+            n.gotResponse = true;
+            // can the targeted city nuke? try
+            barrage(n.city1, n.city0);
+
+            // allies that will respond on target's behalf?
+            const retaliation = getRetaliationOptions(n.city1.country);
+            for (let c of retaliation) {
+                if (c.relationship == "ally") {
+                    barrage(c, n.city0);
+                }
+            }
+        }
+    }
+}
+
+function barrage(cityF, cityT) {
+    // check if aggressor has nukes
+    let cData = getCountryData(cityF.country);
+    let nukeNumber;
+    if (cData?.warheads_est !== undefined || cData?.warheads_est != null) {
+        nukeNumber = getWarheadNumber(cData.warheads_est);
+    } else {
+        nukeNumber = 0;
+    }
+
+    let fromList = getCities(cityF.country);
+    let toList = getCities(cityT.country);
+    let num = Math.min(nukeNumber, fromList.length, toList.length, getRandInt(8)+1);
+    //console.log(fromList.length, toList.length, num)
+    
+    for (let i = 0; i < num; i++) {
+        let cityF = cities[fromList[getRandInt(fromList.length)]];
+        let cityT = cities[toList[getRandInt(toList.length)]];
+        //console.log(cityF, cityT)
+        if (getRandInt(100) > nukes.length) {
+            const n = new Nuke(cityF, cityT, gameTimer.elapsed());
+            //cast[0].text = `${cityF.country} has retaliated against ${cityT.country}...`;
+            //cast[0].setText(cast[0].text);
+        }
+    }
+}
+
+function iso3ToColor(iso3) {
+  let hash = 0;
+
+  for (let i = 0; i < iso3.length; i++) {
+    hash = ((hash << 5) - hash) + iso3.charCodeAt(i);
+    hash |= 0;
+  }
+
+  // Golden-angle hue distribution gives visually separated colors.
+  const hue = Math.abs(hash * 137.508) % 360;
+
+  // Keep saturation/lightness in a readable range.
+  return `hsl(${hue.toFixed(2)}, 65%, 55%)`;
 }
