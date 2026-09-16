@@ -715,7 +715,7 @@ function nukeProgress(city0, city1, launchTime) {
         );
 
     // Game speed
-    const speedKmPerSecond = 15;
+    const speedKmPerSecond = 150;
 
     // Total simulated flight time
     const flightTimeMs =
@@ -765,7 +765,7 @@ function nukeProgress(city0, city1, launchTime) {
         totalHundredths % 100;
 
     const eta =
-    `${String(days).padStart(2, '0')}:` +
+    //`${String(days).padStart(2, '0')}:` +
     `${String(hours).padStart(2, '0')}:` +
     `${String(minutes).padStart(2, '0')}:` +
     `${String(seconds).padStart(2, '0')}.` +
@@ -796,7 +796,7 @@ function processNukes() {
             n.city0,
             n.city1,
             iso3ToColor(iso3),
-            80,
+            0.3,
             p,
             n.launchTime
         );

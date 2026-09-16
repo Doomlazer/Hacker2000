@@ -57,8 +57,13 @@ function getRandInt(i) {
     return Math.floor(Math.random() * i);
 }
 
-function scaleFont(s, f) {
-    return (c.width * s) + "px " + f;                     
+function scaleFont(s, f, clamp = 999) {
+    const size = Math.min(mapScale * s, clamp);
+    return size + "px " + f;
+}
+
+function scaledFontSize(s, clamp = 999) {
+    return Math.min(mapScale * s, clamp);
 }
 
 function shuffle(array) {
