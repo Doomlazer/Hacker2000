@@ -82,23 +82,38 @@ function speak(text, queue = 0, voice = 0) {
     if (!queue) {
         window.speechSynthesis.cancel();
     }
-    const utterance = new SpeechSynthesisUtterance(text);
 
+    const utterance = new SpeechSynthesisUtterance(text);
     const voices = window.speechSynthesis.getVoices();
+
     utterance.onend = function(event) {
-        if (debug) {
-            //console.log('Speech has finished after ' + event.elapsedTime + ' seconds.');
-        }
+        // Speech finished
     };
-    
-    // Set voice
-    if (voices.length > voice) {
-        utterance.voice = voices[voice];
-    } else {
-        console.log('selected voice not available');
+
+    if (voices.length > 0) {
+
+        const selectedVoice =
+            player.t2sVoice === -1
+                ? Math.floor(Math.random() * voices.length)
+                : player.t2sVoice;
+
+        player.t2sLast = selectedVoice;
+        if (
+            selectedVoice >= 0 &&
+            selectedVoice < voices.length
+        ) {
+            utterance.voice =
+                voices[selectedVoice];
+        } else {
+            console.log(
+                'selected voice not available'
+            );
+        }
     }
+
     window.speechSynthesis.speak(utterance);
 }
+
 
 function createJSON(data, filename, mimeType = "application/json") {
     const json = JSON.stringify(data, null, 2);

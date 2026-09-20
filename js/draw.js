@@ -2119,24 +2119,30 @@ function drawArch(
 
     if (point == 100) {
         // ICMB reached target, print casualties
-        shadowText(
-            ctx,
-            `Target: ${city1.name}, ${city1.country}`,
-            px + 10,
-            py + 5,
-            2,
-            "#FFFFFF",
-            "#000000"
-        );
-        shadowText(
-            ctx,
-            `Est. casualties: ${city1.population}`,
-            px + 10,
-            py + 5 + lineGap,
-            2,
-            "#FFFFFF",
-            "#000000"
-        );
+        if (mouseX > px - 5 &&
+            mouseX < px + 5 &&
+            mouseY > py - 5 &&
+            mouseY < py + 5
+        ) {
+            shadowText(
+                ctx,
+                `Target: ${city1.name}, ${city1.country}`,
+                px + 10,
+                py + 5,
+                2,
+                "#FFFFFF",
+                "#000000"
+            );
+            shadowText(
+                ctx,
+                `Est. casualties: ${city1.population}`,
+                px + 10,
+                py + 5 + lineGap,
+                2,
+                "#FFFFFF",
+                "#000000"
+            );
+        }
     } else {
         // ICBM in transit, show ETA
         shadowText(

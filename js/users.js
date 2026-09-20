@@ -60,7 +60,8 @@ class Player extends User{
         this.audioTrack = 0;
         this.audioPlaylist = [];
         this.phoneMessage = "";
-        this.t2s = false;
+        this.t2s = true;
+        this.t2sVoice = -1;
         // brute cracker
         this.bruteWindow = [];
         this.brutePwdIndex = 0;

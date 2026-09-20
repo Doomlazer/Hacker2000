@@ -271,7 +271,7 @@ function commandHandler(win, mal = false) {
 }
 
 function helpCommand(win) {
-    spawnReadWin(win, `███╗   ███╗ █████╗ ██╗      █████╗  ██████╗
+    let text = `███╗   ███╗ █████╗ ██╗      █████╗  ██████╗
 ████╗ ████║██╔══██╗██║     ██╔══██╗██╔═████╗
 ██╔████╔██║███████║██║     ███████║██║██╔██║
 ██║╚██╔╝██║██╔══██║██║     ╚════██║████╔╝██║
@@ -280,7 +280,9 @@ function helpCommand(win) {
 Mal90 Operations Manual
         
         --==ALL CREWS WELCOME==--
-        **%%N0JNGl3N0L1f3%%**     
+        **%%N0JNGl3N0L1f3%%**    
+        
+        SINCE EVERYTONE KEEPS AKSING: type SPEAK to toggle off the dam voice!
 
         Mal90 Br0wzerOperating System by Vid30Dr0mEE, l337 HAx0r p.o.s.OS .,'"You get what you pay 4"',. Forked from TonyOS v2.309.1 R.I.P PheakySmurph J0nnyK4t, Rulz.
         
@@ -328,7 +330,7 @@ Mal90 Operations Manual
 
         CLOCK - Opens the digital clock window.
 
-        SPEAK - Toggle Text2Speach reading of command output. Use SPEAK [path/to/file] to speak text files.
+        SPEAK - Toggle Text2Speach reading of command output. Use SPEAK [path/to/file] to speak text files. SPEAK SET sets the last used voice. SPEAK RESET selects a random voice each command.
 
         ULIST - List computer user accounts.
 
@@ -410,7 +412,11 @@ Mal90 Operations Manual
 
         Yo,V1d30Dr0me!!11!!11 your documentation was sh1tni had to rewrite h4lf of it becuse it didnt work how u described. I added DELETEALL to wipe this games local data. use with caution
         \t\t\t- X3r0x v1.001.065 Aug 1994
-        `);
+        `;
+    spawnReadWin(win, text);
+    if (player.t2s) {
+        speak(text.slice(268));
+    }
 }
 
 function dateCommand() {
@@ -534,6 +540,9 @@ function readCommand(win, command) {
 
                 Note: The command READ LOG will display the system log files from any directory`;
         win.setText(text);
+    }
+    if (player.t2s) {
+        speak(text);
     }
 
 }
@@ -908,10 +917,23 @@ function speakCommand(win, command){
         win.setText(`Text2Speach is now ${player.t2s}`);
     } else {
         player.t2s = true;
-        let fs = win.node.fileSystem;
-        let str = `speaking file [${command[1]}]...` + 
-                    fs.readFile(command[1], player.authAccountIndex);
-        win.setText(str);
+        if (command[1].toLowerCase() == "reset") {
+            player.t2sVoice = -1;
+            let str = `Random voice mode...` + 
+            win.setText(str);
+        } else if (command[1].toLowerCase() == "set") {
+            const voices = window.speechSynthesis.getVoices();
+            player.t2sVoice = player.t2sLast;
+            let v = voices[player.t2sVoice];
+            let strF = `SPEAK voice set to ${v.name}...`; 
+            win.setText(strF);
+        } else {
+            let fs = win.node.fileSystem;
+            let str = `speaking file [${command[1]}]...` + 
+                        fs.readFile(command[1], player.authAccountIndex);
+            win.setText(str);
+        }
+        
     }
 }
 
