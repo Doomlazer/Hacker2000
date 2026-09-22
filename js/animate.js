@@ -142,6 +142,8 @@ class aniRect {
                 handleCardClick(this);
             } else if (this.type == "mail") {
                 // do nothing on double click
+                this.toOpen = false;
+                this.delete = true;
             } else {
                 this.toOpen = false;
                 this.delete = true;
@@ -155,17 +157,22 @@ class aniRect {
             // execute entered string
             if (this.focusNum == 2) {
                 // connect to email host
-                let ip = lookupDNSCommand(this, ["",this.host], true) // last arg return ip
+                let ip = lookupDNSCommand(this, ["",this.host], true) // last arg return ip for console logging
                 // try to find the ip address
                 let notFound = true;
                 for (let i of nodes) {
                     if (ip == i.ip_address) {
-                        //player.nodeStack.push(i.id);
-                        //logSSH(win);
-                        //attachNode(this, nodes[i.id]);
+                        player.nodeStack.push(i.id);
+                        logSSH(this);
+                        attachNode(this, nodes[i.id]);
                         notFound = false;
 
                         this.fs = i.fileSystem;
+                        console.log(ip, i.ip_address)
+                        console.log(this.fs, i.fileSystem)
+                        console.log(this.fs.list(`C:\\Email\\`, 0))
+                        console.log(i.fileSystem.getFolder(`C:\\Email\\${this.user}`))
+                        console.log(this.fs.getFolder(`C:\\Email\\${this.user}`))
                         if (this.fs.getFolder(`C:\\Email\\${this.user}`)) {
                             const p = this.fs.readFile(`C:\\Email\\${this.user}\\Acct\\pswd.txt`,0);
                             this.text = p;
@@ -191,7 +198,7 @@ class aniRect {
                             }
                         } else {
                             this.text = "User does not exist";
-                            console.log(this.fs.list(`C:\\Email`))
+                            console.log(this.text, this.fs.list(`C:\\Email`))
                         }
                     }
                 }

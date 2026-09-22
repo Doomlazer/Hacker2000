@@ -1877,7 +1877,7 @@ function drawMailAuth(win) {
 
     if (win.xP == win.xW) {
         ctx.fillStyle = '#f7f5f5';
-        ctx.font = scaleFont(0.02, "Courier new");
+        ctx.font = "22px arial"; //scaleFont(0.02, "Courier new");
         ctx.fillText(
             "ZMail Client v2.00m",
             win.x1 + (win.xW/8),
@@ -1885,8 +1885,16 @@ function drawMailAuth(win) {
         );
     }
 
-    ctx.font = scaleFont(0.02, "arial");
+    ctx.font = "22px Courier new"; //scaleFont(0.02, "arial");
     for (let i = 0; i < fields.length; i++) {
+        ctx.fillStyle = '#030303';
+        ctx.fillRect(
+            win.x1 + (win.xP/3) - (fW/2),
+            win.y1 + (win.yP/3) - (fH/4) + (win.yP/5 * i),
+            win.xP/1.8,
+            win.xP/15
+        );
+
         let f = fields[i];
 
         if (win.xP == win.xW) {
@@ -1897,13 +1905,7 @@ function drawMailAuth(win) {
                 win.y1 + (win.yP/3) - (fH/4) + (win.yP/5 * i) - 10
             );
         }
-        ctx.fillStyle = '#030303';
-        ctx.fillRect(
-            win.x1 + (win.xP/3) - (fW/2),
-            win.y1 + (win.yP/3) - (fH/4) + (win.yP/5 * i),
-            win.xP/1.8,
-            win.xP/15
-        );
+    
         if (win.xP == win.xW) {
             ctx.fillStyle = '#f7f5f5';
             ctx.fillText(
@@ -1924,7 +1926,7 @@ function drawMailAuth(win) {
         );
     }
 
-    // focus
+    // focus outline indicator
     ctx.lineWidth = 3;
     ctx.strokeStyle = '#f5f1f1';
     ctx.strokeRect(

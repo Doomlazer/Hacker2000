@@ -403,14 +403,14 @@ Mal90 Operations Manual
         
         THE END
 
-        Remember that a computer has no morals, it only inherits its user's. -Nameless1 on HarbNetBBS ${nodes[locpnum].ip_address}
+        Remember that a computer has no morals, it only inherits its user's. -V1d30Dr0me on HarbNetBBS ${nodes[locpnum].ip_address}
 
         SHOUTS TO FZ (l337) AND SPR3
 
         “There is no spoon.”
         \t\t\t\t\t\t\t\t—- The Matrix
 
-        Yo,V1d30Dr0me!!11!!11 your documentation was sh1tni had to rewrite h4lf of it becuse it didnt work how u described. I added DELETEALL to wipe this games local data. use with caution
+        Yo, Nameless1, your documentation was sh1t n i had to rewrite h4lf of it becuse it didnt work how u described. I added DELETEALL command which will wipe everything.
         \t\t\t- X3r0x v1.001.065 Aug 1994
         `;
     spawnReadWin(win, text);
@@ -911,6 +911,7 @@ function speakCommand(win, command){
     if (command.length < 2) {
         if (player.t2s) {
             player.t2s = false;
+            window.speechSynthesis.cancel();
         } else {
             player.t2s = true;
         }

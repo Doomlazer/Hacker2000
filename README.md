@@ -12,3 +12,9 @@ IMPORTANT NOTICE TO THE PLAYER: Despite the fact this is a browser-based game, t
 # Early pre-alpha version:
 
 [Click Here](https://doomlazer.github.io/Hacker2000)
+
+Persistence is a work in progress if the game will not load, trash the databade in your browser's JS console by running: 
+
+indexedDB.deleteDatabase("VirtualFileSystemDB");
+
+or running the command DELETEALL in game 

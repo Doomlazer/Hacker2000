@@ -1,3 +1,280 @@
+class ArrayStorage {
+
+    static DB_NAME = "VirtualFileSystemDB";
+    static DB_VERSION = 2;
+    static STORE_NAME = "arrays";
+
+
+    //=====================================================
+    // IndexedDB
+    //=====================================================
+
+    static openDatabase() {
+
+        return new Promise((resolve, reject) => {
+
+            const request =
+                indexedDB.open(
+                    ArrayStorage.DB_NAME,
+                    ArrayStorage.DB_VERSION
+                );
+
+
+            request.onupgradeneeded = function (event) {
+
+                const db = event.target.result;
+
+                if (!db.objectStoreNames.contains("filesystems")) {
+                    db.createObjectStore("filesystems");
+                }
+
+                if (!db.objectStoreNames.contains("arrays")) {
+                    db.createObjectStore("arrays");
+                }
+            };
+
+
+            request.onsuccess = function () {
+
+                resolve(request.result);
+
+            };
+
+
+            request.onerror = function () {
+
+                reject(request.error);
+
+            };
+
+        });
+
+    }
+
+
+    //=====================================================
+    // Save
+    //=====================================================
+
+    static async save(name, array) {
+
+        const db =
+            await ArrayStorage.openDatabase();
+
+
+        try {
+
+            await new Promise((resolve, reject) => {
+
+                const transaction =
+                    db.transaction(
+                        ArrayStorage.STORE_NAME,
+                        "readwrite"
+                    );
+
+
+                const store =
+                    transaction.objectStore(
+                        ArrayStorage.STORE_NAME
+                    );
+
+
+                store.put(
+                    JSON.stringify(array),
+                    name
+                );
+
+
+                transaction.oncomplete =
+                    resolve;
+
+
+                transaction.onerror =
+                    () =>
+                        reject(
+                            transaction.error
+                        );
+
+
+                transaction.onabort =
+                    () =>
+                        reject(
+                            transaction.error ||
+                            new Error(
+                                "IndexedDB array transaction aborted."
+                            )
+                        );
+
+            });
+
+        } finally {
+
+            db.close();
+
+        }
+
+    }
+
+
+    //=====================================================
+    // Load
+    //=====================================================
+
+    static async load(name) {
+
+        const db =
+            await ArrayStorage.openDatabase();
+
+
+        try {
+
+            return await new Promise(
+                (resolve, reject) => {
+
+                    const transaction =
+                        db.transaction(
+                            ArrayStorage.STORE_NAME,
+                            "readonly"
+                        );
+
+
+                    const store =
+                        transaction.objectStore(
+                            ArrayStorage.STORE_NAME
+                        );
+
+
+                    const request =
+                        store.get(name);
+
+
+                    request.onsuccess =
+                        () => {
+
+                            resolve(
+                                request.result === undefined
+                                    ? null
+                                    : JSON.parse(request.result)
+                            );
+
+                        };
+
+
+                    request.onerror =
+                        () =>
+                            reject(
+                                request.error
+                            );
+
+                }
+            );
+
+        } finally {
+
+            db.close();
+
+        }
+
+    }
+
+
+    //=====================================================
+    // Delete
+    //=====================================================
+
+    static async delete(name) {
+
+        const db =
+            await ArrayStorage.openDatabase();
+
+
+        try {
+
+            await new Promise((resolve, reject) => {
+
+                const transaction =
+                    db.transaction(
+                        ArrayStorage.STORE_NAME,
+                        "readwrite"
+                    );
+
+
+                const store =
+                    transaction.objectStore(
+                        ArrayStorage.STORE_NAME
+                    );
+
+
+                store.delete(name);
+
+
+                transaction.oncomplete =
+                    resolve;
+
+
+                transaction.onerror =
+                    () =>
+                        reject(
+                            transaction.error
+                        );
+
+
+                transaction.onabort =
+                    () =>
+                        reject(
+                            transaction.error ||
+                            new Error(
+                                "IndexedDB array transaction aborted."
+                            )
+                        );
+
+            });
+
+        } finally {
+
+            db.close();
+
+        }
+
+    }
+
+    // check if array exists 
+    static async exists(name) {
+
+        const db = await ArrayStorage.openDatabase();
+
+        try {
+            return await new Promise((resolve, reject) => {
+
+                const transaction =
+                    db.transaction(
+                        ArrayStorage.STORE_NAME,
+                        "readonly"
+                    );
+
+                const request =
+                    transaction.objectStore(
+                        ArrayStorage.STORE_NAME
+                    ).getKey(name);
+
+                request.onsuccess = () =>
+                    resolve(request.result !== undefined);
+
+                request.onerror = () =>
+                    reject(request.error);
+
+            });
+
+        } finally {
+            db.close();
+        }
+    }   
+}
+
+
+
+
+
 /**
  * filesystem.js
  *
@@ -59,7 +336,7 @@ class FileSystem {
     static DB_NAME =
         "VirtualFileSystemDB";
 
-    static DB_VERSION = 1;
+    static DB_VERSION = 2;
 
     static STORE_NAME =
         "filesystems";
@@ -76,25 +353,18 @@ class FileSystem {
                 );
 
 
-            request.onupgradeneeded =
-                function (event) {
+            request.onupgradeneeded = function (event) {
 
-                    const db =
-                        event.target.result;
+                const db = event.target.result;
 
-                    if (
-                        !db.objectStoreNames.contains(
-                            FileSystem.STORE_NAME
-                        )
-                    ) {
+                if (!db.objectStoreNames.contains("filesystems")) {
+                    db.createObjectStore("filesystems");
+                }
 
-                        db.createObjectStore(
-                            FileSystem.STORE_NAME
-                        );
-
-                    }
-
-                };
+                if (!db.objectStoreNames.contains("arrays")) {
+                    db.createObjectStore("arrays");
+                }
+            };
 
 
             request.onsuccess =

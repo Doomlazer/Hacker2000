@@ -42,7 +42,7 @@ const deck = [
         "AC", "2C", "3C", "4C", "5C", "6C", "7C", "8C", "9C", "10C", "JC", "QC", "KC"
     ];
 
-function init() {
+async function init() {
     window.addEventListener('click', doClick);
     window.addEventListener('keydown', doKeyDown);  
     window.addEventListener('mousemove', doMouseMove);
@@ -62,30 +62,34 @@ function init() {
             cast[0].keyHandler(e);
         }
     });
-    locpnum = getRandInt(999) + 1;
-
-    // add touch support for mobile at some point... maybe
-    //document.addEventListener("gesturestart", e => e.preventDefault(), { passive: false });
 
     doResize();
     mapXOff = getWidth()/2;  //3 * 2;
     mapYOff = getHeight()/2;
     ctx.fillStyle = '#f4eded';
 
-    // Indicate the game is loading to the player
-    ctx.font = scaleFont(0.01, "arial");
-    //ctx.fillText("Loading game. Please wait...", 20,20);
-    //indexedDB.deleteDatabase("VirtualFileSystemDB");
-    shuffle(emailProviders);
+    // has the world been initialized?
+    if (await ArrayStorage.exists("cities")) {
+        await loadAllArrays();
+    } else {
+        // this leads to the mal90 author supposedly :)
+        locpnum = getRandInt(999) + 1;
 
-    fetch('data/locations.json')
-        .then(response => response.json())
-        .then(data => locations = data)
-        .then(result => {
-            shuffle(locations);
-            loadPasswords();
-        })
-        .catch(error => console.error('Error loading locations JSON file', error));
+        // add touch support for mobile at some point... maybe
+        //document.addEventListener("gesturestart", e => e.preventDefault(), { passive: false });
+
+        //indexedDB.deleteDatabase("VirtualFileSystemDB");
+        shuffle(emailProviders);
+
+        fetch('data/locations.json')
+            .then(response => response.json())
+            .then(data => locations = data)
+            .then(result => {
+                shuffle(locations);
+                loadPasswords();
+            })
+            .catch(error => console.error('Error loading locations JSON file', error));
+    }
 }
 
 function loadPasswords() {
@@ -164,11 +168,11 @@ function loadNodes() {
         .catch(error => console.error('Error loading node JSON file', error));
 }
 
-function loadMap() {
+async function loadMap() {
     fetch('data/map.json')
         .then(response => response.json())
         .then(data => map = data)
-        .then(result => {
+        .then(async result => {
             // sluff unused map stuff
             map = map.features;
 
@@ -184,6 +188,7 @@ function loadMap() {
             if (!nodes[256].fileSystem.getFolder(`C:\\Email`)) {
                 console.log("creating all emails")
                 createAllEmails();
+                await saveAllArrays();
             } else {
                 console.log("skipping email creation")
                 requestAnimationFrame(frame);
@@ -267,5 +272,81 @@ async function createAllEmails() {
     const quota = await navigator.storage.estimate();
     console.log('Approx total allocated space:', formatBytes(quota.quota));
     console.log('Approx used space:', formatBytes(quota.usage));
+    requestAnimationFrame(frame);
+}
+
+async function saveAllArrays() {
+    await ArrayStorage.save("map", map);
+    await ArrayStorage.save("locations", locations);
+    await ArrayStorage.save("passwords", passwords);
+    await ArrayStorage.save("cities", cities);
+
+    // destroy filesystem before saving 
+    const nodesToSave = nodes.map(node => {
+        const copy = { ...node };
+        delete copy.fileSystem;
+        return copy;
+    });
+    await ArrayStorage.save("nodes", nodesToSave);
+
+    await ArrayStorage.save("emailProviders", emailProviders);
+    await ArrayStorage.save("DNSKeys", DNSKeys);
+    await ArrayStorage.save("gUsers", gUsers);
+}
+
+async function loadAllArrays() {
+    nodes = await ArrayStorage.load("nodes");
+    console.log("nodes loaded", nodes)
+
+    const arrayTotal = 8;
+    const fsTotal = nodes.length;
+    const total = arrayTotal + fsTotal;
+    let done = 0;
+    drawFSProgress(++done, total);
+
+    map = await ArrayStorage.load("map");
+    console.log("Map loaded", map)
+    drawFSProgress(++done, total);
+
+    locations = await ArrayStorage.load("locations");
+    console.log("locations loaded", locations)
+    drawFSProgress(++done, total);
+
+    passwords = await ArrayStorage.load("passwords");
+    console.log("passwords loaded", passwords)
+    drawFSProgress(++done, total);
+
+    cities = await ArrayStorage.load("cities");
+    console.log("cities loaded", cities)
+    drawFSProgress(++done, total);
+
+
+    emailProviders = await ArrayStorage.load("emailProviders");
+    console.log("emailProviders loaded", emailProviders)
+    drawFSProgress(++done, total);
+
+    DNSKeys = await ArrayStorage.load("DNSKeys");
+    console.log("DNSKeys loaded", DNSKeys)
+    drawFSProgress(++done, total);
+
+    gUsers = await ArrayStorage.load("gUsers");
+    console.log("gUsers loaded", gUsers)
+    drawFSProgress(++done, total);
+    player = gUsers[0];
+
+
+    let playersWindow = new aniRect(getWidth()/20, getHeight()/8, getWidth()/3, getHeight()/1.5);
+    attachNode(playersWindow, nodes[0]);
+    playersWindow.admins.push(0); // add player as admin to own computer
+    cast.push(playersWindow);
+
+
+    // reload node fs
+    for (let i = 0; i < nodes.length; i++) {
+        nodes[i].fileSystem = await FileSystem.load(i);
+        done++;
+        drawFSProgress(done, total);
+    }
+
     requestAnimationFrame(frame);
 }
