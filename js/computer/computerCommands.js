@@ -640,7 +640,7 @@ function sshCommand(win, command) {
             } else {
                 // TESTING ONLY - DELETE
                 // Print the account info to console.log()
-                //console.log("User: " + node.accounts[1].user + ", pwd: " + node.accounts[1].pwd);
+                console.log("User: " + node.accounts[1].user + ", pwd: " + node.accounts[1].pwd);
                 // TESTING ONLY - DELETE
 
                 if (node.accounts.includes(player.tryAuthName)) {
@@ -1047,6 +1047,7 @@ function lookupDNSCommand(win, command, internal = false) {
         for (let i = 0; i < locations.length; i++) {
             if (DNSIP == nodes[i].ip_address) {
                 let DNSKeys = nodes[i].fileSystem.readFile('C:\\System\\DNS\\entries.txt', player.authAccountIndex)
+                //console.log("DNSIP ",DNSIP, "DNSKeys",DNSKeys, "node ", i, nodes[i])
                 DNSKeys = JSON.parse(DNSKeys);
                 //console.log("JSON.parse(DNSKeys)[domain] " + DNSKeys[domain]);
                 if (Object.hasOwn(DNSKeys, domain) && DNSKeys[domain] !== undefined) {
@@ -1183,7 +1184,7 @@ function minesweeperCommand(win, command) {
 }
 
 function nukeCommand(win, command) {
-    console.log(typeof player.selectedCity)
+    //console.log(typeof player.selectedCity)
     if (typeof player.selectedCity === "undefined") {
         let r = getRandInt(5)+1;
         win.text = `No location selected, Nuking ${r} random countries...`

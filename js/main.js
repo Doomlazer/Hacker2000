@@ -183,7 +183,10 @@ async function loadMap() {
 
             // dns
             fsDNS(nodes[1].fileSystem, DNSServers[0], 1);
+            await nodes[1].fileSystem.save();
             fsDNS(nodes[2].fileSystem, DNSServers[1], 2);
+            await nodes[2].fileSystem.save();
+
 
             if (!nodes[256].fileSystem.getFolder(`C:\\Email`)) {
                 console.log("creating all emails")
@@ -265,9 +268,11 @@ async function createAllEmails() {
                 (_, j) => populateEmailServers(i + j).then()
             )
         );
-
         drawFSProgress(end, locations.length, 1);
     }
+    // saving one node !!!should!!! save all file systems 
+    // and doing it after population is fastest
+    await nodes[0].fileSystem.save();
 
     const quota = await navigator.storage.estimate();
     console.log('Approx total allocated space:', formatBytes(quota.quota));
@@ -290,13 +295,14 @@ async function saveAllArrays() {
     await ArrayStorage.save("nodes", nodesToSave);
 
     await ArrayStorage.save("emailProviders", emailProviders);
+    await ArrayStorage.save("DNSKeys", DNSServers);
     await ArrayStorage.save("DNSKeys", DNSKeys);
     await ArrayStorage.save("gUsers", gUsers);
 }
 
 async function loadAllArrays() {
     nodes = await ArrayStorage.load("nodes");
-    console.log("nodes loaded", nodes)
+    //console.log("nodes loaded", nodes)
 
     const arrayTotal = 8;
     const fsTotal = nodes.length;
@@ -305,32 +311,33 @@ async function loadAllArrays() {
     drawFSProgress(++done, total);
 
     map = await ArrayStorage.load("map");
-    console.log("Map loaded", map)
+    //console.log("Map loaded", map)
     drawFSProgress(++done, total);
 
     locations = await ArrayStorage.load("locations");
-    console.log("locations loaded", locations)
+    //console.log("locations loaded", locations)
     drawFSProgress(++done, total);
 
     passwords = await ArrayStorage.load("passwords");
-    console.log("passwords loaded", passwords)
+    //console.log("passwords loaded", passwords)
     drawFSProgress(++done, total);
 
     cities = await ArrayStorage.load("cities");
-    console.log("cities loaded", cities)
+    //console.log("cities loaded", cities)
     drawFSProgress(++done, total);
 
 
     emailProviders = await ArrayStorage.load("emailProviders");
-    console.log("emailProviders loaded", emailProviders)
+    //console.log("emailProviders loaded", emailProviders)
     drawFSProgress(++done, total);
 
+    DNSServers = await ArrayStorage.load("DNSServers");
     DNSKeys = await ArrayStorage.load("DNSKeys");
-    console.log("DNSKeys loaded", DNSKeys)
+    //console.log("DNSKeys loaded", DNSKeys)
     drawFSProgress(++done, total);
 
     gUsers = await ArrayStorage.load("gUsers");
-    console.log("gUsers loaded", gUsers)
+    //console.log("gUsers loaded", gUsers)
     drawFSProgress(++done, total);
     player = gUsers[0];
 

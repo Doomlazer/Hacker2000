@@ -411,6 +411,7 @@ async function createFS(n) {
 }
 
 function fsDNS(fs, ip, n) {
+    //console.log("fsdns ip: ", ip, " node number ", n);
     fs.createFolder(
         `C:\\System\\DNS`,
         1,
@@ -423,7 +424,7 @@ function fsDNS(fs, ip, n) {
         JSON.stringify(DNSKeys),
         0
     );
-    //console.log("sssss" + fs.readFile(`C:\\System\\DNS\\entries.txt`, 0))
+    //console.log(ip, fs.readFile(`C:\\System\\DNS\\entries.txt`, 0))
     fs.createFile(
         `C:\\System\\bin\\dns`,
         0,
@@ -890,9 +891,9 @@ async function populateEmailServers(i) {
         fs.createFolder(`C:\\Email`, 0, 0);
     }
     //console.log(`C:\\Email\\${e[0]}`);
-    //console.log(fs.createFolder(`C:\\Email\\${e[0]}`, 0, 0));
-    //fs.createFolder(`C:\\Email\\${e[0]}\\Acct`, 0, 0);
-    //fs.createFile(`C:\\Email\\${e[0]}\\Acct\\pswd.txt`, 0, 0, nodes[i].accounts[1].pwd, 0);
+    fs.createFolder(`C:\\Email\\${e[0]}`, 0, 0);
+    fs.createFolder(`C:\\Email\\${e[0]}\\Acct`, 0, 0);
+    fs.createFile(`C:\\Email\\${e[0]}\\Acct\\pswd.txt`, 0, 0, nodes[i].accounts[1].pwd, 0);
     fs.createFolder(`C:\\Email\\${e[0]}\\Inbox`, 0, 0);
     fs.createFolder(`C:\\Email\\${e[0]}\\Sent`, 0, 0);
 
@@ -921,8 +922,8 @@ async function populateEmailServers(i) {
     //console.log(nodes[i].accounts[1].pwd);
     fs.createFile(`C:\\Email\\${e[0]}\\Inbox\\${email.messageId}`, 0, 0, JSON.stringify(email), 0);
 
-    await fs.save();
-    //console.log(fs.getFolder('C:\\Email'))
+    //await fs.save();
+    //console.log(fs.list('C:\\Email'))
 }
 
 function spawnClock() {

@@ -2529,21 +2529,11 @@ class FileSystem {
         indent = ""
     ) {
 
-        console.log(
-            `${indent}${folder.name}/`
-        );
+        console.log(`${indent}${folder.name}/`);
 
 
-        for (
-            const child of
-            Object.values(folder.folders)
-        ) {
-
-            this.print(
-                child,
-                indent + "    "
-            );
-
+        for (const child of Object.values(folder.folders)) {
+            this.print(child, indent + "    ");
         }
 
 
