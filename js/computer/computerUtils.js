@@ -405,8 +405,6 @@ async function createFS(n) {
         0
     );
 
-    await fs.save();
-
     return fs;
 }
 

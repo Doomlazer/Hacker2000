@@ -288,15 +288,50 @@ function drawMap() {
             (node.longitude * mapScale) + mapXOff - (bSize * mapScale/2),
             (-node.latitude * mapScale) + mapYOff - (bSize * mapScale/2),
             bSize * mapScale,
-            bSize * mapScale);
+            bSize * mapScale
+        );
 
         // loc label
         ctx.fillStyle = '#20974c';
         ctx.font = scaleFont(0.018, "arial");
         let lt = node.country + ", ip: " + node.ip_address;
-        ctx.fillText(lt,
-                    (node.longitude * mapScale) + mapXOff,
-                    (-node.latitude * mapScale) + mapYOff);
+        ctx.fillText(
+            lt,
+            (node.longitude * mapScale) + mapXOff,
+            (-node.latitude * mapScale) + mapYOff
+        );
+    }
+    // nuked to death
+    let thresh = 50;
+    if (nukes.length >= thresh) {
+        let i = 0;
+        let count = 0;
+        let crash = 99;
+        // count completed ICBM strikes
+        while (i < nukes.length - 1) {
+            let n = nukes[i];
+            let p = nukeProgress(n.city0, n.city1, n.launchTime).progress;
+            if (p == 100) {
+                count ++;
+            }
+            i ++;
+        }
+        if (count >= thresh) {
+            ctx.fillStyle = '#03fa30';
+            const fontSize = mapScale * 30;
+            ctx.font = `${fontSize}px Impact, "Arial Black", sans-serif`;
+            ctx.globalAlpha = 0.5;
+            ctx.fillText(
+                "NUCL34R W1N74R",
+                mapXOff - (110 * mapScale),
+                mapYOff
+            );
+            ctx.globalAlpha = 1;
+        }
+        if (count >= crash) {
+            indexedDB.deleteDatabase("VirtualFileSystemDB");
+            location.reload();
+        }
     }
 }
 
@@ -655,9 +690,12 @@ function drawWin(win) { // draw a window
 
             // clock
             if (win.type == "clock") {
-                win.displayLines = [];
-                win.text = gameTimer.formatted();
-                win.setText(win.text, false);
+                if (win.text != gameTimer.formatted()) {
+                    win.displayLines = [];
+                    //console.log("clock change", win.text, gameTimer.formatted())
+                    win.text = gameTimer.formatted();
+                    win.setText(win.text, false);
+                }
             }
 
             // minesweeper
@@ -1945,187 +1983,211 @@ function drawArch(
     point = 100,
     launchTime
 ) {
-    // --------------------------------------------------
-    // Convert geographic coordinates to screen coordinates
-    // --------------------------------------------------
-    const x0 = (city0.lon * mapScale) + mapXOff;
-    const y0 = (-city0.lat * mapScale) + mapYOff;
+    if (gameTimer.elapsed() >= launchTime) {
+        // --------------------------------------------------
+        // Convert geographic coordinates to screen coordinates
+        // --------------------------------------------------
+        const x0 = (city0.lon * mapScale) + mapXOff;
+        const y0 = (-city0.lat * mapScale) + mapYOff;
 
-    const x1 = (city1.lon * mapScale) + mapXOff;
-    const y1 = (-city1.lat * mapScale) + mapYOff;
+        const x1 = (city1.lon * mapScale) + mapXOff;
+        const y1 = (-city1.lat * mapScale) + mapYOff;
 
-    // --------------------------------------------------
-    // Distance between cities in screen coordinates
-    // --------------------------------------------------
-    const dx = x1 - x0;
-    const dy = y1 - y0;
-    const distance = Math.hypot(dx, dy);
+        // --------------------------------------------------
+        // Distance between cities in screen coordinates
+        // --------------------------------------------------
+        const dx = x1 - x0;
+        const dy = y1 - y0;
+        const distance = Math.hypot(dx, dy);
 
-    if (distance < 1) return;
+        if (distance < 1) return;
 
-    // --------------------------------------------------
-    // SCREEN-SPACE styling
-    //
-    // These should NOT change with mapScale.
-    // --------------------------------------------------
-    const lineWidth = Math.max(2, 0.3 * mapScale);
-    const dashLength = 1.5 * mapScale;
-    const gapLength = 0.5 * mapScale;
+        // --------------------------------------------------
+        // SCREEN-SPACE styling
+        //
+        // These should NOT change with mapScale.
+        // --------------------------------------------------
+        const lineWidth = Math.max(2, 0.3 * mapScale);
+        const dashLength = 1.5 * mapScale;
+        const gapLength = 0.5 * mapScale;
 
-    let ballRadius;
+        let ballRadius;
 
-    // --------------------------------------------------
-    // ARCH GEOMETRY
-    //
-    // Height is proportional to the distance between
-    // the cities. Since distance already contains
-    // mapScale, the entire arch scales proportionally.
-    //
-    // Do NOT multiply archHeight by mapScale again.
-    // --------------------------------------------------
-    const archHeight = distance * height;
+        // --------------------------------------------------
+        // ARCH GEOMETRY
+        //
+        // Height is proportional to the distance between
+        // the cities. Since distance already contains
+        // mapScale, the entire arch scales proportionally.
+        //
+        // Do NOT multiply archHeight by mapScale again.
+        // --------------------------------------------------
+        const archHeight = distance * height;
 
-    // --------------------------------------------------
-    // Perpendicular vector
-    // --------------------------------------------------
-    const perpX = -dy / distance;
-    const perpY = dx / distance;
+        // --------------------------------------------------
+        // Perpendicular vector
+        // --------------------------------------------------
+        const perpX = -dy / distance;
+        const perpY = dx / distance;
 
-    // Always point north/up
-    const direction = perpY > 0 ? -1 : 1;
+        // Always point north/up
+        const direction = perpY > 0 ? -1 : 1;
 
-    const nx = perpX * direction;
-    const ny = perpY * direction;
+        const nx = perpX * direction;
+        const ny = perpY * direction;
 
-    // --------------------------------------------------
-    // Quadratic Bézier control point
-    // --------------------------------------------------
-    const cx = (x0 + x1) / 2;
-    const cy = (y0 + y1) / 2;
+        // --------------------------------------------------
+        // Quadratic Bézier control point
+        // --------------------------------------------------
+        const cx = (x0 + x1) / 2;
+        const cy = (y0 + y1) / 2;
 
-    const cpx = cx + nx * archHeight;
-    const cpy = cy + ny * archHeight;
+        const cpx = cx + nx * archHeight;
+        const cpy = cy + ny * archHeight;
 
-    // --------------------------------------------------
-    // Clamp progress
-    // --------------------------------------------------
-    const t = Math.max(0, Math.min(100, point)) / 100;
+        // --------------------------------------------------
+        // Clamp progress
+        // --------------------------------------------------
+        const t = Math.max(0, Math.min(100, point)) / 100;
 
-    // --------------------------------------------------
-    // Ball size
-    //
-    // Keep the ball in screen pixels so it doesn't
-    // change size when zooming.
-    // --------------------------------------------------
-    if (point == 100) {
-        city1.nukeCounter += 0.2;
-        city1.nukeCounter = Math.min(city1.nukeCounter, 20);
-        ballRadius = (city1.nukeCounter/10) * mapScale;
-    } else {;
-        city1.nukeCounter = 0.25 * mapScale;
-        ballRadius =  city1.nukeCounter;
-    }
+        // --------------------------------------------------
+        // Ball size
+        //
+        // Keep the ball in screen pixels so it doesn't
+        // change size when zooming.
+        // --------------------------------------------------
+        if (point == 100) {
+            city1.nukeCounter += 0.2;
+            city1.nukeCounter = Math.min(city1.nukeCounter, 20);
+            ballRadius = (city1.nukeCounter/10) * mapScale;
+        } else {;
+            city1.nukeCounter = 0.25 * mapScale;
+            ballRadius =  city1.nukeCounter;
+        }
 
-    // --------------------------------------------------
-    // Position of ball on curve
-    // --------------------------------------------------
-    const u = 1 - t;
+        // --------------------------------------------------
+        // Position of ball on curve
+        // --------------------------------------------------
+        const u = 1 - t;
 
-    const px =
-        u * u * x0 +
-        2 * u * t * cpx +
-        t * t * x1;
+        const px =
+            u * u * x0 +
+            2 * u * t * cpx +
+            t * t * x1;
 
-    const py =
-        u * u * y0 +
-        2 * u * t * cpy +
-        t * t * y1;
+        const py =
+            u * u * y0 +
+            2 * u * t * cpy +
+            t * t * y1;
 
-    // --------------------------------------------------
-    // Control point for partial curve
-    // --------------------------------------------------
-    const partialCpx = x0 + t * (cpx - x0);
-    const partialCpy = y0 + t * (cpy - y0);
+        // --------------------------------------------------
+        // Control point for partial curve
+        // --------------------------------------------------
+        const partialCpx = x0 + t * (cpx - x0);
+        const partialCpy = y0 + t * (cpy - y0);
 
-    ctx.save();
+        ctx.save();
 
-    // --------------------------------------------------
-    // Dashed arch
-    // --------------------------------------------------
-    if (point == 100) {
-        ctx.strokeStyle = "#4b4a4a";
-    } else {
-        ctx.strokeStyle = color;
-    }
 
-    ctx.lineWidth = lineWidth;
-    ctx.lineCap = "butt";
+        // --------------------------------------------------
+        // Dashed arch
+        // --------------------------------------------------
+        if (point == 100) {
+            ctx.strokeStyle = "#4b4a4a";
+        } else {
+            ctx.strokeStyle = color;
+        }
 
-    ctx.setLineDash([dashLength, gapLength]);
+        ctx.lineWidth = lineWidth;
+        ctx.lineCap = "butt";
 
-    if (point == 100) {
-        ctx.lineDashOffset = 0;
-    } else {
-        ctx.lineDashOffset = player.archDashOffset;
+        ctx.setLineDash([dashLength, gapLength]);
+
+        if (point == 100) {
+            ctx.lineDashOffset = 0;
+        } else {
+            ctx.lineDashOffset = player.archDashOffset;
+
+            ctx.beginPath();
+
+            ctx.moveTo(x0, y0);
+
+            ctx.quadraticCurveTo(
+                partialCpx,
+                partialCpy,
+                px,
+                py
+            );
+
+            ctx.stroke();
+        }
+
+        // --------------------------------------------------
+        // Ball
+        // --------------------------------------------------
+        ctx.setLineDash([]);
+
+        if (point == 100) {
+            ctx.fillStyle = "#82f81c";
+            ctx.globalAlpha = 0.35;
+        } else {
+            ctx.fillStyle = "#FFFFFF";
+            ctx.globalAlpha = 1;
+        }
 
         ctx.beginPath();
 
-        ctx.moveTo(x0, y0);
-
-        ctx.quadraticCurveTo(
-            partialCpx,
-            partialCpy,
+        ctx.arc(
             px,
-            py
+            py,
+            ballRadius,
+            0,
+            Math.PI * 2
         );
 
-        ctx.stroke();
-    }
+        ctx.fill();
 
-    // --------------------------------------------------
-    // Ball
-    // --------------------------------------------------
-    ctx.setLineDash([]);
-
-    if (point == 100) {
-        ctx.fillStyle = "#82f81c";
-        ctx.globalAlpha = 0.35;
-    } else {
-        ctx.fillStyle = "#FFFFFF";
         ctx.globalAlpha = 1;
-    }
 
-    ctx.beginPath();
+        // --------------------------------------------------
+        // Text
+        // scale and clamp at 20px
+        // --------------------------------------------------
+        const fontSize = scaledFontSize(1.5, 20);
+        ctx.font = `${fontSize}px arial`;
 
-    ctx.arc(
-        px,
-        py,
-        ballRadius,
-        0,
-        Math.PI * 2
-    );
+        // Keep line spacing proportional to the actual font size
+        const lineGap = fontSize * 1.1;
 
-    ctx.fill();
-
-    ctx.globalAlpha = 1;
-
-    // --------------------------------------------------
-    // Text
-    // scale and clamp at 20px
-    // --------------------------------------------------
-    const fontSize = scaledFontSize(1.5, 20);
-    ctx.font = `${fontSize}px arial`;
-
-    // Keep line spacing proportional to the actual font size
-    const lineGap = fontSize * 1.1;
-
-    if (point == 100) {
-        // ICMB reached target, print casualties
-        if (mouseX > px - 5 &&
-            mouseX < px + 5 &&
-            mouseY > py - 5 &&
-            mouseY < py + 5
-        ) {
+    
+        if (point == 100) {
+            // ICMB reached target, print casualties
+            if (mouseX > px - 5 &&
+                mouseX < px + 5 &&
+                mouseY > py - 5 &&
+                mouseY < py + 5
+            ) {
+                shadowText(
+                    ctx,
+                    `Target: ${city1.name}, ${city1.country}`,
+                    px + 10,
+                    py + 5,
+                    2,
+                    "#FFFFFF",
+                    "#000000"
+                );
+                shadowText(
+                    ctx,
+                    `Est. casualties: ${city1.population}`,
+                    px + 10,
+                    py + 5 + lineGap,
+                    2,
+                    "#FFFFFF",
+                    "#000000"
+                );
+            }
+        } else {
+            // ICBM in transit, show ETA
             shadowText(
                 ctx,
                 `Target: ${city1.name}, ${city1.country}`,
@@ -2137,7 +2199,7 @@ function drawArch(
             );
             shadowText(
                 ctx,
-                `Est. casualties: ${city1.population}`,
+                `ETA: ${nukeProgress(city0, city1, launchTime).eta}`,
                 px + 10,
                 py + 5 + lineGap,
                 2,
@@ -2145,28 +2207,8 @@ function drawArch(
                 "#000000"
             );
         }
-    } else {
-        // ICBM in transit, show ETA
-        shadowText(
-            ctx,
-            `Target: ${city1.name}, ${city1.country}`,
-            px + 10,
-            py + 5,
-            2,
-            "#FFFFFF",
-            "#000000"
-        );
-        shadowText(
-            ctx,
-            `ETA: ${nukeProgress(city0, city1, launchTime).eta}`,
-            px + 10,
-            py + 5 + lineGap,
-            2,
-            "#FFFFFF",
-            "#000000"
-        );
+        ctx.restore();
     }
-    ctx.restore();
 }
 
 function shadowText(c1, text, x, y, dist, foreCol, backCol) {

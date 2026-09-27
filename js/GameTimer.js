@@ -45,6 +45,18 @@ class GameTimer {
         };
     }
     
+    setTime(value) {
+        if (value instanceof Date) {
+            this.startDate = new Date(value);
+            this.realStartTime = Date.now();
+        } else if (typeof value === "number") {
+            this.realStartTime = this.realStartTime + value //new Date(this.realStartTime + value);
+            console.log("time ",this.startDate);
+        } else {
+            throw new TypeError("setTime expects a Date or milliseconds");
+        }
+    }
+
     formatted(offset = 0) {
         const elapsed = Date.now() - this.realStartTime + offset;
         const gameDate = new Date(this.startDate.getTime() + elapsed);

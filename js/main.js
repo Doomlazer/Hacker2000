@@ -34,7 +34,7 @@ let emailProviders = ["MailSphere.com", "ZipPost.net", "InboxZone.com", "WebLett
     "WebPost.com", "MailWorks.net", "RabbitMail.com","EZMail.com", "KillerMail.net"];
 let DNSServers = ["1.1.1.1", "8.8.8.8"];
 let DNSKeys = {};
-let locpnum;
+let locpnum = 777;
 const deck = [
         "AH", "2H", "3H", "4H", "5H", "6H", "7H", "8H", "9H", "10H", "JH", "QH", "KH",
         "AD", "2D", "3D", "4D", "5D", "6D", "7D", "8D", "9D", "10D", "JD", "QD", "KD",
@@ -218,6 +218,16 @@ function frame(timestamp) {
     draw();
     //renderer.flush(cameraMatrix);
 
+    // save time
+    const now = new Date();
+    const seconds = now.getSeconds();
+    if (seconds % 30 === 0 && gUsers[1] + 1000 < gameTimer.elapsed()) {
+        gUsers[1] = gameTimer.elapsed();
+        gUsers[3] = cast[0]; // mal90
+        saveAllArrays();
+        console.log("autosaving ", seconds, gUsers[1],gUsers[2]);
+    }
+
     requestAnimationFrame(frame);
 }
 
@@ -239,6 +249,7 @@ async function createAllFS() {
                 )
             )
         );
+        await nodes[0].fileSystem.save();
 
         drawFSProgress(end, locations.length);
         drawFSProgress(0, locations.length, 1);
@@ -297,14 +308,22 @@ async function saveAllArrays() {
     await ArrayStorage.save("emailProviders", emailProviders);
     await ArrayStorage.save("DNSKeys", DNSServers);
     await ArrayStorage.save("DNSKeys", DNSKeys);
+    gUsers[1] = {
+        realStartTime: gameTimer.realStartTime,
+        startDate: gameTimer.startDate.getTime()
+    };
+    gUsers[2] = locpnum;
+    gUsers[3] = JSON.stringify(cast[0]);
     await ArrayStorage.save("gUsers", gUsers);
+    await ArrayStorage.save("nukes", nukes);
+    //console.log(nukes, " save nukes");
 }
 
 async function loadAllArrays() {
     nodes = await ArrayStorage.load("nodes");
     //console.log("nodes loaded", nodes)
 
-    const arrayTotal = 8;
+    const arrayTotal = 9;
     const fsTotal = nodes.length;
     const total = arrayTotal + fsTotal;
     let done = 0;
@@ -340,12 +359,23 @@ async function loadAllArrays() {
     //console.log("gUsers loaded", gUsers)
     drawFSProgress(++done, total);
     player = gUsers[0];
+    gameTimer.realStartTime = gUsers[1].realStartTime;
+    gameTimer.startDate = new Date(gUsers[1].startDate);
+    locpnum = gUsers[2];
+
+    nukes = await ArrayStorage.load("nukes");
+    //console.log("cities loaded", cities)
+    drawFSProgress(++done, total);
+    //console.log(nukes, " load nukes");
 
 
     let playersWindow = new aniRect(getWidth()/20, getHeight()/8, getWidth()/3, getHeight()/1.5);
     attachNode(playersWindow, nodes[0]);
     playersWindow.admins.push(0); // add player as admin to own computer
     cast.push(playersWindow);
+    //console.log(JSON.parse(gUsers[3]).displayLines)
+    cast[0].displayLines = JSON.parse(gUsers[3]).displayLines;
+    cast[0].setText("Welcome back...")
 
 
     // reload node fs

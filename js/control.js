@@ -33,6 +33,9 @@ function doWheel(e) {
             adjustedWindow = true;
 
             c.wheelOff += e.deltaY;
+            if (c.type == "clock") {
+                gameTimer.setTime(e.deltaY*50);
+            }
 
             // set max
             c.textMaxLines = Math.floor((c.yH - o) / (c.fontSize * 1.25));
@@ -343,6 +346,8 @@ function doClick(e) {
 
 function doMouseDown(e) {
     e.preventDefault();
+    //saveAllArrays();
+    //gameTimer.setTime(10000);
 
     if (e.button === 2) {
         doClick(e);

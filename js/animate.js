@@ -97,7 +97,7 @@ class aniRect {
 
     setText(theText, prompt = true) {
 
-        if (player.t2s) {
+        if (player.t2s && this.type != "clock") {
             speak(theText);
         }
         
@@ -125,7 +125,7 @@ class aniRect {
         }
         if (this.type == "none") {
             // force the mal90 scroll to bottom
-            this.wheelOff += 10000
+            this.wheelOff += 100000
         }
     }
 
