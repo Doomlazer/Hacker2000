@@ -51,7 +51,7 @@ class GameTimer {
             this.realStartTime = Date.now();
         } else if (typeof value === "number") {
             this.realStartTime = this.realStartTime + value //new Date(this.realStartTime + value);
-            console.log("time ",this.startDate);
+            //console.log("time ",this.startDate);
         } else {
             throw new TypeError("setTime expects a Date or milliseconds");
         }

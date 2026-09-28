@@ -414,6 +414,7 @@ Mal90 Operations Manual
         \t\t\t- X3r0x v1.001.065 Aug 1994
         `;
     spawnReadWin(win, text);
+    
     if (player.t2s) {
         speak(text.slice(268));
     }
@@ -611,11 +612,13 @@ function sshCommand(win, command) {
         let notFound = true;
         for (let i of nodes) {
             if (ip == i.ip_address) {
-                player.nodeStack.push(i.id);
-                logSSH(win);
-                attachNode(win, nodes[i.id]);
-                win.setProxyText();
-                notFound = false;
+                if (!i.nuked) {
+                    player.nodeStack.push(i.id);
+                    logSSH(win);
+                    attachNode(win, nodes[i.id]);
+                    win.setProxyText();
+                    notFound = false;
+                }
             }
         }
 
@@ -845,11 +848,12 @@ function scanCommand(win, command) {
         // and hopes one is in the selected country
         for (let i = 0; i < 100; i++) {
             const r = getRandInt(nodes.length);
-            if (nodes[r].country == player.selCountry && !nodes[r].discoverd) {
-                nodes[r].discovered = true;
-                win.text += `Found...${nodes[r].ip_address}\n`;
+            const n = nodes[r];
+            if (n.country == player.selCountry && !n.discoverd && !n.nuked) {
+                n.discovered = true;
+                win.text += `Found...${n.ip_address}\n`;
                 win.setText(win.text);
-                player.lastScanIP.push(nodes[r].ip_address);
+                player.lastScanIP.push(n.ip_address);
                 mapCitiesSteps = 0;
                 mapNodeSteps = 0;
                 updateMap = true;
@@ -936,6 +940,7 @@ function speakCommand(win, command){
         }
         
     }
+    saveAllArrays();
 }
 
 function brutecCommand(win, command) {
@@ -960,7 +965,7 @@ function brutecCommand(win, command) {
                 //console.log("player.lastScanIP: ", player.lastScanIP.length);  
                 let notFound = true;
                 for (let i of nodes) {
-                    if (player.lastScanIP[j] == i.ip_address) {
+                    if (player.lastScanIP[j] == i.ip_address && !i.nuked) {
                         notFound = false;
                         spawnBruteWin(win, command, player.lastScanIP[j], "root", nodes[i.id]);
                     }

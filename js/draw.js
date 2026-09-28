@@ -302,11 +302,11 @@ function drawMap() {
         );
     }
     // nuked to death
-    let thresh = 50;
+    let thresh = 120;
     if (nukes.length >= thresh) {
         let i = 0;
         let count = 0;
-        let crash = 99;
+        let crash = 1666;
         // count completed ICBM strikes
         while (i < nukes.length - 1) {
             let n = nukes[i];
@@ -349,8 +349,14 @@ function drawCities(bSize) {
                 if (city.population > player.cityPopulationThreshold) {
                     // gradient effect
                     ctxMarkers.globalAlpha = 1;
-                    ctxMarkers.strokeStyle = brighten('#0048ff', city.lat * 0.4 - 20);
-                    ctxMarkers.lineWidth = 1;
+                    if (city.nuked) {
+                        ctxMarkers.lineWidth = 4;
+                        ctxMarkers.strokeStyle = brighten('#ff0000', city.lat * 0.4 - 20);
+                    } else {
+                        ctxMarkers.lineWidth = 1;
+                        ctxMarkers.strokeStyle = brighten('#0048ff', city.lat * 0.4 - 20);
+                    }
+        
                     ctxMarkers.strokeRect(
                         (city.lon * mapScale) + mapXOff - (bSize * mapScale/2),
                         (-city.lat * mapScale) + mapYOff  - (bSize * mapScale/2),
@@ -375,7 +381,7 @@ function drawNodes(bSize) {
         mapNodeSteps += 1 + mapNodeSteps/4;
         for (let i = 0; i < nodes.length; i++) {
             let node = nodes[i];
-            if (i < mapNodeSteps && node.discovered) {
+            if (i < mapNodeSteps && node.discovered && !node.nuked) {
                 ctxMarkers.strokeStyle = '#a40396';
                 ctxMarkers.lineWidth = 4;
                 ctxMarkers.strokeRect(
@@ -2057,6 +2063,7 @@ function drawArch(
         // change size when zooming.
         // --------------------------------------------------
         if (point == 100) {
+            //console.log(!city1.nuked) 
             city1.nukeCounter += 0.2;
             city1.nukeCounter = Math.min(city1.nukeCounter, 20);
             ballRadius = (city1.nukeCounter/10) * mapScale;
@@ -2064,6 +2071,109 @@ function drawArch(
             city1.nukeCounter = 0.25 * mapScale;
             ballRadius =  city1.nukeCounter;
         }
+
+        // ICBM damage to city and nodes
+        if (point == 100 && !city1.nuked) {
+            city1.nuked = true;
+            console.log(!city1.nuked) 
+
+            // --------------------------------------------------
+            // Distance between two geographic coordinates
+            // Returns kilometers
+            // --------------------------------------------------
+            function distanceKm(lat1, lon1, lat2, lon2) {
+                const R = 6371; // Earth radius in km
+
+                const dLat = (lat2 - lat1) * Math.PI / 180;
+                const dLon = (lon2 - lon1) * Math.PI / 180;
+
+                const a =
+                    Math.sin(dLat / 2) ** 2 +
+                    Math.cos(lat1 * Math.PI / 180) *
+                    Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLon / 2) ** 2;
+
+                return R * 2 * Math.atan2(
+                    Math.sqrt(a),
+                    Math.sqrt(1 - a)
+                );
+            }
+
+            // --------------------------------------------------
+            // Nuke origin
+            // --------------------------------------------------
+            const lat0 = city1.lat;
+            const lon0 = city1.lon;
+
+            // --------------------------------------------------
+            // Damage to nodes
+            // --------------------------------------------------
+            for (let n of nodes) {
+
+                const distance = distanceKm(
+                    lat0,
+                    lon0,
+                    n.latitude,
+                    n.longitude
+                );
+
+                // 500 km blast radius
+                if (distance < 200) {
+
+                    if (!n.nuked) {
+                        n.nuked = true;
+
+                        if (player.nodeStack.includes(n.id)) {
+                            const i = player.nodeStack.indexOf(n.id);
+
+                            // Remove this node and everything after it
+                            player.nodeStack = player.nodeStack.slice(0, i);
+
+                            mapNodeSteps = 0;
+                            updateMap = true;
+                        }
+                    }
+                }
+            }
+
+            // --------------------------------------------------
+            // Damage to cities
+            // --------------------------------------------------
+            for (let n of cities) {
+
+                const distance = distanceKm(
+                    lat0,
+                    lon0,
+                    n.lat,
+                    n.lon
+                );
+                /*console.log(
+                            "Nuked:",
+                            n.name,
+                            "distance:",
+                            distance,
+                            "km"
+                        );*/
+                //console.log("distance",distance, n)
+                // 800 km blast radius
+                if (distance < 200) {
+
+                    if (!n.nuked) {
+                        n.nuked = true;
+                        mapCitiesSteps = 0;
+                        updateMap = true;
+                        console.log(
+                            "Nuked:",
+                            n.city,
+                            "distance:",
+                            distance,
+                            "km"
+                        );
+                    }
+                }
+            }
+        }
+
 
         // --------------------------------------------------
         // Position of ball on curve

@@ -80,6 +80,7 @@ function shuffle(array) {
 
 function speak(text, queue = 0, voice = 0) {
     console.log("speak",text)
+    
     if (!queue) {
         window.speechSynthesis.cancel();
     }

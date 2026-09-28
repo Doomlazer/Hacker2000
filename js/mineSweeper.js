@@ -36,7 +36,7 @@ function mineInit(win, s = 20, diff) {
     win.msBArray = [];
     win.msRArray = [];
     win.msFArray = [];
-    if (getRandInt(100) == 1) {
+    if (getRandInt(10) == 1) {
         win.coverStyle = `rgb(${getRandInt(255)}, ${getRandInt(255)}, ${getRandInt(255)})`;
     } else {
         win.coverStyle = `rgb(160, 160, 160)`;
@@ -145,7 +145,7 @@ function mineSweeperClick(xr, yr, button, win) {
                     if (win.msFArray[cel] != 1) {
                         mineSweeperGameOver(win);
                         if (player.t2s) {
-                            speak("BOOM! You step on a landmine, blowing your entire leg into a fine mist.");
+                            speak("BOooOM! You step on a landmine, vaporizing your entire lower leg into a fine mist.");
                         }
                     }
                     

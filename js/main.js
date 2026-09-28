@@ -314,6 +314,7 @@ async function saveAllArrays() {
     };
     gUsers[2] = locpnum;
     gUsers[3] = JSON.stringify(cast[0]);
+    gUsers[4] = player.t2sVoice;
     await ArrayStorage.save("gUsers", gUsers);
     await ArrayStorage.save("nukes", nukes);
     //console.log(nukes, " save nukes");
@@ -355,6 +356,12 @@ async function loadAllArrays() {
     //console.log("DNSKeys loaded", DNSKeys)
     drawFSProgress(++done, total);
 
+    nukes = await ArrayStorage.load("nukes");
+    //console.log("cities loaded", cities)
+    drawFSProgress(++done, total);
+    //console.log(nukes, " load nukes");
+
+
     gUsers = await ArrayStorage.load("gUsers");
     //console.log("gUsers loaded", gUsers)
     drawFSProgress(++done, total);
@@ -362,20 +369,14 @@ async function loadAllArrays() {
     gameTimer.realStartTime = gUsers[1].realStartTime;
     gameTimer.startDate = new Date(gUsers[1].startDate);
     locpnum = gUsers[2];
-
-    nukes = await ArrayStorage.load("nukes");
-    //console.log("cities loaded", cities)
-    drawFSProgress(++done, total);
-    //console.log(nukes, " load nukes");
-
-
     let playersWindow = new aniRect(getWidth()/20, getHeight()/8, getWidth()/3, getHeight()/1.5);
     attachNode(playersWindow, nodes[0]);
-    playersWindow.admins.push(0); // add player as admin to own computer
+    //playersWindow.admins.push(0); // add player as admin to own computer
     cast.push(playersWindow);
     //console.log(JSON.parse(gUsers[3]).displayLines)
     cast[0].displayLines = JSON.parse(gUsers[3]).displayLines;
     cast[0].setText("Welcome back...")
+    player.t2sVoice = gUsers[4];
 
 
     // reload node fs

@@ -980,7 +980,7 @@ function nukeProgress(city0, city1, launchTime) {
 function getCities(country) {
     let list = [];
     for (let i = 0; i < cities.length; i++) {
-        if (cities[i].country === country) {
+        if (cities[i].country === country && !cities[i].nuked) {
             list.push(i)
         }
     }
@@ -990,6 +990,7 @@ function getCities(country) {
 function processNukes() {
     for (let n of nukes) {
         //console.log(n, " nukeporgress: ", nukeProgress(n.city0, n.city1, n.launchTime))
+        //console.log("n.city1",n.city1);
         let p = nukeProgress(n.city0, n.city1, n.launchTime).progress
         let t = n.city0.country;
         let iso3 = getCountryData(t).iso3;
@@ -1005,12 +1006,22 @@ function processNukes() {
             n.gotResponse = true;
             // can the targeted city nuke? try
             barrage(n.city1, n.city0);
+    
 
             // allies that will respond on target's behalf?
             const retaliation = getRetaliationOptions(n.city1.country);
             for (let c of retaliation) {
                 if (c.relationship == "ally") {
                     barrage(c, n.city0);
+                }
+            }
+
+            // maybe nuke their friends
+            if (getRandInt(10) > 5) {
+                for (let c of retaliation) {
+                    if (c.relationship == "enemy") {
+                        barrage(n.city1, c);
+                    }
                 }
             }
         }
@@ -1029,15 +1040,18 @@ function barrage(cityF, cityT) {
 
     let fromList = getCities(cityF.country);
     let toList = getCities(cityT.country);
-    let num = Math.min(nukeNumber, fromList.length, toList.length, getRandInt(8)+1);
+    let num = Math.min(nukeNumber, fromList.length, toList.length, getRandInt(20)+1);
     //console.log(fromList.length, toList.length, num)
     
     for (let i = 0; i < num; i++) {
         let cityF = cities[fromList[getRandInt(fromList.length)]];
         let cityT = cities[toList[getRandInt(toList.length)]];
         //console.log(cityF, cityT)
-        if (getRandInt(100) > nukes.length) {
-            const n = new Nuke(cityF, cityT, gameTimer.elapsed());
+        if (getRandInt(150) > nukes.length) {
+            if (!cityF.nuked) {
+                //cityT.nuked = true;
+                const n = new Nuke(cityF, cityT, gameTimer.elapsed() + getRandInt(4000));
+            }
             //cast[0].text = `${cityF.country} has retaliated against ${cityT.country}...`;
             //cast[0].setText(cast[0].text);
         }
