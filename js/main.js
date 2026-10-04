@@ -313,7 +313,7 @@ async function saveAllArrays() {
         startDate: gameTimer.startDate.getTime()
     };
     gUsers[2] = locpnum;
-    gUsers[3] = JSON.stringify(cast[0]);
+    gUsers[3] = JSON.stringify(cast[0].displayLines);
     gUsers[4] = player.t2sVoice;
     await ArrayStorage.save("gUsers", gUsers);
     await ArrayStorage.save("nukes", nukes);
@@ -374,7 +374,7 @@ async function loadAllArrays() {
     //playersWindow.admins.push(0); // add player as admin to own computer
     cast.push(playersWindow);
     //console.log(JSON.parse(gUsers[3]).displayLines)
-    cast[0].displayLines = JSON.parse(gUsers[3]).displayLines;
+    cast[0].displayLines = JSON.parse(gUsers[3]);
     cast[0].setText("Welcome back...")
     player.t2sVoice = gUsers[4];
 

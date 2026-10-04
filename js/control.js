@@ -79,6 +79,7 @@ function doWheel(e) {
         mapCitiesSteps = 0;
         mapNodeSteps = 0;
         mapNodeStackSteps = 0;
+        ctxMarkers.clearRect(0, 0, cMarkers.width, cMarkers.height);
     }
 }
 
@@ -96,7 +97,7 @@ function doMouseMove(e) {
 
     //console.log("player !== undefined", player !== "undefined")
     //console.log("player.ignoreMouseDrag ",player.ignoreMouseDrag)
-    if (player !== "undefined" && player.ignoreMouseDrag) {
+    if (player !== "undefined" && player?.ignoreMouseDrag) {
         // clicking on not shown cards needs to have no effect
         // without ingnoreMouseDrag we'd be moving the map
         adjustedWindow = true;
@@ -259,6 +260,7 @@ function doMouseMove(e) {
             mapCitiesSteps = 0;
             mapNodeSteps = 0;
             mapNodeStackSteps = 0;
+            ctxMarkers.clearRect(0, 0, cMarkers.width, cMarkers.height);
         }
     } else {
         mouseLabel = "";
@@ -594,6 +596,9 @@ function doMouseDown(e) {
                                 cast[0].setText(cast[0].text);
                                 player.selectedCity = city;
                                 updateMap = true;
+                                ctxMarkers.clearRect(0, 0, cMarkers.width, cMarkers.height);
+                                mapCitiesSteps = 0;
+                                mapNodeSteps = 0;
                             }
                         }
                     }
@@ -631,6 +636,9 @@ function doMouseDown(e) {
                             cast[0].textDisplayChar = 0;
                             player.selectedNode = nodes[i];
                             updateMap = true;
+                            ctxMarkers.clearRect(0, 0, cMarkers.width, cMarkers.height);
+                            mapCitiesSteps = 0;
+                            mapNodeSteps = 0;
                         }
                     } 
                 }          

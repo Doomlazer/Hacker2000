@@ -258,6 +258,9 @@ function commandHandler(win, mal = false) {
                     win.text = `ERROR: ${command[0]} - Unknown Command`;
                     win.setText(win.text);  
             }
+            if (command[0].toLowerCase() != "deleteall") {
+                saveAllArrays();
+            }
         } else {
             if (command[0].length < 1) {
                 win.text = 'SYNTAX ERROR: No command';
@@ -718,9 +721,14 @@ function mapCommand(win, command) {
         if (player.drawNodes) {
             player.drawNodes = false;
             win.setText("Hide nodes");
+            ctxMarkers.clearRect(0, 0, cMarkers.width, cMarkers.height);
+            mapCitiesSteps = cities.length - 1;
+            mapNodeSteps = 0;
         } else {
             player.drawNodes = true;
-            mapNodeSteps = 0
+            ctxMarkers.clearRect(0, 0, cMarkers.width, cMarkers.height);
+            mapCitiesSteps = cities.length - 1;
+            mapNodeSteps = nodes.length - 1;
             win.setText("Show nodes");
         }
     } else if (command[1].toLowerCase() == "cities" ||
@@ -729,11 +737,14 @@ function mapCommand(win, command) {
         if (player.drawCities) {
             player.drawCities = false;
             win.setText("Hide Cities");
+            ctxMarkers.clearRect(0, 0, cMarkers.width, cMarkers.height);
             mapCitiesSteps = 0;
-            mapSteps = 1000;
+            mapNodeSteps = nodes.length - 1;
         } else {
             player.drawCities = true;
-            mapCitiesSteps = 0
+            ctxMarkers.clearRect(0, 0, cMarkers.width, cMarkers.height);
+            mapCitiesSteps = 0;
+            mapNodeSteps = nodes.length - 1;
             win.setText(`Show Cities (Pop.Threshold: ${player.cityPopulationThreshold})`);
         }
     } else if (command[1].toLowerCase() == "center") {
@@ -854,9 +865,10 @@ function scanCommand(win, command) {
                 win.text += `Found...${n.ip_address}\n`;
                 win.setText(win.text);
                 player.lastScanIP.push(n.ip_address);
-                mapCitiesSteps = 0;
-                mapNodeSteps = 0;
-                updateMap = true;
+                //mapCitiesSteps = 0;
+                mapNodeSteps = 0; //nodes.length - 1;
+                //updateMap = true;
+
             }
         }
         win.text += "Scan Complete"
@@ -940,7 +952,6 @@ function speakCommand(win, command){
         }
         
     }
-    saveAllArrays();
 }
 
 function brutecCommand(win, command) {
