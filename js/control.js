@@ -350,6 +350,9 @@ function doMouseDown(e) {
     e.preventDefault();
     //saveAllArrays();
     //gameTimer.setTime(10000);
+    if (player.intro) {
+        player.intro = false;
+    }
 
     if (e.button === 2) {
         doClick(e);
@@ -743,6 +746,9 @@ function doMouseUp(e) {
 }
 
 function doKeyDown(e) {
+    if (player.intro) {
+        player.intro = false;
+    }
     if (player.mailWindow && player.mailWindow.authMode) {
         player.mailWindow.authKeyHandler(e);
     } else {

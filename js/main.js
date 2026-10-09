@@ -35,6 +35,12 @@ let emailProviders = ["MailSphere.com", "ZipPost.net", "InboxZone.com", "WebLett
 let DNSServers = ["1.1.1.1", "8.8.8.8"];
 let DNSKeys = {};
 let locpnum = 777;
+const introText4 = "By the end of the 20th century...";
+const introText0 = `Greedy corporate executives have completely ingored warnings about the Y2K bug`;
+const introText1 = `On midnight of the new millennium nearly all computer systems and networks crashed and were rendered`;
+const introText2 = `permantently disabled. 7 months after The Great Reset, as the world struggles to get back online, interests clash`;
+const introText3 = `and tensions rise between a new gereation of hackers and the evil corporations. You are...`;
+const introText5 = "HACKER2000";
 const deck = [
         "AH", "2H", "3H", "4H", "5H", "6H", "7H", "8H", "9H", "10H", "JH", "QH", "KH",
         "AD", "2D", "3D", "4D", "5D", "6D", "7D", "8D", "9D", "10D", "JD", "QD", "KD",
@@ -218,15 +224,16 @@ function frame(timestamp) {
     draw();
     //renderer.flush(cameraMatrix);
 
-    // save time
+    // since it should save on each command now, I dont need autosave
+    /*/ save time
     const now = new Date();
     const seconds = now.getSeconds();
     if (seconds % 30 === 0 && gUsers[1] + 1000 < gameTimer.elapsed()) {
         gUsers[1] = gameTimer.elapsed();
         gUsers[3] = cast[0]; // mal90
         saveAllArrays();
-        console.log("autosaving ", seconds, gUsers[1],gUsers[2]);
-    }
+        //console.log("autosaving ", seconds, gUsers[1],gUsers[2]);
+    }*/
 
     requestAnimationFrame(frame);
 }
@@ -288,6 +295,7 @@ async function createAllEmails() {
     const quota = await navigator.storage.estimate();
     console.log('Approx total allocated space:', formatBytes(quota.quota));
     console.log('Approx used space:', formatBytes(quota.usage));
+    speak(introText4);
     requestAnimationFrame(frame);
 }
 
@@ -377,7 +385,6 @@ async function loadAllArrays() {
     cast[0].displayLines = JSON.parse(gUsers[3]);
     cast[0].setText("Welcome back...")
     player.t2sVoice = gUsers[4];
-
 
     // reload node fs
     for (let i = 0; i < nodes.length; i++) {

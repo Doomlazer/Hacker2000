@@ -76,7 +76,6 @@ async function setAudioSource(url, array = phoneAudio) {
 
 function playMusic(window, url="") {
     player.audioPlaylist.push("https://archive.org/download/raveforce1-jungle-breakcore/Dmachine%20-%20Condiments%20of%20the%20Darkside.%20Jungle%20%26%20Breakcore%20Mix%20Heavy%20Amen%20subwoofer%20excurison-yVLXI-m70lQ.mp3");
-    player.audioPlaylist.push("https://archive.org/download/raveforce1-sextrancemix/%5B2022%5D%20Exodia%20-%20Valkyria-fd6ZF1UJ9oM.mp3");
     player.audioPlaylist.push("https://archive.org/download/selected-dnb-1/Inner-Vation%20-%20Movements%20%281999%29-DU3Rezgt-TE.mp3");
     player.audioPlaylist.push("https://archive.org/download/selected-dnb-1/Intelligent%20Drum%20%26%20Bass%20-%20Selected%20Works%20%281994-2000%29-1zGaTE2AmsU.mp3");
     player.audioPlaylist.push("https://archive.org/download/selected-dnb-1/Jungle%20Mix%20-%20psiX%20-%20Room%2099-lfcehfutGBM.mp3");
@@ -86,11 +85,9 @@ function playMusic(window, url="") {
     player.audioPlaylist.push("https://archive.org/download/NinjaGaijinTheLegacyofthe47RoninJUNGLE/Ninja%20Gaijin%20-%20The%20Legacy%20of%20the%2047%20Ronin%20%28JUNGLE-10Nov2014%29.mp3");
     player.audioPlaylist.push("https://archive.org/download/NinjaGaijin-TheChokeholddarkstepMix10july11/Ninja_Gaijin_-_The_Chokehold_10July2011-DARKSTEP-320.mp3");
     player.audioPlaylist.push("https://archive.org/download/NinjaGaijinBlackBokorJUNGLE25Apr2015/Ninja%20Gaijin%20-%20Black%20Bokor%20%28JUNGLE-25Apr2015%29.mp3");
-    player.audioPlaylist.push("https://archive.org/download/rumbus-fuck-glamour-dn-b-mix/Rumbus%20-%20Fuck%20Glamour%20DnB%20Mix.mp3");
     player.audioPlaylist.push("https://archive.org/download/rf1-jumpstylemix-1/%F0%9D%94%87%F0%9D%94%8D%206YR%E0%B0%A5%E0%B1%8D%E2%80%8C%D9%A3%D9%A3A%20%D0%97%D0%90%D0%9E%20%26%20Y%20A%20B%20H%20I%20E%20L%20-%20JUMPSTYLE%20CRAZYMIX%20VOL.01%20%5BKgpuXb6vDvk%5D.mp3");
     player.audioPlaylist.push("https://archive.org/download/CriteriaForFailureLiveMixAtKuznetskiyMost/Criteria%20For%20Failure%20-%20%20Live%20mix%20at%20Kuznetskiy%20Most.mp3");
     player.audioPlaylist.push("https://archive.org/download/dj-combo-ragga-jungle-bass-action-1/DJ%20Combo%20-%20Ragga%20Jungle%20Bass%20Action%201.mp3");
-    player.audioPlaylist.push("https://archive.org/download/rumbus-fuck-glamour-dn-b-mix/Rumbus%20-%20Fuck%20Glamour%20DnB%20Mix.mp3");
     player.audioPlaylist.push("https://archive.org/download/Sinapz-liquidLightMix3/LiquidLight3.mp3");
     player.audioPlaylist.push("https://archive.org/download/1757030366_windowlicker/Windowlicker/01%20Aphex%20Twin%20-%20Windowlicker.mp3");
     player.audioPlaylist.push("https://archive.org/download/Squarepusher19970724JapanTokyo/Squarepusher%20-%201997-07-24%20Japan-Tokyo.mp3");

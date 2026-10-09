@@ -7,53 +7,137 @@ function draw() {
     ctx.fillRect(0, 0, c.width, c.height);
 
     drawMap();
-    //console.log(-player.archDashOffset*2%180)
-    player.archDashOffset -= 0.2;
-    processNukes();
+    if (player.intro) {
+        //ctx.font = Math.max(20, Math.min(20, 12 * mapScale)) + "px courier";
+        ctx.font = 25 + "px times";
+        shadowText(
+                ctx,
+                introText4,
+                100,
+                100,
+                4,
+               "#f38908fb",
+                "#000000"
+            );
+        shadowText(
+                ctx,
+                introText0,
+                100,
+                150,
+                4,
+               "#f38908fb",
+                "#000000"
+            );
+        //ctx.fillText(introText0, 100, 150);
+        //ctx.font = 24 + "px arial";
+        shadowText(
+                ctx,
+                introText1,
+                100,
+                200,
+                4,
+               "#f38908fb",
+                "#000000"
+            );
+        //ctx.font = 26 + "px Garamond";
+        shadowText(
+                ctx,
+                introText2,
+                100,
+                250,
+                4,
+               "#f38908fb",
+                "#000000"
+            );
+        //ctx.font = 25 + "px Tahoma";
+        shadowText(
+                ctx,
+                introText3,
+                100,
+                300,
+                4,
+               "#f38908fb",
+                "#000000"
+            );
+        ctx.font = 150 + "px Courier New";
+        let r = getRandInt(2);
+        let rText = introText5;
+        if (r == 1) {
+            if (getRandInt(100) > 98) {
+                r = getRandInt(96);
+            }
+            rText = "H4CK3R2000"
+        } else {
+            r = 4;
+        }
+        shadowText(
+                ctx,
+                rText,
+                100,
+                440,
+                r,
+               "#9f3d00fb",
+                "rgb(243, 117, 0)"
+            );
+        ctx.font = 40 + "px Courier New";
+        shadowText(
+                ctx,
+                gameTimer.formatted(),
+                100,
+                500,
+                3,
+               "#f38908fb",
+                "#461d00"
+            );
+    } else {
+        //console.log(-player.archDashOffset*2%180)
+        player.archDashOffset -= 0.2;
+        processNukes();
 
-    // Release player.cNotStoring if complete.
-    // this is a terrible name to mean if the game is in 
-    // the process of storing or unstoring the deck.
-    if (!player.cNotStoring) {
-        let done = true;
-        // check if all cards have finished moving to their targetXY
-        for (let win of cast) {
-            if (win.type == "card") {
-                if (!(win.x1 == win.targetX && win.y1 == win.targetY)) {
-                    done = false;
+        // Release player.cNotStoring if complete.
+        // this is a terrible name to mean if the game is in 
+        // the process of storing or unstoring the deck.
+        if (!player.cNotStoring) {
+            let done = true;
+            // check if all cards have finished moving to their targetXY
+            for (let win of cast) {
+                if (win.type == "card") {
+                    if (!(win.x1 == win.targetX && win.y1 == win.targetY)) {
+                        done = false;
+                    }
                 }
             }
-        }
-        if (done) {
-            player.cNotStoring = true;
-            player.cResettingStack = false;
-        }
-    }
-
-    if (
-        (
-            player.cHoles[0].length == 13 &&
-            player.cHoles[1].length == 13 &&
-            player.cHoles[2].length == 13 &&
-            player.cHoles[3].length == 13
-        ) || !player.cWon
-    ) {
-        ctxCards.clearRect(0, 0, cCards.width, cCards.height);
-    }
-    // draw windows based on priority, highest is top most window
-    let s = cast.toSorted((a, b) => a.pri - b.pri);
-    for (let i = 0; i < s.length; i++) {
-        if (player.cWon && s[i].type == "card") {
-            if(s[i] == player.cWonCard || player.cHoles[0].length == 13) {
-                drawWin(s[i]);  
+            if (done) {
+                player.cNotStoring = true;
+                player.cResettingStack = false;
             }
-        } else {
-            drawWin(s[i]);
         }
+
+        if (
+            (
+                player.cHoles[0].length == 13 &&
+                player.cHoles[1].length == 13 &&
+                player.cHoles[2].length == 13 &&
+                player.cHoles[3].length == 13
+            ) || !player.cWon
+        ) {
+            ctxCards.clearRect(0, 0, cCards.width, cCards.height);
+        }
+        // draw windows based on priority, highest is top most window
+        let s = cast.toSorted((a, b) => a.pri - b.pri);
+        for (let i = 0; i < s.length; i++) {
+            if (player.cWon && s[i].type == "card") {
+                if(s[i] == player.cWonCard || player.cHoles[0].length == 13) {
+                    drawWin(s[i]);  
+                }
+            } else {
+                drawWin(s[i]);
+            }
+        }
+        // cards have their own ctx drawn on top
+        drawCards();
+        //cardDebug();
     }
-    // cards have their own ctx drawn on top
-    drawCards();
-    //cardDebug();
 
     //drawIcon()
     drawCursor();
@@ -175,7 +259,7 @@ function drawMap() {
         // clear map context
         ctxMap.globalAlpha = 1;
         ctxMap.fillStyle = '#000000';
-        ctxMap.fillRect(0, 0, c.width, c.height);
+        ctxMap.clearRect(0, 0, c.width, c.height);
         ctxMap.lineWidth = 1;
         ctxMap.strokeStyle = mapColor;
 
@@ -214,10 +298,12 @@ function drawMap() {
     // size of node/city sqaures
     let bSize = 0.5;
 
-    drawCities(bSize);
-    drawNodes(bSize);
-    drawProxyConnections();
-    drawBruteConnections();
+    if (!player.intro) {
+        drawCities(bSize);
+        drawNodes(bSize);
+        drawProxyConnections();
+        drawBruteConnections();
+    }
 
     // draw the mouse hover label
     player.windowHover = true;
