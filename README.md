@@ -6,7 +6,9 @@ IMPORTANT NOTICE TO THE PLAYER: Despite the fact this is a browser-based game, t
 
 <img src="./pics/ssh.png" width="800" alt="SSH command tunneling through multible nodes"></img>
 
-# Playable pre-alpha: [Click Here](https://doomlazer.github.io/Hacker2000)
+# Playable alpha: [Click Here](https://doomlazer.github.io/Hacker2000)
+
+Lots of bugs and missing features.
 
 Persistence is currently a work in progress. If the game will not load, trash the database in your browser's JS console with: 
 
