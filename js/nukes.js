@@ -915,7 +915,7 @@ function nukeProgress(city0, city1, launchTime) {
         );
 
     // Game speed
-    const speedKmPerSecond = 150;
+    const speedKmPerSecond = 40;
 
     // Total simulated flight time
     const flightTimeMs =
@@ -1012,7 +1012,9 @@ function processNukes() {
             const retaliation = getRetaliationOptions(n.city1.country);
             for (let c of retaliation) {
                 if (c.relationship == "ally") {
-                    barrage(c, n.city0);
+                    if (getRandInt(10) > 5) {
+                        barrage(c, n.city0);
+                    }
                 }
             }
 
@@ -1020,7 +1022,9 @@ function processNukes() {
             if (getRandInt(10) > 5) {
                 for (let c of retaliation) {
                     if (c.relationship == "enemy") {
-                        barrage(n.city1, c);
+                        if (getRandInt(10) > 8) {
+                            barrage(n.city1, c);
+                        }
                     }
                 }
             }
@@ -1050,7 +1054,7 @@ function barrage(cityF, cityT) {
         if (getRandInt(150) > nukes.length) {
             if (!cityF.nuked) {
                 //cityT.nuked = true;
-                const n = new Nuke(cityF, cityT, gameTimer.elapsed() + getRandInt(4000));
+                const n = new Nuke(cityF, cityT, gameTimer.elapsed() + getRandInt(80000));
             }
             //cast[0].text = `${cityF.country} has retaliated against ${cityT.country}...`;
             //cast[0].setText(cast[0].text);

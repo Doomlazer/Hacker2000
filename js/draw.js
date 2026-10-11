@@ -8,87 +8,7 @@ function draw() {
 
     drawMap();
     if (player.intro) {
-        //ctx.font = Math.max(20, Math.min(20, 12 * mapScale)) + "px courier";
-        ctx.font = 25 + "px times";
-        shadowText(
-                ctx,
-                introText4,
-                100,
-                100,
-                4,
-               "#f38908fb",
-                "#000000"
-            );
-        shadowText(
-                ctx,
-                introText0,
-                100,
-                150,
-                4,
-               "#f38908fb",
-                "#000000"
-            );
-        //ctx.fillText(introText0, 100, 150);
-        //ctx.font = 24 + "px arial";
-        shadowText(
-                ctx,
-                introText1,
-                100,
-                200,
-                4,
-               "#f38908fb",
-                "#000000"
-            );
-        //ctx.font = 26 + "px Garamond";
-        shadowText(
-                ctx,
-                introText2,
-                100,
-                250,
-                4,
-               "#f38908fb",
-                "#000000"
-            );
-        //ctx.font = 25 + "px Tahoma";
-        shadowText(
-                ctx,
-                introText3,
-                100,
-                300,
-                4,
-               "#f38908fb",
-                "#000000"
-            );
-        ctx.font = 150 + "px Courier New";
-        let r = getRandInt(2);
-        let rText = introText5;
-        if (r == 1) {
-            if (getRandInt(100) > 98) {
-                r = getRandInt(96);
-            }
-            rText = "H4CK3R2000"
-        } else {
-            r = 4;
-        }
-        shadowText(
-                ctx,
-                rText,
-                100,
-                440,
-                r,
-               "#9f3d00fb",
-                "rgb(243, 117, 0)"
-            );
-        ctx.font = 40 + "px Courier New";
-        shadowText(
-                ctx,
-                gameTimer.formatted(),
-                100,
-                500,
-                3,
-               "#f38908fb",
-                "#461d00"
-            );
+        drawIntro();
     } else {
         //console.log(-player.archDashOffset*2%180)
         player.archDashOffset -= 0.2;
@@ -383,11 +303,11 @@ function drawMap() {
     }
 
     // nuked to death
-    let thresh = 120;
+    let thresh = 70;
     if (nukes.length >= thresh) {
         let i = 0;
         let count = 0;
-        let crash = 1666;
+        let crash = 100;
         // count completed ICBM strikes
         while (i < nukes.length - 1) {
             let n = nukes[i];
@@ -404,8 +324,15 @@ function drawMap() {
             ctx.globalAlpha = 0.5;
             ctx.fillText(
                 "NUCL34R W1N74R",
-                mapXOff - (110 * mapScale),
+                mapXOff - (130 * mapScale),
                 mapYOff
+            );
+            ctx.font = `${mapScale * 6}px Impact, "Arial Black", sans-serif`;
+            ctx.globalAlpha = 0.5;
+            ctx.fillText(
+                "I guess the auto retaliate computers were Y2K Complyant after all",
+                mapXOff - (105 * mapScale),
+                mapYOff + (20 * mapScale)
             );
             ctx.globalAlpha = 1;
         }
@@ -1858,6 +1785,12 @@ function drawArch(
             city1.nuked = true;
             //console.log(!city1.nuked) 
 
+            // kill player if direct nuke hit
+            if (cities.indexOf(city1) == 0) {
+                indexedDB.deleteDatabase("VirtualFileSystemDB");
+                location.reload();
+            }
+
             // --------------------------------------------------
             // Nuke origin
             // --------------------------------------------------
@@ -1879,6 +1812,11 @@ function drawArch(
                             // Remove this node and everything after it
                             player.nodeStack = player.nodeStack.slice(0, i);
                         }
+                        // kill player if node 0 in blast radius
+                        if (nodes.indexOf(n) == 0) {
+                            indexedDB.deleteDatabase("VirtualFileSystemDB");
+                            location.reload();
+                        }
                     }
                 }
             }
@@ -1886,13 +1824,13 @@ function drawArch(
             // --------------------------------------------------
             // Damage to cities
             // --------------------------------------------------
-            for (let n of cities) {
-                const distance = distanceKm(lat0, lon0, n.lat, n.lon);
+            for (let city of cities) {
+                const distance = distanceKm(lat0, lon0, city.lat, city.lon);
                 // km blast radius
                 if (distance < 200) {
-                    if (!n.nuked) {
-                        n.nuked = true;
-                        mapCitiesSteps = cities.length -1;
+                    if (!city.nuked) {
+                        city.nuked = true;
+                        mapCitiesSteps = cities.length - 1;
                         /*console.log(
                             "Nuked:",
                             n.name,
@@ -1900,6 +1838,12 @@ function drawArch(
                             distance,
                             "km"
                         );*/
+
+                        // kill player if city 0 in blast radius
+                        if (nodes.indexOf(city) == 0) {
+                            indexedDB.deleteDatabase("VirtualFileSystemDB");
+                            location.reload();
+                        }
                     }
                 }
             }
@@ -2028,25 +1972,31 @@ function drawArch(
                 );
             }
         } else {
-            // ICBM in transit, show ETA
-            shadowText(
-                ctx,
-                `Target: ${city1.name}, ${city1.country}`,
-                px + 10,
-                py + 5,
-                2,
-                "#FFFFFF",
-                "#000000"
-            );
-            shadowText(
-                ctx,
-                `ETA: ${nukeProgress(city0, city1, launchTime).eta}`,
-                px + 10,
-                py + 5 + lineGap,
-                2,
-                "#FFFFFF",
-                "#000000"
-            );
+            if (mouseX > px - 10 &&
+                mouseX < px + 10 &&
+                mouseY > py - 10 &&
+                mouseY < py + 10
+            ) {
+                // ICBM in transit, show ETA
+                shadowText(
+                    ctx,
+                    `Target: ${city1.name}, ${city1.country}`,
+                    px + 10,
+                    py + 5,
+                    2,
+                    "#FFFFFF",
+                    "#000000"
+                );
+                shadowText(
+                    ctx,
+                    `ETA: ${nukeProgress(city0, city1, launchTime).eta}`,
+                    px + 10,
+                    py + 5 + lineGap,
+                    2,
+                    "#FFFFFF",
+                    "#000000"
+                );
+            }
         }
         ctx.restore();
     }
@@ -2058,4 +2008,122 @@ function shadowText(c1, text, x, y, dist, foreCol, backCol) {
     c1.fillText(text, x + dist, y + dist);
     c1.fillStyle = foreCol;
     c1.fillText(text, x, y);
+}
+
+function drawIntro() {
+    mapSteps = 1;
+    mapInc = 0;
+    mapCitiesSteps = 0;
+    mapNodeSteps = 0;
+    mapNodeStackSteps = 0;
+    //ctx.font = Math.max(20, Math.min(20, 12 * mapScale)) + "px courier";
+    ctx.font = 24 + "px PerfectDOS";
+    
+    // falling letters
+    let x = 0;
+    let y = 0;
+    for (let i = 0; i < introText0.length - 1; i ++) {
+        let char = introText0[i];
+        if (introStep > i) {
+            let col = "#08c801fb";
+            if (
+                mouseX > 100 + (15 * x) - 30 &&
+                mouseX < 100 + (15 * x) + 45 &&
+                mouseY > 60 + (30 * y) - 60 &&
+                mouseY < 60 + (30 * y) + 30
+            ) {
+                
+                if (char != " " && char != "\n") {
+                    const hex = "0123456789ABCDEF";
+                    char = hex[getRandInt(hex.length)];
+                    col = `#${char}0${char}0${char}0`;
+                }
+            }
+            shadowText(
+                ctx,
+                char,
+                100 + (15 * x),
+                60 + (30 * y),
+                4,
+                col,
+                "#000000"
+            ); 
+        } else if (i > introStep && i - 10 < introStep) {
+            shadowText(
+                ctx,
+                char,
+                100 + (15 * x),
+                60 + (30 * y) + ((i - introStep) * 4),
+                4,
+                "#034d01fb",
+                "#000000"
+            );
+        }
+
+        x ++;
+        if ((15 * x) + 250 >= getWidth() && char == " ") {
+            x = 0;
+            y ++;
+        }
+        // sentence breaks
+        if (char == "\n") {
+            x = 0;
+            y ++;
+        }
+    }
+    introStep ++;
+
+    if (introStep > 550) {
+        ctx.font = 150 + "px PerfectDOS";
+        let r = getRandInt(20);
+        let s = "";
+        let w = 84;
+        for (let l = 0; l < introText1.length; l ++) {
+            if (
+                getRandInt(130) == 0 ||
+                (
+                    mouseX > 100 + (w * l) &&
+                    mouseX < 100 + (w * l) + w &&
+                    mouseY > (y * 30) + 75 &
+                    mouseY < (y * 30) + 75 + 150
+                )
+            ) {
+                //ctx.strokeRect(100 + (w * l), (y * 30) + 75, 80, 150)
+                //ctx.strokeRect(100, (y * 30) + 75, w*introText1.length, 150)
+                const hex = "0123456789ABCDEF";
+                s += hex[getRandInt(hex.length)];
+            } else {
+                s += introText1[l];
+            }
+        }
+        //let rText = introText5;
+        if (r == 1) {
+            if (getRandInt(30) == 0) {
+                r = getRandInt(26);
+            } else {
+                r = 4
+            }
+        } else {
+            r = 4;
+        }
+        shadowText(
+            ctx,
+            s,
+            100,
+            (y * 30) + 200,
+            0,
+            "#08c801fb",
+            "#028a16"
+        );
+        ctx.font = 40 + "px PerfectDOS";
+        shadowText(
+            ctx,
+            gameTimer.formatted(),
+            100,
+            (y * 30) + 250,
+            3,
+            "#08c801fb",
+            "#000000"
+        );
+    }
 }

@@ -94,11 +94,14 @@ function speak(text, queue = 0, voice = 0) {
 
     if (voices.length > 0) {
 
-        const selectedVoice =
+        let selectedVoice =
             player.t2sVoice === -1
                 ? Math.floor(Math.random() * voices.length)
                 : player.t2sVoice;
 
+        if (voice != 0) {
+            selectedVoice = voice;
+        }
         player.t2sLast = selectedVoice;
         if (
             selectedVoice >= 0 &&

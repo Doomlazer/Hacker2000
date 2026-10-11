@@ -785,6 +785,9 @@ function doBrute() {
         if (c.type == "brute" && c.cracked == false) {
             //let stack = player.nodeStack;
             let node = nodes[c.bNode];
+            if (node.nuked) {
+                return;
+            }
             let account = node.accounts[c.authAccountIndex];
 
             c.displayLines = [];
@@ -821,6 +824,7 @@ function doBrute() {
                         Trying - ${p}
                         (${c.tryAuthPwd} of ${passwords.length} * ${c.loops})
                         elapsed: ${t.days}:${t.hours}:${t.minutes}:${t.seconds}`;
+                
                 c.setText(c.text, false);
                 logFailedAuth(c, node, c.user);
                 

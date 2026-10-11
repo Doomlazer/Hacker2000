@@ -283,11 +283,14 @@ function helpCommand(win) {
 Mal90 Operations Manual
         
         --==ALL CREWS WELCOME==--
-        **%%N0JNGl3N0L1f3%%**    
+        **%%N0JNGl3N0L1f3%%** 
+        R.I.P PheakySmurph & J0nnyK4t   
         
         SINCE EVERYTONE KEEPS AKSING: type SPEAK to toggle off the dam voice!
 
-        Mal90 Br0wzerOperating System by Vid30Dr0mEE, l337 HAx0r p.o.s.OS .,'"You get what you pay 4"',. Forked from TonyOS v2.309.1 R.I.P PheakySmurph J0nnyK4t, Rulz.
+        Mal90 Operating System
+        by Vid30Dr0mEE, 
+        Forked from TonyOS v2.309.1
         
         In addition to dumb terminal functionality, the Mal90 includes several t00lz to facilitate network scanning and account cracking. The TonySoft registration lock has been disabled since v0.1134.777 when the servers went offline and promising your f1rst b0rn to \${Kleptocorp} was no longer required just to run an OS! PRAISE $TONY$. Use mousewheel to scroll document text  
 
@@ -300,12 +303,9 @@ Mal90 Operations Manual
         Known Bugs:
 
         \tWindow click priority is still broken sometimes
-        \tClicking on nodes in the map causes crashing
         \tTab Completion is not quite adequate
         
         \"...like a hammer, a computer is just a tool; The morality of its use is determined by the individu4l.\"\n\t\t\t\t\t- CMOTDibblersDistant2ndCousin
-        
-        IMPORTANT NOTICE TO THE PLAYER: Despite the fact this is a browser-based game, the simulated computers are created locally on your device. The pretend tools in this videogame, such as SSH, are NOT connecting over the internet to real computers. The DTMF tones from DIAL are NOT makeing real world phone calls. That said, this game does make real network connections for the command AUDIO, which streams music from real urls over the real world internet. Streaming Jungle music (and whatever URLs you add to the playlist) is the only network connection this game will make.
         
         
         COMMANDS
@@ -1202,7 +1202,12 @@ function minesweeperCommand(win, command) {
 function nukeCommand(win, command) {
     //console.log(typeof player.selectedCity)
     if (typeof player.selectedCity === "undefined") {
-        let r = getRandInt(5)+1;
+        win.text = `No location selected, a destination is required...`
+        win.setText(win.text, false);
+        const n = new Nuke(cities[1], cities[0], gameTimer.elapsed())
+        win.text = `ICBM launched at ${cities[0].name},${cities[0].country}`
+        win.setText(win.text);
+        /*let r = getRandInt(5)+1;
         win.text = `No location selected, Nuking ${r} random countries...`
         win.setText(win.text, false);
         for (let i = 0; i < r; i++) {
@@ -1215,7 +1220,7 @@ function nukeCommand(win, command) {
                     win.setText(`Nuking ${cities[r1].name}, ${cities[r1].country}`, false)
                 }
             }
-        }
+        }*/
     } else {
         // just nuke one city
         const n = new Nuke(cities[0], player.selectedCity, gameTimer.elapsed())
