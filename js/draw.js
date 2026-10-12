@@ -1787,6 +1787,7 @@ function drawArch(
 
             // kill player if direct nuke hit
             if (cities.indexOf(city1) == 0) {
+                alert(`You have been killing in a nuclear attack on ${city1.name}`);
                 indexedDB.deleteDatabase("VirtualFileSystemDB");
                 location.reload();
             }
@@ -1812,8 +1813,9 @@ function drawArch(
                             // Remove this node and everything after it
                             player.nodeStack = player.nodeStack.slice(0, i);
                         }
-                        // kill player if node 0 in blast radius
+                        // ayer if node 0 in blast radius
                         if (nodes.indexOf(n) == 0) {
+                            alert(`You were too close to the blast radius of the attack on ${n.city} and have been knocked off-line`);
                             indexedDB.deleteDatabase("VirtualFileSystemDB");
                             location.reload();
                         }
@@ -1841,6 +1843,7 @@ function drawArch(
 
                         // kill player if city 0 in blast radius
                         if (nodes.indexOf(city) == 0) {
+                            alert(`You were too close to the blast radius in ${city.name} and have died`);
                             indexedDB.deleteDatabase("VirtualFileSystemDB");
                             location.reload();
                         }
