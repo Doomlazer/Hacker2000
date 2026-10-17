@@ -299,6 +299,7 @@ Mal90 Operations Manual
         
         \tCapitalization is now generally ignored
         \tTab Completion is nearly adequate
+        \tfour digits year complyance
 
         Known Bugs:
 

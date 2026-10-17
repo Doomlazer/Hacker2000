@@ -38,11 +38,10 @@ let DNSKeys = {};
 let locpnum = 777;
 const introText0 = `By the end of the 20th century... 
 
-Years of greedy corporate executives ignoring warnings about the Y2K bug had experts predicting a global catastrophe. At midnight on Jan 1st 2000, nearly all computer systems and networks were permanently disabled. Transportation, shipping and Military operations across the globe ground to a halt.
+In an alternate reality greedy corporate executives ignore warning of the year 2000 bug. When the clock struck midnight on Jan 1st 2000, 90% of the worlds computer, transpartation and military infrustructure shut down permanately.
 
-Now, seven months later, the void is filling up again; both with DIY hardware & software hackers, as well as the profit-driven corporate infrastructure.
+Now, seven months later, corporations slowly recover from the outage as open source hardware enthusists flurish, some of them relics from the early 90s. Seven months later, only about 10k computers are back online.
 
-...and then there's you.`;
 const introText1 = "HACKER2000";
 const deck = [
         "AH", "2H", "3H", "4H", "5H", "6H", "7H", "8H", "9H", "10H", "JH", "QH", "KH",
