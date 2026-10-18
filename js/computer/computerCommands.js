@@ -289,7 +289,7 @@ Mal90 Operations Manual
         SINCE EVERYTONE KEEPS AKSING: type SPEAK to toggle off the dam voice!
 
         Mal90 Operating System
-        by Vid30Dr0mEE, 
+        by V1d30Dr0m3, 
         Forked from TonyOS v2.309.1
         
         In addition to dumb terminal functionality, the Mal90 includes several t00lz to facilitate network scanning and account cracking. The TonySoft registration lock has been disabled since v0.1134.777 when the authentication servers were abandoned and promising your f1rst b0rn to KleptOS was no longer required thanks to this hand decompiled fork! PRAISE $TONY$. Use mousewheel to scroll document text  
@@ -414,11 +414,8 @@ Mal90 Operations Manual
 
         SHOUTS TO FZ (l337) AND SPR3
 
-        “There is no spoon.”
-        \t\t\t\t\t\t\t\t—- The Matrix
-
-        Yo, Vid30Dr0mEE, your documentation was sh1t n i had to rewrite h4lf of it becuse it didnt work how u described. I added DELETEALL command which will wipe everything.
-        \t\t\t- X3r0x v1.001.065 Aug 1994
+        Yo, Vid30Dr0mE, your documentation was sh1t n i had to rewrite h4lf of it becuse it didnt work how u described. I added DELETEALL command which will wipe everything.
+        \t\t\t- X3RX3S v1.001.065 Aug 1994
         `;
     spawnReadWin(win, text);
     

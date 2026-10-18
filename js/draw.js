@@ -2039,7 +2039,7 @@ function drawIntro() {
                 
                 if (char != " " && char != "\n") {
                     const hex = "0123456789ABCDEF";
-                    char = hex[getRandInt(hex.length)];
+                    char = hex[getRandInt(hex.length-1)];
                     col = `#${char}0${char}0${char}0`;
                 }
             }
@@ -2053,13 +2053,15 @@ function drawIntro() {
                 "#000000"
             ); 
         } else if (i > introStep && i - 10 < introStep) {
+            const hex = "0123456789ABCDEF";
+            let col = `#00${10 - (i - introStep)}000`;
             shadowText(
                 ctx,
                 char,
-                100 + (15 * x),
+                80 + (15 * x),
                 60 + (30 * y) + ((i - introStep) * 4),
                 4,
-                "#034d01fb",
+                col,
                 "#000000"
             );
         }

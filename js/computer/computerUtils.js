@@ -363,7 +363,7 @@ async function createFS(n) {
 
 
     if (locpnum == n) {
-        fsVid30Dr0mEE(fs, n)
+        fsV1d30Dr0m3(fs, n)
     }
 
     //==================================================
@@ -417,58 +417,58 @@ function fsDNS(fs, ip, n) {
     nodes[n].ip_address = ip;
 }
 
-function fsVid30Dr0mEE(fs, n) {
+function fsV1d30Dr0m3(fs, n) {
     //
     // Mal90 Author, 15 yrld nerd
     //
     fs.createFolder(
-        `C:\\Users\\Vid30Dr0mEE`,
+        `C:\\Users\\V1d30Dr0m3`,
         1,
         0
     );
 
-    nodes[n].accounts.push({"user": "Vid30Dr0mEE", "pwd":"password", "admin": true, "userId":n})
+    nodes[n].accounts.push({"user": "V1d30Dr0m3", "pwd":"password", "admin": true, "userId":n})
     fs.createFolder(
-        `C:\\Users\\Vid30Dr0mEE`,
-        1,
-        0
-    );
-
-    fs.createFolder(
-        `C:\\Users\\Vid30Dr0mEE\\Desktop`,
+        `C:\\Users\\V1d30Dr0m3`,
         1,
         0
     );
 
     fs.createFolder(
-        `C:\\Users\\Vid30Dr0mEE\\Documents`,
+        `C:\\Users\\V1d30Dr0m3\\Desktop`,
         1,
         0
     );
 
     fs.createFolder(
-        `C:\\Users\\Vid30Dr0mEE\\Music`,
+        `C:\\Users\\V1d30Dr0m3\\Documents`,
         1,
         0
     );
 
     fs.createFolder(
-        `C:\\Users\\Vid30Dr0mEE\\Documents\\mal90`,
+        `C:\\Users\\V1d30Dr0m3\\Music`,
+        1,
+        0
+    );
+
+    fs.createFolder(
+        `C:\\Users\\V1d30Dr0m3\\Documents\\mal90`,
         1,
         0
     );
     fs.createFolder(
-        `C:\\Users\\Vid30Dr0mEE\\Documents\\mal90\\SourceCode`,
+        `C:\\Users\\V1d30Dr0m3\\Documents\\mal90\\SourceCode`,
         1,
         0
     );
     fs.createFolder(
-        `C:\\Users\\Vid30Dr0mEE\\Documents\\mal90\\SourceCode\\TonySoft`,
+        `C:\\Users\\V1d30Dr0m3\\Documents\\mal90\\SourceCode\\TonySoft`,
         1,
         0
     );
     fs.createFile(
-        `C:\\Users\\Vid30Dr0mEE\\Documents\\mal\\mal90.txt`,
+        `C:\\Users\\V1d30Dr0m3\\Documents\\mal\\mal90.txt`,
         0,
         0,
         `ToDo:
@@ -478,7 +478,7 @@ function fsVid30Dr0mEE(fs, n) {
         0
     );
     fs.createFile(
-        `C:\\Users\\Vid30Dr0mEE\\Documents\\mal90\\SourceCode\\TonySoft\\main.src`,
+        `C:\\Users\\V1d30Dr0m3\\Documents\\mal90\\SourceCode\\TonySoft\\main.src`,
         0,
         0,
         generateGiberish(257),
@@ -494,7 +494,7 @@ function fsVid30Dr0mEE(fs, n) {
     );
 
     fs.createFile(
-        `C:\\Users\\Vid30Dr0mEE\\Documents\\waterCycle.txt`,
+        `C:\\Users\\V1d30Dr0m3\\Documents\\waterCycle.txt`,
         0,
         0,
         `The Importance of the Water Cycle
