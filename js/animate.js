@@ -174,14 +174,16 @@ class aniRect {
                         this.fs = i.fileSystem;
                         console.log(ip, i.ip_address)
                         console.log(this.fs, i.fileSystem)
-                        console.log(this.fs.list(`C:\\Email\\`, 0))
-                        console.log(i.fileSystem.getFolder(`C:\\Email\\${this.user}`))
+                        //console.log(this.fs.list(`C:\\Email\\`, 0))
+                        //console.log(i.fileSystem.getFolder(`C:\\Email\\${this.user}`))
                         console.log(this.fs.getFolder(`C:\\Email\\${this.user}`))
                         if (this.fs.getFolder(`C:\\Email\\${this.user}`)) {
                             const p = this.fs.readFile(`C:\\Email\\${this.user}\\Acct\\pswd.txt`,0);
                             this.text = p;
+                            console.log("p: ", p)
                             if (p == this.password) {
                                 this.authMode = false;
+                                // load inbox
                                 this.inbox = [];
                                 let arr1 = this.fs.list(`C:\\Email\\${this.user}\\Inbox`, 0, false)
                                 let arr = arr1.split("\n");
@@ -194,6 +196,20 @@ class aniRect {
                                 } else {
                                     this.inbox = [];
                                     this.mailSelected = null;
+                                }
+                                // load sent
+                                this.sent = [];
+                                let arr1b = this.fs.list(`C:\\Email\\${this.user}\\Sent`, 0, false)
+                                let arrB = arr1b.split("\n");
+                                arrB.shift();
+                                if (arrB[0] !== "(empty)") {
+                                    for (let i of arrB) {
+                                        this.sent.push(this.fs.readFile(`C:\\Email\\${this.user}\\Sent\\${i}`));
+                                    }
+                                    this.sentMailSelected = JSON.parse(this.sent[0]);
+                                } else {
+                                    this.sent = [];
+                                    this.sentMailSelected = null;
                                 }
                             } else {
                                 if (this.password != "bobalu") {
@@ -264,7 +280,6 @@ class aniRect {
             }
             
         }
-
     }
 
     keyHandler(e) {
@@ -683,6 +698,7 @@ class aniRect {
                     player.bruteWindow.splice(index, 1);
                 }
             } else if (this.type == "mail") {
+                //player.mailWindow.authMode = false;
                 player.mailWindow = 0;
             } else if (this.type == "audio") {
                 // there can be only one

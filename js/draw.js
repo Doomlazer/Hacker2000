@@ -1127,7 +1127,9 @@ function drawWin(win) { // draw a window
                 if (win.authMode) {
                     drawMailAuth(win);
                 } else {
+                    let inOrOut = (win.showSent) ? "SENT" : "INBOX";
                     const buttons = [
+                        inOrOut,
                         "NEW",
                         "REPLY",
                         "DELETE",
@@ -1256,21 +1258,29 @@ function drawWin(win) { // draw a window
 
                     // draw inbox subject lines
                     ctx.fillStyle = "#b5b2b2";
-                    ctx.font = `${buttonSize * 0.6}px sans-serif`;
+                    ctx.font = `${buttonSize * 0.6}px courier`;
                     ctx.textAlign = "left";
                     ctx.textBaseline = "middle";
-                    for (let i = 0; i < win.inbox.length; i++) {
-                        let m = JSON.parse(win.inbox[i]);
+                    let whichBox = (win.showSent) ? win.sent : win.inbox;
+                    let whichOff = (win.showSent) ? win.sentOffset : win.inboxOffset;
+                    //console.log(whichBox)
+                    let min = Math.min(whichBox.length - 1, 5);
+                    for (let i = 0; i < min; i++) {
+                        let max = Math.min(whichBox.length-1, i+whichOff);
+                        //console.log(max, whichBox.length)
+                        let m = JSON.parse(whichBox[max]);
                         let str = m.from + " - " + m.subject;
                         ctx.fillText(
                             str,
                             win.x1 + (gap/6), 
-                            win.y1 + gap/4 + (gap/3 * i)
+                            win.y1 + ((buttonSize * 0.75) * i) + ((buttonSize * 0.75)/2),
+                            win.xW - gap
                         );
                     }
-                    if (win.inbox.length < 1) {
+                    if (whichBox.length < 1) {
+                        let b = (win.showSent) ? "Sent Mail" : "Inbox"
                         ctx.fillText(
-                            "(Inbox Empty)",
+                            `(${b} Empty)`,
                             win.x1 + (gap/6), 
                             win.y1 + gap/4
                         );
@@ -1278,25 +1288,57 @@ function drawWin(win) { // draw a window
 
                     ctx.fillStyle = "#b5b2b2";
                     //ctx.font = `${buttonSize * 0.6}px sans-serif`;
+                    ctx.font = `${buttonSize * 0.6}px courier`;
                     ctx.textAlign = "left";
                     ctx.textBaseline = "middle";
                     let str;
-                    if (win.mailSelected != null) {
+                    //if (win.mailSelected != null) {
                         //console.log("here ", win.mailSelected)
-                        let m = win.mailSelected;
-                        str = m.from + "\n" +
-                            m.to + "\n" +
-                            m.timestamp + "\n" +
-                            m.subject + "\n" +
+                        let m = (win.showSent) ? win.sentMailSelected : win.mailSelected;
+                        str = "From: " + m.from + "\n" +
+                            "To: " + m.to + "\n" +
+                            "Date: " + m.timestamp + "\n" +
+                            "Subject: " + m.subject + "\n\n" +
                             m.message;
-                    } else {
-                        str = ""
-                    }
+                    //} else {
+                    //    str = ""
+                    //}
 
                     if (win.text != str) {
                         win.displayLines = [];
                         win.text = str;
-                        win.setText(win.text);
+                        win.setText(win.text, false);
+                    }
+
+
+                    for (let i = 0; i < 5; i++) {
+                        if (
+                            mouseX >= win.x1 &&
+                            mouseX <= win.x1 + win.xW &&
+                            mouseY >= win.y1 + ((buttonSize * 0.8) * i) &&
+                            mouseY <= win.y1 + ((buttonSize * 0.8) * i) + (buttonSize * 0.8)
+                        ) {
+                            ctx.strokeStyle = "#ec0303";
+                        } else {
+                            if (win.showSent) {
+                                if (win.sentMailSelected == i) {
+                                    ctx.strokeStyle = "#2ef002";
+                                } else {
+                                    ctx.strokeStyle = "#616161";
+                                }
+                                
+                            } else {
+                                if (win.mailSelected == i) {
+                                    ctx.strokeStyle = "#0e02f0";
+                                } else {
+                                    ctx.strokeStyle = "#616161";
+                                }
+                            }
+                        }
+                        ctx.strokeRect(win.x1,
+                            win.y1 + ((buttonSize * 0.8) * i),
+                            win.xW,
+                            (buttonSize * 0.8))
                     }
                 }
 
@@ -1671,11 +1713,11 @@ function drawMailAuth(win) {
 
     if (win.xP == win.xW) {
         ctx.fillStyle = '#f71111';
-        ctx.font = scaleFont(0.02, "Courier new");
+        ctx.font = "22px Courier new"; //scaleFont(0.02, "Courier new");
         ctx.fillText(
             win.text,
-            win.x1 + (win.xW/8),
-            win.y1 + ((win.yP/8)*7.5)
+            win.x1 + (win.xW/4),
+            win.y1 + ((win.yP/8)*7)
         );
     }
 
@@ -2026,7 +2068,7 @@ function drawIntro() {
     // falling letters
     let x = 0;
     let y = 0;
-    for (let i = 0; i < introText0.length - 1; i ++) {
+    for (let i = 0; i < introText0.length; i ++) {
         let char = introText0[i];
         if (introStep > i) {
             let col = "#08c801fb";

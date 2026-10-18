@@ -16,4 +16,4 @@ indexedDB.deleteDatabase("VirtualFileSystemDB");
 
 If the game will run, typing the command DELETEALL in-game will also reset everything.
 
-LLM Disclosure: LLM code was generated for traversing filesystems and the audio player.
+LLM Disclosure: code was generated from an LLM for traversing filesystems, junk email/phone number generation, and the audio player design.

@@ -1142,7 +1142,7 @@ function deckCommand(win, command) {
 }
 
 function mailCommand(win) {
-    if (player.mailWindow === 0) {
+    if (player.mailWindow == 0) {
         player.mailWindow = spawnMailWin(win.node.dns[0]);
         win.setText("Loading eMail client...");
     } else {

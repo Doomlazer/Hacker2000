@@ -84,6 +84,17 @@ async function createFS(n) {
         0
     );
 
+    if (n == 0) {
+        console.log("trying passwordtext ",nodes[n].accounts[1].pwd)
+        console.log(fs.createFile(
+            "C:\\Users\\${user}\\Documents\\password.txt",
+            0,
+            0,
+            nodes[n].accounts[1].pwd,
+            0
+        ));
+    }
+
     fs.createFolder(
         `C:\\Users\\${user}\\Music`,
         1,
@@ -619,8 +630,11 @@ function spawnMailWin(dns) {
     mw.user = locations[0].email.split("@")[0];
     mw.password = ""
     mw.mailSelected = null;
-    mw.Inbox = [];
-    mw.Sent = [];
+    mw.showSent = false;
+    mw.inbox = [];
+    mw.sent = [];
+    mw.inboxOffset = 0;
+    mw.sentOffset = 0;
     mw.type = "mail";
     cast.push(mw);
     mw.text = ""; //generateGiberish(600);
@@ -891,31 +905,60 @@ async function populateEmailServers(i) {
     fs.createFolder(`C:\\Email\\${e[0]}\\Inbox`, 0, 0);
     fs.createFolder(`C:\\Email\\${e[0]}\\Sent`, 0, 0);
 
+    let c = 9;
+    let reply;
+    for (let i = 0; i < c; i++) {
+        let r = getRandInt(locations.length-1);
+        const email = EmailGenerator.generate({
+            fromEmail: locations[r].email,
+            toEmail: locations[i].email,
+            fromName: locations[r].homeowner.split(" ")[0],
+            toName: locations[i].homeowner.split(" ")[0],
+            
+            //domain: e[i]
+            //replyTo: messageId
+            /*attachment: {
+                name: "invoice.pdf",
+                size: 48231,
+                type: "application/pdf"
+            }
+                or
+            attachment: "invoice.pdf"    
+            */
+
+            //offset is milliseconds, so a time 1 hour before realStartTime:
+            // gameTimer.formatted(-60 * 60 * 1000)
+            timestamp: gameTimer.formatted(-getRandInt(4000) * 60 * 32 * 1000)
+        });
+        //console.log(nodes[i].accounts[1].pwd);
+        fs.createFile(`C:\\Email\\${e[0]}\\Inbox\\${email.messageId}`, 0, 0, JSON.stringify(email), 0);
+        reply = email.messageId;
+    }
     let r = getRandInt(locations.length-1);
-    const email = EmailGenerator.generate({
-        fromEmail: locations[r].email,
-        toEmail: locations[i].email,
-        fromName: locations[r].homeowner.split(" ")[0],
-        toName: locations[i].homeowner.split(" ")[0],
-        
-        //domain: e[i]
-        //replyTo: messageId
-        /*attachment: {
-            name: "invoice.pdf",
-            size: 48231,
-            type: "application/pdf"
-        }
-            or
-        attachment: "invoice.pdf"    
-        */
+        const email = EmailGenerator.generate({
+            fromEmail: locations[i].email,
+            toEmail: locations[r].email,
+            fromName: locations[i].homeowner.split(" ")[0],
+            toName: locations[r].homeowner.split(" ")[0],
+            
+        message: "SCREW YOU!",
+            //domain: e[i]
+            replyTo: reply,
+            /*attachment: {
+                name: "invoice.pdf",
+                size: 48231,
+                type: "application/pdf"
+            }
+                or
+            attachment: "invoice.pdf"    
+            */
 
-        //offset is milliseconds, so a time 1 hour before realStartTime:
-        // gameTimer.formatted(-60 * 60 * 1000)
-        timestamp: gameTimer.formatted(-getRandInt(4000) * 60 * 32 * 1000)
-    });
-    //console.log(nodes[i].accounts[1].pwd);
-    fs.createFile(`C:\\Email\\${e[0]}\\Inbox\\${email.messageId}`, 0, 0, JSON.stringify(email), 0);
-
+            //offset is milliseconds, so a time 1 hour before realStartTime:
+            // gameTimer.formatted(-60 * 60 * 1000)
+            timestamp: gameTimer.formatted(-getRandInt(4000) * 60 * 32 * 1000)
+        });
+        //console.log(nodes[i].accounts[1].pwd);
+        fs.createFile(`C:\\Email\\${e[0]}\\Sent\\${email.messageId}`, 0, 0, JSON.stringify(email), 0);
     //await fs.save();
     //console.log(fs.list('C:\\Email'))
 }

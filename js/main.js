@@ -390,6 +390,7 @@ async function loadAllArrays() {
     cast[0].displayLines = JSON.parse(gUsers[3]);
     cast[0].setText("Welcome back...")
     player.t2sVoice = gUsers[4];
+    player.mailWindow = 0;
 
     // reload node fs
     for (let i = 0; i < nodes.length; i++) {

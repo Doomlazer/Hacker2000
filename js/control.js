@@ -23,6 +23,23 @@ function doWheel(e) {
         // mail has a lowered scroll area
         if (c.type == "mail") {
             o = c.xW/10 * 2.6;
+            if (c.showSent) {
+                c.sentOffset += Math.floor(e.deltaY);
+                if (c.sentOffset < 0) {
+                    c.sentOffset = 0;
+                }
+                if (c.sentOffset > c.sent.length) {
+                    c.sentOffset = c.sent.length - 5;
+                }
+            } else {
+                c.inboxOffset += Math.floor(e.deltaY);
+                if (c.inboxOffset < 0) {
+                    c.inboxOffset = 0;
+                }
+                if (c.inboxOffset + 6 > c.inbox.length) {
+                    c.inboxOffset = c.inbox.length - 5;
+                }
+            }
         }
         if (mouseX > c.x1 &&
             mouseX < c.x1 + c.xW &&
@@ -510,6 +527,38 @@ function doMouseDown(e) {
                             break;
                         }
                     }
+                    // clicked email
+                    let whichBox = (c.showSent) ? c.sent : c.inbox;
+                    const buttonAreaY = c.x1/5;
+                    const buttonAreaH = c.xW/20;
+                    
+                    const pw = c.xP;
+                    const px = c.x1;
+
+                    const gap = pw * 0.1;
+                    const buttonSize = Math.min(
+                        buttonAreaH,
+                        (pw * 1.85 - gap * 3) / 4
+                    );
+                    let off = (c.showSent) ? c.sentOffset : c.inboxOffset;
+                    let max = Math.max()
+                    for (let i = 0; i < 5; i ++) {
+                        if (
+                            mouseX >= c.x1 &&
+                            mouseX <= c.x1 + c.xW &&
+                            mouseY >= c.y1 + ((buttonSize * 0.75) * i) - (buttonSize * 0.75) &&
+                            mouseY >= c.y1 + ((buttonSize * 0.75) * i)
+                        ) {
+                            console.log("FFFFFFFFFF")
+                            if (c.showSent) {
+                                c.sentMailSelected = JSON.parse(c.sent[i + off]);
+                                //console.log("c.sentMailSelected ", c.sentMailSelected)
+                            } else {
+                                c.mailSelected = JSON.parse(c.inbox[i + off]);
+                                //console.log("c.mailSelected ", c.mailSelected);
+                            }
+                        }
+                    }
                 }
             }
 
@@ -749,7 +798,8 @@ function doKeyDown(e) {
     if (player.intro) {
         player.intro = false;
     }
-    if (player.mailWindow && player.mailWindow.authMode) {
+    if (player.mailWindow != 0 && player.mailWindow.authMode) {
+        //console.log(player.mailWindow)
         player.mailWindow.authKeyHandler(e);
     } else {
         for (let i = 0; i < cast.length; i++) {
@@ -803,13 +853,21 @@ function handleAudioButton(button) {
 function handleMailButton(win, button) {
     switch (button) {
 
-        case 0: // New
+        case 0: // inbox/sent toggle
+            if (win.showSent) {
+                win.showSent = false;
+            } else {
+                win.showSent = true;
+            }
             break;
 
-        case 1: // Reply
+        case 1: // New
             break;
 
-        case 2: // Delete
+        case 2: // Reply
+            break;
+
+        case 3: // Delete
             if (win.mailSelected != null) {
                 let id = win.mailSelected.messageId;
                 win.fs.deleteFile(`C:\\Email\\${win.user}\\Inbox\\${id}`, 0);
@@ -836,7 +894,7 @@ function handleMailButton(win, button) {
             }
             break;
 
-        case 3: // Quit
+        case 4: // Quit
             win.toOpen = false;
             win.delete = true;
             break;
