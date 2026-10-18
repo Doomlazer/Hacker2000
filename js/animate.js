@@ -97,7 +97,11 @@ class aniRect {
 
     setText(theText, prompt = true) {
 
-        if (player.t2s && this.type != "clock") {
+        if (
+            player.t2s && 
+            this.type != "clock" &&
+            this.type != "brute"
+        ) {
             speak(theText);
         }
         

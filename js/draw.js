@@ -337,6 +337,7 @@ function drawMap() {
             ctx.globalAlpha = 1;
         }
         if (count >= crash) {
+            alert("The planet is now uninhabitable. Game data deleted.")
             indexedDB.deleteDatabase("VirtualFileSystemDB");
             location.reload();
         }
@@ -1787,7 +1788,7 @@ function drawArch(
 
             // kill player if direct nuke hit
             if (cities.indexOf(city1) == 0) {
-                alert(`You have been killing in a nuclear attack on ${city1.name}`);
+                alert(`You have been killing in a nuclear attack on ${city1.name}. Game data deleted`);
                 indexedDB.deleteDatabase("VirtualFileSystemDB");
                 location.reload();
             }
@@ -1815,7 +1816,7 @@ function drawArch(
                         }
                         // ayer if node 0 in blast radius
                         if (nodes.indexOf(n) == 0) {
-                            alert(`You were too close to the blast radius of the attack on ${n.city} and have been knocked off-line`);
+                            alert(`You were too close to the blast radius of the attack on ${n.city} and have been knocked off-line. Game data deleted.`);
                             indexedDB.deleteDatabase("VirtualFileSystemDB");
                             location.reload();
                         }
@@ -1843,7 +1844,7 @@ function drawArch(
 
                         // kill player if city 0 in blast radius
                         if (nodes.indexOf(city) == 0) {
-                            alert(`You were too close to the blast radius in ${city.name} and have died`);
+                            alert(`You were too close to the blast radius in ${city.name} and have died. Game data deleted.`);
                             indexedDB.deleteDatabase("VirtualFileSystemDB");
                             location.reload();
                         }
@@ -2021,7 +2022,7 @@ function drawIntro() {
     mapNodeStackSteps = 0;
     //ctx.font = Math.max(20, Math.min(20, 12 * mapScale)) + "px courier";
     ctx.font = 24 + "px PerfectDOS";
-    
+
     // falling letters
     let x = 0;
     let y = 0;
@@ -2076,7 +2077,7 @@ function drawIntro() {
     }
     introStep ++;
 
-    if (introStep > 550) {
+    if (introStep > 600) {
         ctx.font = 150 + "px PerfectDOS";
         let r = getRandInt(20);
         let s = "";

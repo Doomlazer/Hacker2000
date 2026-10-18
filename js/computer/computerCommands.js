@@ -292,18 +292,19 @@ Mal90 Operations Manual
         by Vid30Dr0mEE, 
         Forked from TonyOS v2.309.1
         
-        In addition to dumb terminal functionality, the Mal90 includes several t00lz to facilitate network scanning and account cracking. The TonySoft registration lock has been disabled since v0.1134.777 when the servers went offline and promising your f1rst b0rn to \${Kleptocorp} was no longer required just to run an OS! PRAISE $TONY$. Use mousewheel to scroll document text  
+        In addition to dumb terminal functionality, the Mal90 includes several t00lz to facilitate network scanning and account cracking. The TonySoft registration lock has been disabled since v0.1134.777 when the authentication servers were abandoned and promising your f1rst b0rn to KleptOS was no longer required thanks to this hand decompiled fork! PRAISE $TONY$. Use mousewheel to scroll document text  
 
         Interpreter Version 1.001.064
         December 1992
         
         \tCapitalization is now generally ignored
         \tTab Completion is nearly adequate
-        \tfour digits year complyance
+        \tAdded four digits year complyance
+        \tUpdated command documentation
 
         Known Bugs:
 
-        \tWindow click priority is still broken sometimes
+        \tWindow priority is still broken sometimes
         \tTab Completion is not quite adequate
         
         \"...like a hammer, a computer is just a tool; The morality of its use is determined by the individu4l.\"\n\t\t\t\t\t- CMOTDibblersDistant2ndCousin
@@ -383,6 +384,8 @@ Mal90 Operations Manual
 
         SCAN - Connects to 100 random IP address. If the IP address is valid and is assigned to the Map selected country, add the ip to SCAN QUEUE.
 
+        SCAN REG - Opens a text window listing the registration information tied to each IP address in the SCAN QUEUE. Each request requires a $1 database access fee plus the $10 monthly subscription. Well it would if their security wasn't garbage. all requests are now free from this terminal
+        
         BRUTE [USERNAME]@[IP] - Attempt to brute force crack the user account by cycling through the built-in 10k word password table (TNKS2 D4taL00v3r). Cracked accounts are automatically added 2 the cached SSH authentications so that SSH [IP] will now auto authenicate with the previously cracked credentials. If a match isn't found after trying all 10k passwords it cycles them again, but adding the cycle count number to the end of the password.
         
         BRUTE SCAN - Autorun BRUTE root@[IP] on every IP address in the SCAN QUEUE.
@@ -414,7 +417,7 @@ Mal90 Operations Manual
         “There is no spoon.”
         \t\t\t\t\t\t\t\t—- The Matrix
 
-        Yo, Nameless1, your documentation was sh1t n i had to rewrite h4lf of it becuse it didnt work how u described. I added DELETEALL command which will wipe everything.
+        Yo, Vid30Dr0mEE, your documentation was sh1t n i had to rewrite h4lf of it becuse it didnt work how u described. I added DELETEALL command which will wipe everything.
         \t\t\t- X3r0x v1.001.065 Aug 1994
         `;
     spawnReadWin(win, text);
@@ -874,20 +877,37 @@ function scanCommand(win, command) {
         }
         win.text += "Scan Complete"
         win.setText(win.text);
+    } else if (command[1].toLowerCase() == "reg") {
+        let c = 0;
+        for (let i = 0; i < player.lastScanIP.length; i++) {
+            let s = player.lastScanIP[i];
+            for (let j = 0; j < nodes.length; j++) {
+                if (s == nodes[j].ip_address) {
+                    console.log(nodes.ip_address);
+                    c ++;
+                    regCommand(win, j);
+                }
+            }
+        }
+        if (c == 0) {
+            win.setText("Nothing in SCAN QUEUE")
+        }
     }
 }
 
-function regCommand(win) {
+function regCommand(win, s = win.locNum) {
     // shows node 'registration' info
     // To Do: this command is lame, improve it
-    let l = locations[win.locNum];
-    let address = l["address"];
-
+    let l = locations[s];
+    //console.log(s)
+    if (!l) {
+        return;
+    }
     win.text = `${l.homeowner},
-        ${address.street_number} ${address.street_name}
-        ${address.district}, ${address.city},
-        ${address.region} ${address.postal_code}
-        ${address.country}`;
+        ${nodes[s].street},
+        ${nodes[s].city} ${nodes[s].country} ${nodes[s].postal_code},
+        ${nodes[s].telephone},
+        ${nodes[s].ip_address}`
 
     win.setText(win.text);
 }

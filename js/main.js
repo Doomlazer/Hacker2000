@@ -38,9 +38,11 @@ let DNSKeys = {};
 let locpnum = 777;
 const introText0 = `By the end of the 20th century... 
 
-In an alternate reality greedy corporate executives ignore warning of the year 2000 bug. When the clock struck midnight on Jan 1st 2000, 90% of the worlds computer, transpartation and military infrustructure shut down permanately.
+In an alternate reality, greedy corporate executives ignore warning of the year 2000 bug. When the clock struck midnight on Jan 1st 2000, 90% of the worlds computer, transpartation and military infrustructure was disabled permanately.
 
-Now, seven months later, corporations slowly recover from the outage as open source hardware enthusists flurish, some of them relics from the early 90s. Seven months later, only about 10k computers are back online.
+Now, seven months later, corporations slowly recover from the outage and open source hardware computer kits are in high demand. To date, only about 10k computers are back online.
+
+You are the proud owner of the Mal90 homebrew computing platform. Now you just need to figure out how to use it.`
 
 const introText1 = "HACKER2000";
 const deck = [
