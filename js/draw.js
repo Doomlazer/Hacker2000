@@ -1263,8 +1263,10 @@ function drawWin(win) { // draw a window
                     ctx.textBaseline = "middle";
                     let whichBox = (win.showSent) ? win.sent : win.inbox;
                     let whichOff = (win.showSent) ? win.sentOffset : win.inboxOffset;
+                    let whichSel = (win.showSent) ? win.sentMailSelected : win.mailSelected;
+                    let h = whichSel;
                     //console.log(whichBox)
-                    let min = Math.min(whichBox.length - 1, 5);
+                    let min = Math.min(whichBox.length, 5);
                     for (let i = 0; i < min; i++) {
                         let max = Math.min(whichBox.length-1, i+whichOff);
                         //console.log(max, whichBox.length)
@@ -1310,7 +1312,6 @@ function drawWin(win) { // draw a window
                         win.setText(win.text, false);
                     }
 
-
                     for (let i = 0; i < 5; i++) {
                         if (
                             mouseX >= win.x1 &&
@@ -1318,7 +1319,8 @@ function drawWin(win) { // draw a window
                             mouseY >= win.y1 + ((buttonSize * 0.8) * i) &&
                             mouseY <= win.y1 + ((buttonSize * 0.8) * i) + (buttonSize * 0.8)
                         ) {
-                            ctx.strokeStyle = "#ec0303";
+                            ctx.strokeStyle = "#cfcece";
+                            h = i;
                         } else {
                             if (win.showSent) {
                                 if (win.sentMailSelected == i) {
@@ -1340,7 +1342,13 @@ function drawWin(win) { // draw a window
                             win.xW,
                             (buttonSize * 0.8))
                     }
+                    ctx.strokeStyle = "#cfcece";
+                    ctx.strokeRect(win.x1,
+                            win.y1 + ((buttonSize * 0.8) * h),
+                            win.xW,
+                            (buttonSize * 0.8))
                 }
+        
 
                 ctx.restore();
             }

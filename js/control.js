@@ -541,17 +541,19 @@ function doMouseDown(e) {
                         (pw * 1.85 - gap * 3) / 4
                     );
                     let off = (c.showSent) ? c.sentOffset : c.inboxOffset;
-                    let max = Math.max()
-                    for (let i = 0; i < 5; i ++) {
+                    let max = Math.min(5, whichBox.length);
+                    console.log(max, "max")
+                    for (let i = 0; i < max; i ++) {
                         if (
                             mouseX >= c.x1 &&
                             mouseX <= c.x1 + c.xW &&
                             mouseY >= c.y1 + ((buttonSize * 0.75) * i) - (buttonSize * 0.75) &&
                             mouseY >= c.y1 + ((buttonSize * 0.75) * i)
                         ) {
-                            console.log("FFFFFFFFFF")
                             if (c.showSent) {
+                                console.log("FFFFFFFFFF", c.sentMailSelected, i + off)
                                 c.sentMailSelected = JSON.parse(c.sent[i + off]);
+                                
                                 //console.log("c.sentMailSelected ", c.sentMailSelected)
                             } else {
                                 c.mailSelected = JSON.parse(c.inbox[i + off]);
