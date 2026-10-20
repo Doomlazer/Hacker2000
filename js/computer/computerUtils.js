@@ -85,14 +85,17 @@ async function createFS(n) {
     );
 
     if (n == 0) {
-        console.log("trying passwordtext ",nodes[n].accounts[1].pwd)
-        console.log(fs.createFile(
-            "C:\\Users\\${user}\\Documents\\password.txt",
+        // let player find email account
+        let str = "email provider: " + locations[0].email.split("@")[1] + "\n" + 
+        "username: " + nodes[n].accounts[1].user + "\n" + 
+        "password: " + nodes[n].accounts[1].pwd
+        fs.createFile(
+            `C:\\Users\\${user}\\Documents\\MailAccount.txt`,
             0,
             0,
-            nodes[n].accounts[1].pwd,
+            str,
             0
-        ));
+        );
     }
 
     fs.createFolder(
@@ -625,10 +628,9 @@ function spawnMailWin(dns) {
     mw.authMode = true;
     mw.focusNum = 0;
     mw.dns = dns;
-    mw.host = locations[0].email.split("@")[1];
-    console.log("mw.host", mw.host)
-    mw.user = locations[0].email.split("@")[0];
-    mw.password = ""
+    mw.host = player.lastMailDomain; //locations[0].email.split("@")[1];
+    mw.user = player.lastMailAccount; //locations[0].email.split("@")[0];
+    mw.password = player.lastMailPassword;
     mw.mailSelected = null;
     mw.showSent = false;
     mw.inbox = [];
@@ -905,62 +907,68 @@ async function populateEmailServers(i) {
     fs.createFolder(`C:\\Email\\${e[0]}\\Inbox`, 0, 0);
     fs.createFolder(`C:\\Email\\${e[0]}\\Sent`, 0, 0);
 
-    let c = 9;
-    let reply;
-    for (let i = 0; i < c; i++) {
-        let r = getRandInt(locations.length-1);
-        const email = EmailGenerator.generate({
-            fromEmail: locations[r].email,
-            toEmail: locations[i].email,
-            fromName: locations[r].homeowner.split(" ")[0],
-            toName: locations[i].homeowner.split(" ")[0],
-            
-            //domain: e[i]
-            //replyTo: messageId
-            /*attachment: {
-                name: "invoice.pdf",
-                size: 48231,
-                type: "application/pdf"
-            }
-                or
-            attachment: "invoice.pdf"    
-            */
 
-            //offset is milliseconds, so a time 1 hour before realStartTime:
-            // gameTimer.formatted(-60 * 60 * 1000)
-            timestamp: gameTimer.formatted(-getRandInt(4000) * 60 * 32 * 1000)
-        });
-        //console.log(nodes[i].accounts[1].pwd);
-        fs.createFile(`C:\\Email\\${e[0]}\\Inbox\\${email.messageId}`, 0, 0, JSON.stringify(email), 0);
-        reply = email.messageId;
+    // only create email for player
+    if (i == 0) {
+        let c = 10;
+        let reply;
+        for (let j = 0; j < c; j++) {
+            let r = getRandInt(locations.length);
+            const email = EmailGenerator.generate({
+                fromEmail: locations[r].email,
+                toEmail: locations[i].email,
+                fromName: locations[r].homeowner.split(" ")[0],
+                toName: locations[i].homeowner.split(" ")[0],
+                
+                //domain: e[i]
+                //replyTo: messageId
+                /*attachment: {
+                    name: "invoice.pdf",
+                    size: 48231,
+                    type: "application/pdf"
+                }
+                    or
+                attachment: "invoice.pdf"    
+                */
+
+                //offset is milliseconds, so a time 1 hour before realStartTime:
+                // gameTimer.formatted(-60 * 60 * 1000)
+                timestamp: gameTimer.formatted(-getRandInt(4000) * 60 * 32 * 1000)
+            });
+            //console.log(nodes[i].accounts[1].pwd);
+            fs.createFile(`C:\\Email\\${e[0]}\\Inbox\\${email.messageId}`, 0, 0, JSON.stringify(email), 0);
+            reply = email.messageId;
+        }
+        for (let h = 0; h < c; h++) {
+            let r = getRandInt(locations.length);
+            const email = EmailGenerator.generate({
+                fromEmail: locations[i].email,
+                toEmail: locations[r].email,
+                fromName: locations[i].homeowner.split(" ")[0],
+                toName: locations[r].homeowner.split(" ")[0],
+                
+                message: "SCREW YOU!",
+                //domain: e[i]
+                //replyTo: reply,
+                /*attachment: {
+                    name: "invoice.pdf",
+                    size: 48231,
+                    type: "application/pdf"
+                }
+                    or
+                attachment: "invoice.pdf"    
+                */
+
+                //offset is milliseconds, so a time 1 hour before realStartTime:
+                // gameTimer.formatted(-60 * 60 * 1000)
+                timestamp: gameTimer.formatted(-getRandInt(4000) * 60 * 32 * 1000)
+            });
+            //console.log(nodes[i].accounts[1].pwd);
+            fs.createFile(`C:\\Email\\${e[0]}\\Sent\\${email.messageId}`, 0, 0, JSON.stringify(email), 0);
+        //await fs.save();
+        //console.log(fs.list('C:\\Email'))
+        }
     }
-    let r = getRandInt(locations.length-1);
-        const email = EmailGenerator.generate({
-            fromEmail: locations[i].email,
-            toEmail: locations[r].email,
-            fromName: locations[i].homeowner.split(" ")[0],
-            toName: locations[r].homeowner.split(" ")[0],
-            
-        message: "SCREW YOU!",
-            //domain: e[i]
-            replyTo: reply,
-            /*attachment: {
-                name: "invoice.pdf",
-                size: 48231,
-                type: "application/pdf"
-            }
-                or
-            attachment: "invoice.pdf"    
-            */
-
-            //offset is milliseconds, so a time 1 hour before realStartTime:
-            // gameTimer.formatted(-60 * 60 * 1000)
-            timestamp: gameTimer.formatted(-getRandInt(4000) * 60 * 32 * 1000)
-        });
-        //console.log(nodes[i].accounts[1].pwd);
-        fs.createFile(`C:\\Email\\${e[0]}\\Sent\\${email.messageId}`, 0, 0, JSON.stringify(email), 0);
-    //await fs.save();
-    //console.log(fs.list('C:\\Email'))
 }
 
 function spawnClock() {

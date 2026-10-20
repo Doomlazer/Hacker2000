@@ -79,6 +79,9 @@ class Player extends User{
         this.bYH = 130;
         // email client
         this.mailWindow = 0;
+        this.lastMailDomain = "";
+        this.lastMailAccount = "";
+        this.lastMailPassword = "";
         this.mailFontSize = 16;
         this.mailText = ""
         this.mailBackgroundColor = '#565555'

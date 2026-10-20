@@ -25,18 +25,18 @@ function doWheel(e) {
             o = c.xW/10 * 2.6;
             if (c.showSent) {
                 c.sentOffset += Math.floor(e.deltaY);
-                if (c.sentOffset < 0) {
+                if (c.sentOffset < 0 || c.sent.length < 6) {
                     c.sentOffset = 0;
                 }
-                if (c.sentOffset > c.sent.length) {
+                if (c.sentOffset + 5 > c.sent.length) {
                     c.sentOffset = c.sent.length - 5;
                 }
             } else {
                 c.inboxOffset += Math.floor(e.deltaY);
-                if (c.inboxOffset < 0) {
+                if (c.inboxOffset < 0 || c.inbox.length < 6) {
                     c.inboxOffset = 0;
                 }
-                if (c.inboxOffset + 6 > c.inbox.length) {
+                if (c.inboxOffset + 5 > c.inbox.length) {
                     c.inboxOffset = c.inbox.length - 5;
                 }
             }

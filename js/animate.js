@@ -158,6 +158,11 @@ class aniRect {
     authKeyHandler(e) {
         e.preventDefault();
         if (e.key == "Enter") {
+            // update last entered
+            player.lastMailDomain = this.host;
+            player.lastMailAccount = this.user;
+            player.lastMailPassword = this.password
+
             // execute entered string
             if (this.focusNum == 2) {
                 // connect to email host
@@ -166,23 +171,24 @@ class aniRect {
                 let notFound = true;
                 for (let i of nodes) {
                     if (ip == i.ip_address) {
-                        player.nodeStack.push(i.id);
-                        logSSH(this);
-                        attachNode(this, nodes[i.id]);
+                        //player.nodeStack.push(i.id);
+                        //logSSH(this);
+                        //attachNode(this, nodes[i.id]);
                         notFound = false;
 
                         this.fs = i.fileSystem;
-                        console.log(ip, i.ip_address)
-                        console.log(this.fs, i.fileSystem)
+                        //console.log(ip, i.ip_address)
+                        //console.log(this.fs, i.fileSystem)
                         //console.log(this.fs.list(`C:\\Email\\`, 0))
                         //console.log(i.fileSystem.getFolder(`C:\\Email\\${this.user}`))
                         console.log(this.fs.getFolder(`C:\\Email\\${this.user}`))
                         if (this.fs.getFolder(`C:\\Email\\${this.user}`)) {
                             const p = this.fs.readFile(`C:\\Email\\${this.user}\\Acct\\pswd.txt`,0);
-                            this.text = p;
-                            console.log("p: ", p)
+                            //this.text = p;
+                            //console.log("p: ", p)
                             if (p == this.password) {
                                 this.authMode = false;
+                                
                                 // load inbox
                                 this.inbox = [];
                                 let arr1 = this.fs.list(`C:\\Email\\${this.user}\\Inbox`, 0, false)
@@ -197,7 +203,8 @@ class aniRect {
                                     this.inbox = [];
                                     this.mailSelected = null;
                                 }
-                                // load sent
+                                
+                                // load sent box
                                 this.sent = [];
                                 let arr1b = this.fs.list(`C:\\Email\\${this.user}\\Sent`, 0, false)
                                 let arrB = arr1b.split("\n");
@@ -212,9 +219,7 @@ class aniRect {
                                     this.sentMailSelected = null;
                                 }
                             } else {
-                                if (this.password != "bobalu") {
-                                    this.text = "Password is incorrect";
-                                }
+                                this.text = "Password is incorrect";
                             }
                         } else {
                             this.text = "User does not exist";

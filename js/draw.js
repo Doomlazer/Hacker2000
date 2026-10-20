@@ -1265,21 +1265,22 @@ function drawWin(win) { // draw a window
                     let whichOff = (win.showSent) ? win.sentOffset : win.inboxOffset;
                     let whichSel = (win.showSent) ? win.sentMailSelected : win.mailSelected;
                     let h = whichSel;
-                    //console.log(whichBox)
-                    let min = Math.min(whichBox.length, 5);
-                    for (let i = 0; i < min; i++) {
-                        let max = Math.min(whichBox.length-1, i+whichOff);
-                        //console.log(max, whichBox.length)
-                        let m = JSON.parse(whichBox[max]);
-                        let str = m.from + " - " + m.subject;
-                        ctx.fillText(
-                            str,
-                            win.x1 + (gap/6), 
-                            win.y1 + ((buttonSize * 0.75) * i) + ((buttonSize * 0.75)/2),
-                            win.xW - gap
-                        );
-                    }
-                    if (whichBox.length < 1) {
+                    if (whichBox.length > 0) {
+                        //console.log(whichBox)
+                        let min = Math.min(whichBox.length, 5);
+                        for (let i = 0; i < min; i++) {
+                            //let max = Math.min(whichBox.length-1, i+whichOff);
+                            //console.log(max, whichBox.length)
+                            let m = JSON.parse(whichBox[i]);
+                            let str = m.from + " - " + m.subject;
+                            ctx.fillText(
+                                str,
+                                win.x1 + (gap/6), 
+                                win.y1 + ((buttonSize * 0.75) * i) + ((buttonSize * 0.75)/2),
+                                win.xW - gap
+                            );
+                        }
+                    } else {
                         let b = (win.showSent) ? "Sent Mail" : "Inbox"
                         ctx.fillText(
                             `(${b} Empty)`,
@@ -1293,15 +1294,18 @@ function drawWin(win) { // draw a window
                     ctx.font = `${buttonSize * 0.6}px courier`;
                     ctx.textAlign = "left";
                     ctx.textBaseline = "middle";
-                    let str;
+                    let str = "";
                     //if (win.mailSelected != null) {
                         //console.log("here ", win.mailSelected)
-                        let m = (win.showSent) ? win.sentMailSelected : win.mailSelected;
-                        str = "From: " + m.from + "\n" +
-                            "To: " + m.to + "\n" +
-                            "Date: " + m.timestamp + "\n" +
-                            "Subject: " + m.subject + "\n\n" +
-                            m.message;
+                        let m = (win.showSent) ? win.sentMailSelected : win.mailSelected; 
+                        if (m != "undefined" && m != null) {
+                            str = "From: " + m.from + "\n" +
+                                "To: " + m.to + "\n" +
+                                "Date: " + m.timestamp + "\n" +
+                                "Subject: " + m.subject + "\n\n" +
+                                m.message;
+                        }
+                        
                     //} else {
                     //    str = ""
                     //}
