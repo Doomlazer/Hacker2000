@@ -800,7 +800,7 @@ function doKeyDown(e) {
     if (player.intro) {
         player.intro = false;
     }
-    if (player.mailWindow != 0 && player.mailWindow.authMode) {
+    /*if (player.mailWindow != 0 && player.mailWindow.authMode) {
         //console.log(player.mailWindow)
         player.mailWindow.authKeyHandler(e);
     } else {
@@ -813,7 +813,19 @@ function doKeyDown(e) {
                 cast[i].keyHandler(e);
             }
         }
-    }
+    }*/
+    // send to highest priority window
+    let s = cast.toSorted((a, b) => b.pri - a.pri);
+    //for (let i = 0; i < s.length; i++) {
+        if (s[0].acceptInput) {
+            if (s[0].type == "mail") {
+                s[0].authKeyHandler(e);
+            } else {
+                s[0].keyHandler(e);
+            }
+            return;
+        }
+    //}
 }
 
 function handleAudioButton(button) {

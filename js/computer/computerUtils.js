@@ -618,7 +618,7 @@ function spawnMailWin(dns) {
     // the email client window
     let mw = new aniRect(player.mX1, player.mY1, player.mXW, player.mYH);
     mw.fontSize = player.mailFontSize;
-    mw.acceptInput = false;
+    mw.acceptInput = true;
     mw.backgroundColor = player.mailBackgroundColor;
     mw.rectColor = player.mailRectColor;
     mw.textColor = player.mailTextColor
@@ -880,7 +880,7 @@ function doCleanLogs() {
 
 function setWindowPri(win) {
     // PRIORITY
-    if (win.pri != 0) {
+    //if (win.pri != 0) {
         win.pri = cast.length; // set max pri
         // downgrade the others
         for (let i = 0; i < cast.length; i++) {
@@ -888,7 +888,7 @@ function setWindowPri(win) {
                 cast[i].pri --;
             }
         }
-    }
+    //}
 }
 
 async function populateEmailServers(i) {
